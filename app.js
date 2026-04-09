@@ -9,9 +9,7 @@ let accounts = DB.get("accounts");
 
 if(!accounts) accounts = [];
 
-const categories = ["Salário","Alimentação","Transporte","Lazer","Outros"];
-
-// ELEMENTOS
+const title = document.getElementById("title");
 const balance = document.getElementById("balance");
 const accountsDiv = document.getElementById("accounts");
 
@@ -26,7 +24,6 @@ function render(){
 
   balance.innerText="R$ "+total.toFixed(2);
 
-  // CONTAS UX
   accountsDiv.innerHTML="";
 
   accounts.forEach(acc=>{
@@ -40,23 +37,35 @@ function render(){
 
     accountsDiv.innerHTML += `
       <div class="account-card" style="background:${acc.color}">
-        <div class="account-name">${acc.name}</div>
-        <div class="account-balance">R$ ${sum.toFixed(2)}</div>
-        <div class="account-meta">${acc.type} • **** ${acc.card}</div>
+        ${acc.name}<br>
+        R$ ${sum.toFixed(2)}
       </div>
     `;
   });
 
 }
 
-// TABS
+// TABS + TÍTULO
+const names = {
+  home:"Home",
+  transactions:"Lançamentos",
+  debts:"Dívidas",
+  accountsScreen:"Contas"
+};
+
 document.querySelectorAll(".tabbar button").forEach(btn=>{
   btn.onclick=()=>{
+
     document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
     document.querySelectorAll(".tabbar button").forEach(b=>b.classList.remove("active"));
 
     btn.classList.add("active");
-    document.getElementById(btn.dataset.tab).classList.add("active");
+
+    const tab = btn.dataset.tab;
+    document.getElementById(tab).classList.add("active");
+
+    title.innerText = names[tab];
+
   };
 });
 
