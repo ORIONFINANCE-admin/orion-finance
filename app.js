@@ -5,60 +5,57 @@ const DB = {
 
 let transactions = DB.get("t");
 
-// CONTAS (UX PREMIUM)
+// CONTAS
 const accounts = [
-  {
-    name:"Mercado Pago",
-    color:"#00aaff",
-    card:"1234",
-    type:"Crédito"
-  },
-  {
-    name:"Inter",
-    color:"#ff7a00",
-    card:"5678",
-    type:"Débito"
-  },
-  {
-    name:"VR",
-    color:"#00c853",
-    card:"---",
-    type:"Benefício"
-  }
+  {name:"Mercado Pago", color:"#00aaff", card:"1234", type:"Crédito"},
+  {name:"Inter", color:"#ff7a00", card:"5678", type:"Débito"},
+  {name:"VR", color:"#00c853", card:"----", type:"Benefício"}
 ];
 
 // CATEGORIAS
 const categories = [
-  "Salário",
-  "Alimentação",
-  "Transporte",
-  "Lazer",
-  "Outros"
+  "Salário","Alimentação","Transporte","Lazer","Outros"
 ];
 
-// SELECTS
+// ELEMENTOS
+const form = document.getElementById("form");
+const list = document.getElementById("list");
+const balance = document.getElementById("balance");
+const accountsDiv = document.getElementById("accounts");
+
+const accountSelect = document.getElementById("account");
+const categorySelect = document.getElementById("category");
+
+// POPULAR SELECTS
 accounts.forEach(a=>{
-  account.innerHTML+=`<option>${a.name}</option>`;
+  accountSelect.innerHTML += `<option>${a.name}</option>`;
 });
 
 categories.forEach(c=>{
-  category.innerHTML+=`<option>${c}</option>`;
+  categorySelect.innerHTML += `<option>${c}</option>`;
 });
 
 // FORM
-form.onsubmit = e=>{
+form.addEventListener("submit", e=>{
   e.preventDefault();
 
-  transactions.push({
-    desc:desc.value,
-    value:Number(value.value),
-    type:type.value,
-    account:account.value,
-    category:category.value
-  });
+  const newTransaction = {
+    desc: document.getElementById("desc").value,
+    value: Number(document.getElementById("value").value),
+    type: document.getElementById("type").value,
+    account: accountSelect.value,
+    category: categorySelect.value
+  };
 
+  transactions.push(newTransaction);
+
+  form.reset(); // 🔥 CORREÇÃO AQUI
   save();
-};
+
+  // feedback visual
+  form.style.opacity = "0.6";
+  setTimeout(()=> form.style.opacity = "1", 150);
+});
 
 // SAVE
 function save(){
@@ -72,36 +69,37 @@ function render(){
   // SALDO
   let total=0;
   transactions.forEach(t=>{
-    total+= t.type=="entrada"?t.value:-t.value;
+    total += t.type==="entrada" ? t.value : -t.value;
   });
 
-  balance.innerText="R$ "+total.toFixed(2);
+  balance.innerText = "R$ " + total.toFixed(2);
 
-  // CARDS
-  accountsDiv.innerHTML="";
+  // CONTAS VISUAIS
+  accountsDiv.innerHTML = "";
+
   accounts.forEach(acc=>{
-
-    let sum=0;
+    let sum = 0;
 
     transactions.forEach(t=>{
-      if(t.account==acc.name){
-        sum+= t.type=="entrada"?t.value:-t.value;
+      if(t.account === acc.name){
+        sum += t.type==="entrada" ? t.value : -t.value;
       }
     });
 
-    accountsDiv.innerHTML+=`
+    accountsDiv.innerHTML += `
       <div class="account-card" style="background:${acc.color}">
-        <div class="account-name">${acc.name}</div>
-        <div class="account-balance">R$ ${sum.toFixed(2)}</div>
-        <div class="card-number">${acc.type} • **** ${acc.card}</div>
+        <div>${acc.name}</div>
+        <div>R$ ${sum.toFixed(2)}</div>
+        <div>${acc.type} • **** ${acc.card}</div>
       </div>
     `;
   });
 
   // LISTA
-  list.innerHTML="";
+  list.innerHTML = "";
+
   transactions.forEach(t=>{
-    list.innerHTML+=`
+    list.innerHTML += `
       <li>
         ${t.desc} (${t.category})<br>
         ${t.account} - R$ ${t.value}
@@ -109,12 +107,17 @@ function render(){
     `;
   });
 
-  // GRÁFICO
+  renderChart();
+}
+
+// GRÁFICO
+function renderChart(){
+
   const data = {};
 
   transactions.forEach(t=>{
-    if(t.type=="saida"){
-      data[t.category] = (data[t.category]||0)+t.value;
+    if(t.type==="saida"){
+      data[t.category] = (data[t.category]||0) + t.value;
     }
   });
 
@@ -124,23 +127,34 @@ function render(){
   if(window.chart) window.chart.destroy();
 
   window.chart = new Chart(document.getElementById("chart"),{
-    type:"pie",
+    type:"doughnut",
     data:{
       labels:labels,
-      datasets:[{
-        data:values
-      }]
+      datasets:[{ data:values }]
+    },
+    options:{
+      plugins:{ legend:{ display:true } }
     }
   });
 }
 
-// TABS
-document.querySelectorAll(".tabbar button").forEach(b=>{
-  b.onclick=()=>{
-    document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
-    b.classList.add("active");
-    document.getElementById(b.dataset.tab).classList.add("active");
-  };
+// 🔥 TABS CORRIGIDAS
+const tabButtons = document.querySelectorAll(".tabbar button");
+const screens = document.querySelectorAll(".screen");
+
+tabButtons.forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+
+    // remove active de tudo
+    tabButtons.forEach(b=>b.classList.remove("active"));
+    screens.forEach(s=>s.classList.remove("active"));
+
+    // ativa atual
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.tab).classList.add("active");
+
+  });
 });
 
+// INIT
 render();
