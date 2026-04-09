@@ -25,81 +25,22 @@ body {
   background:linear-gradient(135deg,#22c55e,#16a34a);
 }
 
-/* LISTA PREMIUM */
-li {
-  background:#334155;
-  padding:14px;
-  margin-top:10px;
-  border-radius:14px;
-  position:relative;
-  overflow:hidden;
-  transition:0.2s;
-}
-
-li:active {
-  transform:scale(0.97);
-}
-
-/* SWIPE */
-.swipe-area {
-  position:absolute;
-  top:0;
-  right:0;
-  height:100%;
-  width:80px;
-  background:#ef4444;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border-radius:0 14px 14px 0;
-  transform:translateX(100%);
-  transition:0.3s;
-}
-
-li.swiped .swipe-area {
-  transform:translateX(0);
-}
-
-/* TEXTO */
-.desc {
-  font-size:15px;
-}
-
-.value {
-  font-size:16px;
-  font-weight:bold;
-}
-
-.in {
-  color:#22c55e;
-}
-
-.out {
-  color:#ef4444;
-}
-
-.meta {
-  font-size:12px;
-  opacity:0.7;
-  margin-top:4px;
-}
-
-/* CARD */
-.card {
-  background:#1e293b;
-  margin:10px;
-  padding:16px;
-  border-radius:16px;
-  overflow:hidden;
-}
-
-/* FORM */
+/* 🔥 INPUT FIX iOS */
 input, select, button {
   width:100%;
   height:44px;
   margin-top:8px;
   border-radius:10px;
   border:none;
+  font-size:16px; /* 🔥 chave do fix */
+}
+
+/* LIST */
+li {
+  background:#334155;
+  padding:14px;
+  margin-top:10px;
+  border-radius:14px;
 }
 
 /* TABBAR */
