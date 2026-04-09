@@ -2,6 +2,7 @@ body {
   background:#0f172a;
   color:#fff;
   font-family:-apple-system;
+  margin:0;
 }
 
 .app {
@@ -9,10 +10,15 @@ body {
   margin:auto;
 }
 
+header {
+  padding:20px;
+  font-size:22px;
+}
+
 .card {
   background:#1e293b;
-  padding:16px;
   margin:10px;
+  padding:16px;
   border-radius:16px;
 }
 
@@ -20,29 +26,22 @@ body {
   text-align:center;
 }
 
+.screen {
+  display:none;
+}
+
+.screen.active {
+  display:block;
+}
+
 .account-card {
+  margin:10px;
   padding:16px;
   border-radius:16px;
-  margin:10px;
   color:#fff;
 }
 
-.account-name {
-  font-size:14px;
-  opacity:0.8;
-}
-
-.account-balance {
-  font-size:20px;
-}
-
-.card-number {
-  margin-top:10px;
-  font-size:14px;
-  opacity:0.7;
-}
-
-input,select,button {
+input, select, button {
   width:100%;
   padding:12px;
   margin-top:8px;
@@ -55,9 +54,14 @@ button {
   font-weight:bold;
 }
 
+ul {
+  list-style:none;
+  padding:0;
+}
+
 li {
   background:#334155;
-  padding:10px;
+  padding:12px;
   margin-top:8px;
   border-radius:10px;
 }
@@ -77,24 +81,4 @@ li {
 
 .tabbar button.active {
   color:#22c55e;
-}
-
-.account-card {
-  transition: transform 0.2s ease;
-}
-
-.account-card:active {
-  transform: scale(0.97);
-}
-
-button:active {
-  transform: scale(0.95);
-}
-
-li {
-  transition: all 0.2s;
-}
-
-li:active {
-  transform: scale(0.98);
 }
