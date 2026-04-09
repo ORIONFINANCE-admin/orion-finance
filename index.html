@@ -22,7 +22,7 @@
 
 <section id="home" class="screen active">
   <div class="card balance">
-    <p>Saldo Total</p>
+    <p>Saldo</p>
     <h2 id="balance">R$ 0,00</h2>
   </div>
   <div id="accounts"></div>
@@ -50,7 +50,7 @@
         <option value="" disabled selected>Categoria</option>
       </select>
 
-      <button type="submit">Adicionar</button>
+      <button>Adicionar</button>
 
     </form>
   </div>
@@ -64,18 +64,17 @@
 <section id="reports" class="screen">
   <div class="card">
     <canvas id="chart"></canvas>
-    <p id="emptyChart" style="text-align:center;opacity:0.6;"></p>
+    <p id="emptyChart"></p>
   </div>
 </section>
 
 <section id="debts" class="screen">
-
   <div class="card">
 
-    <input id="d_name" placeholder="Nome da dívida">
-    <input id="d_value" type="number" placeholder="Valor da parcela">
-    <input id="d_total" type="number" placeholder="Total de parcelas">
-    <input id="d_paid" type="number" placeholder="Parcelas pagas">
+    <input id="d_name" placeholder="Nome">
+    <input id="d_value" type="number" placeholder="Parcela">
+    <input id="d_total" type="number" placeholder="Total">
+    <input id="d_paid" type="number" placeholder="Pagas">
 
     <button onclick="addDebt()">Salvar</button>
 
@@ -84,7 +83,6 @@
   <div class="card">
     <ul id="debtList"></ul>
   </div>
-
 </section>
 
 </main>
