@@ -6,8 +6,6 @@
 <title>Orion</title>
 
 <link rel="stylesheet" href="style.css">
-
-<!-- 🔥 GRÁFICO -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 </head>
@@ -27,7 +25,6 @@
     <p>Saldo Total</p>
     <h2 id="balance">R$ 0,00</h2>
   </div>
-
   <div id="accounts"></div>
 </section>
 
@@ -67,6 +64,7 @@
 <section id="reports" class="screen">
   <div class="card">
     <canvas id="chart"></canvas>
+    <p id="emptyChart" style="text-align:center;opacity:0.6;"></p>
   </div>
 </section>
 
@@ -89,26 +87,6 @@
 
 </section>
 
-<section id="settings" class="screen">
-
-  <div class="card">
-
-    <input id="a_name" placeholder="Nome da conta">
-    <input id="a_color" placeholder="Cor (#)">
-    <input id="a_card" placeholder="Últimos 4 dígitos">
-
-    <select id="a_type">
-      <option>Crédito</option>
-      <option>Débito</option>
-      <option>Benefício</option>
-    </select>
-
-    <button onclick="addAccount()">Salvar</button>
-
-  </div>
-
-</section>
-
 </main>
 
 <nav class="tabbar">
@@ -116,7 +94,6 @@
   <button data-tab="transactions">💸</button>
   <button data-tab="reports">📊</button>
   <button data-tab="debts">📉</button>
-  <button data-tab="settings">⚙️</button>
 </nav>
 
 </div>
