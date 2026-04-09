@@ -27,6 +27,7 @@ function render(){
   accountsDiv.innerHTML="";
 
   accounts.forEach(acc=>{
+
     let sum=0;
 
     transactions.forEach(t=>{
@@ -37,15 +38,27 @@ function render(){
 
     accountsDiv.innerHTML += `
       <div class="account-card" style="background:${acc.color}">
-        ${acc.name}<br>
-        R$ ${sum.toFixed(2)}
+        
+        <div class="acc-top">
+          <div class="acc-name">${acc.name}</div>
+          <div class="acc-type">${acc.type}</div>
+        </div>
+
+        <div class="acc-balance">
+          R$ ${sum.toFixed(2)}
+        </div>
+
+        <div class="acc-footer">
+          **** ${acc.card}
+        </div>
+
       </div>
     `;
   });
 
 }
 
-// TABS + TÍTULO
+// TABS
 const names = {
   home:"Home",
   transactions:"Lançamentos",
