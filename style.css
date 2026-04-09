@@ -18,34 +18,36 @@ header {
   background:#1e293b;
   margin:10px;
   padding:16px;
-  border-radius:18px;
-  transition:0.2s;
+  border-radius:16px;
 }
 
-.card:active {
-  transform:scale(0.98);
+.balance {
+  text-align:center;
 }
 
 .screen {
   display:none;
-  animation:fade 0.2s ease;
 }
 
 .screen.active {
   display:block;
 }
 
-@keyframes fade {
-  from {opacity:0; transform:translateY(10px);}
-  to {opacity:1;}
+.account-card {
+  margin:10px;
+  padding:16px;
+  border-radius:16px;
+  color:#fff;
 }
 
 input, select, button {
   width:100%;
-  padding:12px;
+  height:48px; /* 🔥 PADRÃO IGUAL */
+  padding:0 12px;
   margin-top:8px;
   border-radius:10px;
   border:none;
+  font-size:16px;
 }
 
 button {
@@ -61,21 +63,15 @@ li {
   background:#334155;
   padding:12px;
   margin-top:8px;
-  border-radius:12px;
-  position:relative;
-  transition:0.2s;
+  border-radius:10px;
 }
 
-.swipe-delete {
-  position:absolute;
-  right:10px;
-  top:50%;
-  transform:translateY(-50%);
-  opacity:0;
-}
-
-li.swiped .swipe-delete {
-  opacity:1;
+.small-btn {
+  margin-top:6px;
+  padding:6px;
+  font-size:12px;
+  height:auto;
+  background:#475569;
 }
 
 .tabbar {
