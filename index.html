@@ -13,69 +13,64 @@
 
 <div class="app">
 
-<header>
-  <h1>Orion</h1>
+<header class="header">
+  <h1>Olá 👋</h1>
+  <p>Seu resumo financeiro</p>
 </header>
 
 <main>
 
 <!-- HOME -->
 <section id="home" class="screen active">
-  <div class="card balance">
-    <p>Saldo</p>
+
+  <div class="balance-card">
+    <span>Saldo total</span>
     <h2 id="balance">R$ 0,00</h2>
   </div>
 
   <div id="accounts"></div>
+
 </section>
 
 <!-- LANÇAMENTOS -->
 <section id="transactions" class="screen">
-
-  <div class="card form-card">
-
+  <div class="card">
     <form id="form">
 
       <input id="desc" placeholder="Descrição" required>
-
       <input id="value" type="number" placeholder="Valor" required>
 
-      <div class="row">
-        <select id="type" required>
-          <option value="" disabled selected>Tipo</option>
-          <option value="entrada">Entrada</option>
-          <option value="saida">Saída</option>
-        </select>
+      <select id="type" required>
+        <option value="" disabled selected>Tipo</option>
+        <option value="entrada">Entrada</option>
+        <option value="saida">Saída</option>
+      </select>
 
-        <select id="account" required>
-          <option value="" disabled selected>Conta</option>
-        </select>
-      </div>
+      <select id="account" required>
+        <option value="" disabled selected>Conta</option>
+      </select>
 
       <select id="category" required>
         <option value="" disabled selected>Categoria</option>
       </select>
 
-      <button type="submit" class="main-btn">Adicionar</button>
+      <button type="submit">Adicionar</button>
 
     </form>
-
   </div>
 
   <div class="card">
     <ul id="list"></ul>
   </div>
-
 </section>
 
 <!-- DÍVIDAS -->
 <section id="debts" class="screen">
-
   <div class="card">
 
     <input id="d_name" placeholder="Nome">
-    <input id="d_value" type="number" placeholder="Valor parcela">
-    <input id="d_total" type="number" placeholder="Total parcelas">
+    <input id="d_value" type="number" placeholder="Parcela">
+    <input id="d_total" type="number" placeholder="Total">
     <input id="d_paid" type="number" placeholder="Pagas">
 
     <button onclick="addDebt()">Salvar</button>
@@ -85,12 +80,10 @@
   <div class="card">
     <ul id="debtList"></ul>
   </div>
-
 </section>
 
 <!-- CONTAS -->
 <section id="accountsScreen" class="screen">
-
   <div class="card">
 
     <input id="a_name" placeholder="Nome da conta">
@@ -106,7 +99,6 @@
     <button onclick="addAccount()">Salvar</button>
 
   </div>
-
 </section>
 
 </main>
