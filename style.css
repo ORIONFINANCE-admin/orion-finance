@@ -66,6 +66,13 @@ li {
   border-radius:10px;
 }
 
+.small-btn {
+  margin-top:6px;
+  padding:6px;
+  font-size:12px;
+  background:#475569;
+}
+
 .tabbar {
   display:flex;
   justify-content:space-around;
