@@ -4,8 +4,15 @@ const DB = {
 };
 
 let transactions = DB.get("t");
-let accounts = DB.get("accounts");
 let debts = DB.get("debts");
+
+// CONTAS PADRÃO
+const accounts = [
+  {name:"Mercado Pago", color:"#00aaff", card:"****", type:"Crédito"},
+  {name:"Inter", color:"#ff7a00", card:"****", type:"Débito"},
+  {name:"Bradesco", color:"#cc092f", card:"****", type:"Débito"},
+  {name:"VR Sólides", color:"#00c853", card:"----", type:"Benefício"}
+];
 
 const categories = ["Salário","Alimentação","Transporte","Lazer","Outros"];
 
@@ -17,23 +24,16 @@ const accountsDiv = document.getElementById("accounts");
 const accountSelect = document.getElementById("account");
 const categorySelect = document.getElementById("category");
 const debtList = document.getElementById("debtList");
-
-// 🔥 NÃO CRIA MAIS CONTA AUTOMÁTICA
-if(!accounts) accounts = [];
+const emptyChart = document.getElementById("emptyChart");
 
 // SELECTS
-function loadSelects(){
-  accountSelect.innerHTML = `<option value="" disabled selected>Conta</option>`;
-  categorySelect.innerHTML = `<option value="" disabled selected>Categoria</option>`;
+accounts.forEach(a=>{
+  accountSelect.innerHTML += `<option>${a.name}</option>`;
+});
 
-  accounts.forEach(a=>{
-    accountSelect.innerHTML += `<option>${a.name}</option>`;
-  });
-
-  categories.forEach(c=>{
-    categorySelect.innerHTML += `<option>${c}</option>`;
-  });
-}
+categories.forEach(c=>{
+  categorySelect.innerHTML += `<option>${c}</option>`;
+});
 
 // ADD TRANSACTION
 form.onsubmit = e=>{
@@ -51,20 +51,6 @@ form.onsubmit = e=>{
   save();
 };
 
-// ADD ACCOUNT
-function addAccount(){
-
-  accounts.push({
-    name:a_name.value,
-    color:a_color.value,
-    card:a_card.value,
-    type:a_type.value
-  });
-
-  DB.set("accounts", accounts);
-  location.reload();
-}
-
 // ADD DEBT
 function addDebt(){
   debts.push({
@@ -77,10 +63,18 @@ function addDebt(){
   save();
 }
 
-// PAGAR PARCELA
+// PAGAR
 function payDebt(i){
   debts[i].paid++;
   save();
+}
+
+// DESFAZER
+function undoDebt(i){
+  if(debts[i].paid > 0){
+    debts[i].paid--;
+    save();
+  }
 }
 
 // SAVE
@@ -93,7 +87,6 @@ function save(){
 // RENDER
 function render(){
 
-  // SALDO
   let total=0;
   transactions.forEach(t=>{
     total += t.type==="entrada" ? t.value : -t.value;
@@ -117,12 +110,12 @@ function render(){
       <div class="account-card" style="background:${acc.color}">
         <div>${acc.name}</div>
         <div>R$ ${sum.toFixed(2)}</div>
-        <div>${acc.type} • **** ${acc.card}</div>
+        <div>${acc.type}</div>
       </div>
     `;
   });
 
-  // HISTÓRICO
+  // LISTA
   list.innerHTML = "";
   transactions.forEach(t=>{
     list.innerHTML += `
@@ -144,7 +137,8 @@ function render(){
         ${d.name}<br>
         Restante: R$ ${remaining.toFixed(2)}<br>
         ${d.paid}/${d.total}
-        <button onclick="payDebt(${i})">Parcela paga</button>
+        <button class="small-btn" onclick="payDebt(${i})">✔</button>
+        <button class="small-btn" onclick="undoDebt(${i})">↩</button>
       </li>
     `;
   });
@@ -152,7 +146,7 @@ function render(){
   renderChart();
 }
 
-// 🔥 GRÁFICO FUNCIONANDO
+// GRÁFICO
 function renderChart(){
 
   const data = {};
@@ -167,6 +161,13 @@ function renderChart(){
   const values = Object.values(data);
 
   if(window.chart) window.chart.destroy();
+
+  if(values.length === 0){
+    emptyChart.innerText = "Sem dados ainda";
+    return;
+  } else {
+    emptyChart.innerText = "";
+  }
 
   window.chart = new Chart(document.getElementById("chart"),{
     type:"doughnut",
@@ -192,5 +193,4 @@ buttons.forEach(btn=>{
 });
 
 // INIT
-loadSelects();
 render();
