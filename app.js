@@ -38,7 +38,7 @@ function loadSelects(){
 form.onsubmit = e=>{
   e.preventDefault();
 
-  transactions.push({
+  transactions.unshift({
     desc:desc.value,
     value:Number(value.value),
     type:type.value,
@@ -47,49 +47,9 @@ form.onsubmit = e=>{
   });
 
   form.reset();
+  desc.focus();
   save();
 };
-
-// ADD ACCOUNT
-function addAccount(){
-
-  accounts.push({
-    name:a_name.value,
-    color:a_color.value,
-    card:a_card.value,
-    type:a_type.value
-  });
-
-  DB.set("accounts", accounts);
-  loadSelects();
-  render();
-}
-
-// ADD DEBT
-function addDebt(){
-  debts.push({
-    name:d_name.value,
-    value:Number(d_value.value),
-    total:Number(d_total.value),
-    paid:Number(d_paid.value)
-  });
-
-  save();
-}
-
-// PAGAR
-function payDebt(i){
-  debts[i].paid++;
-  save();
-}
-
-// DESFAZER
-function undoDebt(i){
-  if(debts[i].paid > 0){
-    debts[i].paid--;
-    save();
-  }
-}
 
 // SAVE
 function save(){
@@ -109,36 +69,40 @@ function render(){
 
   balance.innerText="R$ "+total.toFixed(2);
 
-  // CONTAS
-  accountsDiv.innerHTML="";
+  // LISTA UX
+  list.innerHTML="";
 
-  accounts.forEach(acc=>{
-    let sum=0;
+  transactions.forEach((t,i)=>{
 
-    transactions.forEach(t=>{
-      if(t.account===acc.name){
-        sum += t.type==="entrada"?t.value:-t.value;
+    const li = document.createElement("li");
+
+    li.innerHTML = `
+      <div>${t.desc}</div>
+      <div class="value ${t.type==='entrada'?'in':'out'}">
+        ${t.type==='entrada'?'+':'-'} R$ ${t.value.toFixed(2)}
+      </div>
+      <small>${t.account} • ${t.category}</small>
+      <button class="swipe-delete">🗑</button>
+    `;
+
+    let startX=0;
+
+    li.addEventListener("touchstart",e=>{
+      startX = e.touches[0].clientX;
+    });
+
+    li.addEventListener("touchmove",e=>{
+      if(startX - e.touches[0].clientX > 50){
+        li.classList.add("swiped");
       }
     });
 
-    accountsDiv.innerHTML += `
-      <div class="account-card" style="background:${acc.color}">
-        <div>${acc.name}</div>
-        <div>R$ ${sum.toFixed(2)}</div>
-        <div>${acc.type} • **** ${acc.card}</div>
-      </div>
-    `;
-  });
+    li.querySelector(".swipe-delete").onclick=()=>{
+      transactions.splice(i,1);
+      save();
+    };
 
-  // LISTA
-  list.innerHTML="";
-  transactions.forEach(t=>{
-    list.innerHTML += `
-      <li>
-        ${t.desc} (${t.category})<br>
-        ${t.account} - R$ ${t.value}
-      </li>
-    `;
+    list.appendChild(li);
   });
 
   // DÍVIDAS
@@ -152,11 +116,49 @@ function render(){
         ${d.name}<br>
         Restante: R$ ${remaining.toFixed(2)}<br>
         ${d.paid}/${d.total}
-        <button class="small-btn" onclick="payDebt(${i})">✔</button>
-        <button class="small-btn" onclick="undoDebt(${i})">↩</button>
+        <button onclick="payDebt(${i})">✔</button>
+        <button onclick="undoDebt(${i})">↩</button>
       </li>
     `;
   });
+}
+
+// DÍVIDAS
+function addDebt(){
+  debts.push({
+    name:d_name.value,
+    value:Number(d_value.value),
+    total:Number(d_total.value),
+    paid:Number(d_paid.value)
+  });
+
+  save();
+}
+
+function payDebt(i){
+  debts[i].paid++;
+  save();
+}
+
+function undoDebt(i){
+  if(debts[i].paid>0){
+    debts[i].paid--;
+    save();
+  }
+}
+
+// CONTAS
+function addAccount(){
+  accounts.push({
+    name:a_name.value,
+    color:a_color.value,
+    card:a_card.value,
+    type:a_type.value
+  });
+
+  DB.set("accounts",accounts);
+  loadSelects();
+  render();
 }
 
 // TABS
