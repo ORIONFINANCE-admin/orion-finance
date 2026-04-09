@@ -18,13 +18,8 @@ const accountSelect = document.getElementById("account");
 const categorySelect = document.getElementById("category");
 const debtList = document.getElementById("debtList");
 
-// INIT DEFAULT
-if(accounts.length === 0){
-  accounts = [
-    {name:"Mercado Pago", color:"#00aaff", card:"1234", type:"Crédito"}
-  ];
-  DB.set("accounts", accounts);
-}
+// 🔥 NÃO CRIA MAIS CONTA AUTOMÁTICA
+if(!accounts) accounts = [];
 
 // SELECTS
 function loadSelects(){
@@ -142,7 +137,6 @@ function render(){
   debtList.innerHTML = "";
 
   debts.forEach((d,i)=>{
-
     const remaining = (d.total - d.paid) * d.value;
 
     debtList.innerHTML += `
@@ -154,6 +148,33 @@ function render(){
       </li>
     `;
   });
+
+  renderChart();
+}
+
+// 🔥 GRÁFICO FUNCIONANDO
+function renderChart(){
+
+  const data = {};
+
+  transactions.forEach(t=>{
+    if(t.type==="saida"){
+      data[t.category] = (data[t.category] || 0) + t.value;
+    }
+  });
+
+  const labels = Object.keys(data);
+  const values = Object.values(data);
+
+  if(window.chart) window.chart.destroy();
+
+  window.chart = new Chart(document.getElementById("chart"),{
+    type:"doughnut",
+    data:{
+      labels:labels,
+      datasets:[{data:values}]
+    }
+  });
 }
 
 // TABS
@@ -162,7 +183,6 @@ const screens = document.querySelectorAll(".screen");
 
 buttons.forEach(btn=>{
   btn.onclick = ()=>{
-
     buttons.forEach(b=>b.classList.remove("active"));
     screens.forEach(s=>s.classList.remove("active"));
 
