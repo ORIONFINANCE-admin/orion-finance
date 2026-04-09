@@ -158,3 +158,31 @@ tabButtons.forEach(btn=>{
 
 // INIT
 render();
+
+// 🔥 UPDATE AUTOMÁTICO
+if ("serviceWorker" in navigator) {
+
+  navigator.serviceWorker.register("service-worker.js").then(reg => {
+
+    reg.onupdatefound = () => {
+
+      const newWorker = reg.installing;
+
+      newWorker.onstatechange = () => {
+
+        if (newWorker.state === "installed") {
+
+          if (navigator.serviceWorker.controller) {
+
+            // NOVA VERSÃO DISPONÍVEL
+            const update = confirm("Nova versão disponível. Atualizar?");
+
+            if (update) {
+              window.location.reload();
+            }
+          }
+        }
+      };
+    };
+  });
+}
