@@ -4,19 +4,54 @@ const DB = {
 };
 
 let transactions = DB.get("t");
+let accounts = DB.get("accounts") || [];
 
 const list = document.getElementById("list");
 const balance = document.getElementById("balance");
+const accountsDiv = document.getElementById("accounts");
+
+// 🔥 CONFIG PADRÃO DAS CONTAS
+const defaultAccounts = {
+  "Bradesco": {color:"#cc092f", type:"Débito"},
+  "Banco Inter": {color:"#ff7a00", type:"Débito"},
+  "Mercado Pago": {color:"#00b1ea", type:"Crédito"},
+  "VR": {color:"#22c55e", type:"Benefício"}
+};
+
+// 🔥 GARANTE QUE CONTA EXISTA
+function ensureAccount(name){
+
+  let exists = accounts.find(a=>a.name===name);
+
+  if(!exists){
+
+    let config = defaultAccounts[name] || {color:"#64748b", type:"Conta"};
+
+    accounts.push({
+      name:name,
+      color:config.color,
+      type:config.type,
+      card:"0000"
+    });
+
+    DB.set("accounts",accounts);
+  }
+}
 
 // ADD
 form.onsubmit = e=>{
   e.preventDefault();
 
+  const accName = account.value;
+
+  // 🔥 cria conta automaticamente
+  ensureAccount(accName);
+
   transactions.unshift({
     desc:desc.value,
     value:Number(value.value),
     type:type.value,
-    account:account.value,
+    account:accName,
     category:category.value
   });
 
@@ -27,6 +62,7 @@ form.onsubmit = e=>{
 // SAVE
 function save(){
   DB.set("t",transactions);
+  DB.set("accounts",accounts);
   render();
 }
 
@@ -41,6 +77,40 @@ function render(){
 
   balance.innerText="R$ "+total.toFixed(2);
 
+  // 🔥 CONTAS DINÂMICAS
+  accountsDiv.innerHTML="";
+
+  accounts.forEach(acc=>{
+
+    let sum=0;
+
+    transactions.forEach(t=>{
+      if(t.account===acc.name){
+        sum += t.type==="entrada"?t.value:-t.value;
+      }
+    });
+
+    accountsDiv.innerHTML += `
+      <div class="account-card" style="background:${acc.color}">
+        
+        <div class="acc-top">
+          <div class="acc-name">${acc.name}</div>
+          <div class="acc-type">${acc.type}</div>
+        </div>
+
+        <div class="acc-balance">
+          R$ ${sum.toFixed(2)}
+        </div>
+
+        <div class="acc-footer">
+          **** ${acc.card}
+        </div>
+
+      </div>
+    `;
+  });
+
+  // LISTA
   list.innerHTML="";
 
   transactions.forEach((t,i)=>{
@@ -53,7 +123,6 @@ function render(){
         ${t.type==='entrada'?'+':'-'} R$ ${t.value.toFixed(2)}
       </div>
       <div class="meta">${t.account} • ${t.category}</div>
-
       <div class="swipe-area">🗑</div>
     `;
 
