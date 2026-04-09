@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Orion Finance</title>
+
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+
+  <meta name="theme-color" content="#0f172a"/>
+</head>
+<body>
+
+  <div class="app">
+
+    <header class="header">
+      <h1>Orion</h1>
+      <span>Finance</span>
+    </header>
+
+    <main class="screens">
+
+      <section id="home" class="screen active">
+        <div class="card balance">
+          <p>Saldo</p>
+          <h2 id="balance">R$ 0</h2>
+        </div>
+
+        <div class="summary">
+          <div class="card small">
+            <p>Entradas</p>
+            <h3 id="income">R$ 0</h3>
+          </div>
+          <div class="card small">
+            <p>Saídas</p>
+            <h3 id="expense">R$ 0</h3>
+          </div>
+        </div>
+      </section>
+
+      <section id="transactions" class="screen">
+        <div class="card">
+          <h2>Novo</h2>
+
+          <form id="form">
+            <input type="text" id="desc" placeholder="Descrição" required />
+            <input type="number" id="value" placeholder="Valor" required />
+
+            <select id="type">
+              <option value="entrada">Entrada</option>
+              <option value="saida">Saída</option>
+            </select>
+
+            <button type="submit">Adicionar</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <h2>Lista</h2>
+          <ul id="list"></ul>
+        </div>
+      </section>
+
+      <section id="reports" class="screen">
+        <div class="card">
+          <h2>Resumo</h2>
+          <p>Total de transações:</p>
+          <h3 id="totalCount">0</h3>
+        </div>
+
+        <div class="card">
+          <h2>Backup</h2>
+          <button onclick="exportData()">Exportar dados</button>
+          <input type="file" onchange="importData(event)" />
+        </div>
+      </section>
+
+    </main>
+
+    <nav class="tabbar">
+      <button data-tab="home" class="active">🏠</button>
+      <button data-tab="transactions">💸</button>
+      <button data-tab="reports">📊</button>
+    </nav>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
