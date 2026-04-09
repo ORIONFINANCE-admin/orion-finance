@@ -4,38 +4,16 @@ const DB = {
 };
 
 let transactions = DB.get("t");
-let debts = DB.get("debts");
+let debts = DB.get("d");
 
-// CONTAS PADRÃO
-const accounts = [
-  {name:"Mercado Pago", color:"#00aaff", card:"****", type:"Crédito"},
-  {name:"Inter", color:"#ff7a00", card:"****", type:"Débito"},
-  {name:"Bradesco", color:"#cc092f", card:"****", type:"Débito"},
-  {name:"VR Sólides", color:"#00c853", card:"----", type:"Benefício"}
-];
-
+const accounts = ["Mercado Pago","Inter","Bradesco","VR"];
 const categories = ["Salário","Alimentação","Transporte","Lazer","Outros"];
 
-// ELEMENTOS
-const form = document.getElementById("form");
-const list = document.getElementById("list");
-const balance = document.getElementById("balance");
-const accountsDiv = document.getElementById("accounts");
-const accountSelect = document.getElementById("account");
-const categorySelect = document.getElementById("category");
-const debtList = document.getElementById("debtList");
-const emptyChart = document.getElementById("emptyChart");
-
 // SELECTS
-accounts.forEach(a=>{
-  accountSelect.innerHTML += `<option>${a.name}</option>`;
-});
+accounts.forEach(a=>account.innerHTML+=`<option>${a}</option>`);
+categories.forEach(c=>category.innerHTML+=`<option>${c}</option>`);
 
-categories.forEach(c=>{
-  categorySelect.innerHTML += `<option>${c}</option>`;
-});
-
-// ADD TRANSACTION
+// ADD
 form.onsubmit = e=>{
   e.preventDefault();
 
@@ -51,36 +29,10 @@ form.onsubmit = e=>{
   save();
 };
 
-// ADD DEBT
-function addDebt(){
-  debts.push({
-    name:d_name.value,
-    value:Number(d_value.value),
-    total:Number(d_total.value),
-    paid:Number(d_paid.value)
-  });
-
-  save();
-}
-
-// PAGAR
-function payDebt(i){
-  debts[i].paid++;
-  save();
-}
-
-// DESFAZER
-function undoDebt(i){
-  if(debts[i].paid > 0){
-    debts[i].paid--;
-    save();
-  }
-}
-
 // SAVE
 function save(){
   DB.set("t",transactions);
-  DB.set("debts",debts);
+  DB.set("d",debts);
   render();
 }
 
@@ -88,72 +40,58 @@ function save(){
 function render(){
 
   let total=0;
+
   transactions.forEach(t=>{
-    total += t.type==="entrada" ? t.value : -t.value;
+    total += t.type==="entrada"?t.value:-t.value;
   });
 
-  balance.innerText = "R$ " + total.toFixed(2);
+  balance.innerText="R$ "+total.toFixed(2);
 
-  // CONTAS
-  accountsDiv.innerHTML = "";
+  list.innerHTML="";
 
-  accounts.forEach(acc=>{
-    let sum=0;
+  transactions.forEach((t,i)=>{
 
-    transactions.forEach(t=>{
-      if(t.account===acc.name){
-        sum += t.type==="entrada" ? t.value : -t.value;
+    const li = document.createElement("li");
+
+    li.innerHTML = `
+      ${t.desc} (${t.category})<br>
+      R$ ${t.value}
+      <button class="swipe-delete">🗑</button>
+    `;
+
+    // SWIPE
+    let startX=0;
+
+    li.addEventListener("touchstart",e=>{
+      startX = e.touches[0].clientX;
+    });
+
+    li.addEventListener("touchmove",e=>{
+      let moveX = e.touches[0].clientX;
+      if(startX - moveX > 50){
+        li.classList.add("swiped");
       }
     });
 
-    accountsDiv.innerHTML += `
-      <div class="account-card" style="background:${acc.color}">
-        <div>${acc.name}</div>
-        <div>R$ ${sum.toFixed(2)}</div>
-        <div>${acc.type}</div>
-      </div>
-    `;
-  });
+    li.querySelector(".swipe-delete").onclick=()=>{
+      transactions.splice(i,1);
+      save();
+    };
 
-  // LISTA
-  list.innerHTML = "";
-  transactions.forEach(t=>{
-    list.innerHTML += `
-      <li>
-        ${t.desc} (${t.category})<br>
-        ${t.account} - R$ ${t.value}
-      </li>
-    `;
-  });
-
-  // DÍVIDAS
-  debtList.innerHTML = "";
-
-  debts.forEach((d,i)=>{
-    const remaining = (d.total - d.paid) * d.value;
-
-    debtList.innerHTML += `
-      <li>
-        ${d.name}<br>
-        Restante: R$ ${remaining.toFixed(2)}<br>
-        ${d.paid}/${d.total}
-        <button class="small-btn" onclick="payDebt(${i})">✔</button>
-        <button class="small-btn" onclick="undoDebt(${i})">↩</button>
-      </li>
-    `;
+    list.appendChild(li);
   });
 
   renderChart();
 }
 
-// GRÁFICO
+// CHART
 function renderChart(){
 
   const data = {};
 
   transactions.forEach(t=>{
     if(t.type==="saida"){
-      data[t.category] = (data[t.category] || 0) + t.value;
+      data[t.category] = (data[t.category]||0)+t.value;
     }
   });
 
@@ -162,35 +100,28 @@ function renderChart(){
 
   if(window.chart) window.chart.destroy();
 
-  if(values.length === 0){
-    emptyChart.innerText = "Sem dados ainda";
+  if(values.length===0){
+    emptyChart.innerText="Sem dados ainda";
     return;
   } else {
-    emptyChart.innerText = "";
+    emptyChart.innerText="";
   }
 
-  window.chart = new Chart(document.getElementById("chart"),{
+  window.chart = new Chart(chart,{
     type:"doughnut",
-    data:{
-      labels:labels,
-      datasets:[{data:values}]
-    }
+    data:{labels,datasets:[{data:values}]}
   });
 }
 
 // TABS
-const buttons = document.querySelectorAll(".tabbar button");
-const screens = document.querySelectorAll(".screen");
-
-buttons.forEach(btn=>{
-  btn.onclick = ()=>{
-    buttons.forEach(b=>b.classList.remove("active"));
-    screens.forEach(s=>s.classList.remove("active"));
+document.querySelectorAll(".tabbar button").forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+    document.querySelectorAll(".tabbar button").forEach(b=>b.classList.remove("active"));
 
     btn.classList.add("active");
     document.getElementById(btn.dataset.tab).classList.add("active");
   };
 });
 
-// INIT
 render();
