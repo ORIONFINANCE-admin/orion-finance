@@ -4,17 +4,11 @@ const DB = {
 };
 
 let transactions = DB.get("t");
-let debts = DB.get("debts");
-let accounts = DB.get("accounts");
 
-if(!accounts) accounts = [];
-
-const title = document.getElementById("title");
-const balance = document.getElementById("balance");
-const accountsDiv = document.getElementById("accounts");
 const list = document.getElementById("list");
+const balance = document.getElementById("balance");
 
-// ADD TRANSACTION
+// ADD
 form.onsubmit = e=>{
   e.preventDefault();
 
@@ -33,7 +27,6 @@ form.onsubmit = e=>{
 // SAVE
 function save(){
   DB.set("t",transactions);
-  DB.set("debts",debts);
   render();
 }
 
@@ -48,62 +41,43 @@ function render(){
 
   balance.innerText="R$ "+total.toFixed(2);
 
-  // CONTAS
-  accountsDiv.innerHTML="";
+  list.innerHTML="";
 
-  accounts.forEach(acc=>{
-    let sum=0;
+  transactions.forEach((t,i)=>{
 
-    transactions.forEach(t=>{
-      if(t.account===acc.name){
-        sum += t.type==="entrada"?t.value:-t.value;
+    const li = document.createElement("li");
+
+    li.innerHTML = `
+      <div class="desc">${t.desc}</div>
+      <div class="value ${t.type==='entrada'?'in':'out'}">
+        ${t.type==='entrada'?'+':'-'} R$ ${t.value.toFixed(2)}
+      </div>
+      <div class="meta">${t.account} • ${t.category}</div>
+
+      <div class="swipe-area">🗑</div>
+    `;
+
+    let startX=0;
+
+    li.addEventListener("touchstart",e=>{
+      startX = e.touches[0].clientX;
+    });
+
+    li.addEventListener("touchmove",e=>{
+      if(startX - e.touches[0].clientX > 60){
+        li.classList.add("swiped");
       }
     });
 
-    accountsDiv.innerHTML += `
-      <div class="account-card" style="background:${acc.color}">
-        ${acc.name}<br>
-        R$ ${sum.toFixed(2)}
-      </div>
-    `;
-  });
+    li.querySelector(".swipe-area").onclick=()=>{
+      transactions.splice(i,1);
+      save();
+    };
 
-  // LISTA
-  list.innerHTML="";
-
-  transactions.forEach(t=>{
-    list.innerHTML += `
-      <li>
-        ${t.desc}<br>
-        R$ ${t.value.toFixed(2)}<br>
-        <small>${t.account} • ${t.category}</small>
-      </li>
-    `;
+    list.appendChild(li);
   });
 
 }
-
-// TABS
-const names = {
-  home:"Home",
-  transactions:"Lançamentos",
-  debts:"Dívidas",
-  accountsScreen:"Contas"
-};
-
-document.querySelectorAll(".tabbar button").forEach(btn=>{
-  btn.onclick=()=>{
-    document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
-    document.querySelectorAll(".tabbar button").forEach(b=>b.classList.remove("active"));
-
-    btn.classList.add("active");
-
-    const tab = btn.dataset.tab;
-    document.getElementById(tab).classList.add("active");
-
-    title.innerText = names[tab];
-  };
-});
 
 // INIT
 render();
