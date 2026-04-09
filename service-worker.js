@@ -1,4 +1,4 @@
-const CACHE = "orion-v4";
+const CACHE = "orion-v5";
 
 self.addEventListener("install", e => {
   self.skipWaiting();
