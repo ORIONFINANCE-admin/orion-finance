@@ -6,6 +6,10 @@
 <title>Orion</title>
 
 <link rel="stylesheet" href="style.css">
+
+<!-- 🔥 GRÁFICO -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 </head>
 
 <body>
@@ -18,7 +22,6 @@
 
 <main>
 
-<!-- HOME -->
 <section id="home" class="screen active">
   <div class="card balance">
     <p>Saldo Total</p>
@@ -28,14 +31,12 @@
   <div id="accounts"></div>
 </section>
 
-<!-- LANÇAMENTOS -->
 <section id="transactions" class="screen">
 
   <div class="card">
     <form id="form">
 
       <input id="desc" placeholder="Descrição" required>
-
       <input id="value" type="number" placeholder="Valor" required>
 
       <select id="type" required>
@@ -63,17 +64,19 @@
 
 </section>
 
-<!-- DÍVIDAS -->
+<section id="reports" class="screen">
+  <div class="card">
+    <canvas id="chart"></canvas>
+  </div>
+</section>
+
 <section id="debts" class="screen">
 
   <div class="card">
 
     <input id="d_name" placeholder="Nome da dívida">
-
     <input id="d_value" type="number" placeholder="Valor da parcela">
-
     <input id="d_total" type="number" placeholder="Total de parcelas">
-
     <input id="d_paid" type="number" placeholder="Parcelas pagas">
 
     <button onclick="addDebt()">Salvar</button>
@@ -86,15 +89,12 @@
 
 </section>
 
-<!-- CONTAS -->
 <section id="settings" class="screen">
 
   <div class="card">
 
     <input id="a_name" placeholder="Nome da conta">
-
-    <input id="a_color" placeholder="Cor (ex: #00aaff)">
-
+    <input id="a_color" placeholder="Cor (#)">
     <input id="a_card" placeholder="Últimos 4 dígitos">
 
     <select id="a_type">
@@ -114,6 +114,7 @@
 <nav class="tabbar">
   <button data-tab="home">🏠</button>
   <button data-tab="transactions">💸</button>
+  <button data-tab="reports">📊</button>
   <button data-tab="debts">📉</button>
   <button data-tab="settings">⚙️</button>
 </nav>
