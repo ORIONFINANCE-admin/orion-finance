@@ -4,62 +4,94 @@ const DB = {
 };
 
 let transactions = DB.get("t");
+let accounts = DB.get("accounts");
+let debts = DB.get("debts");
 
-// CONTAS
-const accounts = [
-  {name:"Mercado Pago", color:"#00aaff", card:"1234", type:"Crédito"},
-  {name:"Inter", color:"#ff7a00", card:"5678", type:"Débito"},
-  {name:"VR", color:"#00c853", card:"----", type:"Benefício"}
-];
-
-// CATEGORIAS
-const categories = [
-  "Salário","Alimentação","Transporte","Lazer","Outros"
-];
+const categories = ["Salário","Alimentação","Transporte","Lazer","Outros"];
 
 // ELEMENTOS
 const form = document.getElementById("form");
 const list = document.getElementById("list");
 const balance = document.getElementById("balance");
 const accountsDiv = document.getElementById("accounts");
-
 const accountSelect = document.getElementById("account");
 const categorySelect = document.getElementById("category");
+const debtList = document.getElementById("debtList");
 
-// POPULAR SELECTS
-accounts.forEach(a=>{
-  accountSelect.innerHTML += `<option>${a.name}</option>`;
-});
+// INIT DEFAULT
+if(accounts.length === 0){
+  accounts = [
+    {name:"Mercado Pago", color:"#00aaff", card:"1234", type:"Crédito"}
+  ];
+  DB.set("accounts", accounts);
+}
 
-categories.forEach(c=>{
-  categorySelect.innerHTML += `<option>${c}</option>`;
-});
+// SELECTS
+function loadSelects(){
+  accountSelect.innerHTML = `<option value="" disabled selected>Conta</option>`;
+  categorySelect.innerHTML = `<option value="" disabled selected>Categoria</option>`;
 
-// FORM
-form.addEventListener("submit", e=>{
+  accounts.forEach(a=>{
+    accountSelect.innerHTML += `<option>${a.name}</option>`;
+  });
+
+  categories.forEach(c=>{
+    categorySelect.innerHTML += `<option>${c}</option>`;
+  });
+}
+
+// ADD TRANSACTION
+form.onsubmit = e=>{
   e.preventDefault();
 
-  const newTransaction = {
-    desc: document.getElementById("desc").value,
-    value: Number(document.getElementById("value").value),
-    type: document.getElementById("type").value,
-    account: accountSelect.value,
-    category: categorySelect.value
-  };
+  transactions.push({
+    desc:desc.value,
+    value:Number(value.value),
+    type:type.value,
+    account:account.value,
+    category:category.value
+  });
 
-  transactions.push(newTransaction);
-
-  form.reset(); // 🔥 CORREÇÃO AQUI
+  form.reset();
   save();
+};
 
-  // feedback visual
-  form.style.opacity = "0.6";
-  setTimeout(()=> form.style.opacity = "1", 150);
-});
+// ADD ACCOUNT
+function addAccount(){
+
+  accounts.push({
+    name:a_name.value,
+    color:a_color.value,
+    card:a_card.value,
+    type:a_type.value
+  });
+
+  DB.set("accounts", accounts);
+  location.reload();
+}
+
+// ADD DEBT
+function addDebt(){
+  debts.push({
+    name:d_name.value,
+    value:Number(d_value.value),
+    total:Number(d_total.value),
+    paid:Number(d_paid.value)
+  });
+
+  save();
+}
+
+// PAGAR PARCELA
+function payDebt(i){
+  debts[i].paid++;
+  save();
+}
 
 // SAVE
 function save(){
   DB.set("t",transactions);
+  DB.set("debts",debts);
   render();
 }
 
@@ -74,14 +106,14 @@ function render(){
 
   balance.innerText = "R$ " + total.toFixed(2);
 
-  // CONTAS VISUAIS
+  // CONTAS
   accountsDiv.innerHTML = "";
 
   accounts.forEach(acc=>{
-    let sum = 0;
+    let sum=0;
 
     transactions.forEach(t=>{
-      if(t.account === acc.name){
+      if(t.account===acc.name){
         sum += t.type==="entrada" ? t.value : -t.value;
       }
     });
@@ -95,9 +127,8 @@ function render(){
     `;
   });
 
-  // LISTA
+  // HISTÓRICO
   list.innerHTML = "";
-
   transactions.forEach(t=>{
     list.innerHTML += `
       <li>
@@ -107,82 +138,39 @@ function render(){
     `;
   });
 
-  renderChart();
-}
+  // DÍVIDAS
+  debtList.innerHTML = "";
 
-// GRÁFICO
-function renderChart(){
+  debts.forEach((d,i)=>{
 
-  const data = {};
+    const remaining = (d.total - d.paid) * d.value;
 
-  transactions.forEach(t=>{
-    if(t.type==="saida"){
-      data[t.category] = (data[t.category]||0) + t.value;
-    }
-  });
-
-  const labels = Object.keys(data);
-  const values = Object.values(data);
-
-  if(window.chart) window.chart.destroy();
-
-  window.chart = new Chart(document.getElementById("chart"),{
-    type:"doughnut",
-    data:{
-      labels:labels,
-      datasets:[{ data:values }]
-    },
-    options:{
-      plugins:{ legend:{ display:true } }
-    }
+    debtList.innerHTML += `
+      <li>
+        ${d.name}<br>
+        Restante: R$ ${remaining.toFixed(2)}<br>
+        ${d.paid}/${d.total}
+        <button onclick="payDebt(${i})">Parcela paga</button>
+      </li>
+    `;
   });
 }
 
-// 🔥 TABS CORRIGIDAS
-const tabButtons = document.querySelectorAll(".tabbar button");
+// TABS
+const buttons = document.querySelectorAll(".tabbar button");
 const screens = document.querySelectorAll(".screen");
 
-tabButtons.forEach(btn=>{
-  btn.addEventListener("click", ()=>{
+buttons.forEach(btn=>{
+  btn.onclick = ()=>{
 
-    // remove active de tudo
-    tabButtons.forEach(b=>b.classList.remove("active"));
+    buttons.forEach(b=>b.classList.remove("active"));
     screens.forEach(s=>s.classList.remove("active"));
 
-    // ativa atual
     btn.classList.add("active");
     document.getElementById(btn.dataset.tab).classList.add("active");
-
-  });
+  };
 });
 
 // INIT
+loadSelects();
 render();
-
-// 🔥 UPDATE AUTOMÁTICO
-if ("serviceWorker" in navigator) {
-
-  navigator.serviceWorker.register("service-worker.js").then(reg => {
-
-    reg.onupdatefound = () => {
-
-      const newWorker = reg.installing;
-
-      newWorker.onstatechange = () => {
-
-        if (newWorker.state === "installed") {
-
-          if (navigator.serviceWorker.controller) {
-
-            // NOVA VERSÃO DISPONÍVEL
-            const update = confirm("Nova versão disponível. Atualizar?");
-
-            if (update) {
-              window.location.reload();
-            }
-          }
-        }
-      };
-    };
-  });
-}
