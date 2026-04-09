@@ -6,7 +6,6 @@
 <title>Orion</title>
 
 <link rel="stylesheet" href="style.css">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 </head>
 
@@ -20,20 +19,25 @@
 
 <main>
 
+<!-- HOME -->
 <section id="home" class="screen active">
   <div class="card balance">
     <p>Saldo</p>
     <h2 id="balance">R$ 0,00</h2>
   </div>
+
   <div id="accounts"></div>
 </section>
 
+<!-- LANÇAMENTOS -->
 <section id="transactions" class="screen">
 
   <div class="card">
+
     <form id="form">
 
       <input id="desc" placeholder="Descrição" required>
+
       <input id="value" type="number" placeholder="Valor" required>
 
       <select id="type" required>
@@ -50,9 +54,10 @@
         <option value="" disabled selected>Categoria</option>
       </select>
 
-      <button>Adicionar</button>
+      <button type="submit">Adicionar</button>
 
     </form>
+
   </div>
 
   <div class="card">
@@ -61,19 +66,17 @@
 
 </section>
 
-<section id="reports" class="screen">
-  <div class="card">
-    <canvas id="chart"></canvas>
-    <p id="emptyChart"></p>
-  </div>
-</section>
-
+<!-- DÍVIDAS -->
 <section id="debts" class="screen">
+
   <div class="card">
 
     <input id="d_name" placeholder="Nome">
-    <input id="d_value" type="number" placeholder="Parcela">
-    <input id="d_total" type="number" placeholder="Total">
+
+    <input id="d_value" type="number" placeholder="Valor parcela">
+
+    <input id="d_total" type="number" placeholder="Total parcelas">
+
     <input id="d_paid" type="number" placeholder="Pagas">
 
     <button onclick="addDebt()">Salvar</button>
@@ -83,6 +86,30 @@
   <div class="card">
     <ul id="debtList"></ul>
   </div>
+
+</section>
+
+<!-- CONTAS -->
+<section id="accountsScreen" class="screen">
+
+  <div class="card">
+
+    <input id="a_name" placeholder="Nome da conta">
+
+    <input id="a_color" placeholder="Cor (#ex: #ff0000)">
+
+    <input id="a_card" placeholder="Últimos 4 dígitos">
+
+    <select id="a_type">
+      <option>Crédito</option>
+      <option>Débito</option>
+      <option>Benefício</option>
+    </select>
+
+    <button onclick="addAccount()">Salvar</button>
+
+  </div>
+
 </section>
 
 </main>
@@ -90,8 +117,8 @@
 <nav class="tabbar">
   <button data-tab="home">🏠</button>
   <button data-tab="transactions">💸</button>
-  <button data-tab="reports">📊</button>
   <button data-tab="debts">📉</button>
+  <button data-tab="accountsScreen">💳</button>
 </nav>
 
 </div>
