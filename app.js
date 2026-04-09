@@ -4,16 +4,37 @@ const DB = {
 };
 
 let transactions = DB.get("t");
-let debts = DB.get("d");
+let debts = DB.get("debts");
+let accounts = DB.get("accounts");
 
-const accounts = ["Mercado Pago","Inter","Bradesco","VR"];
+if(!accounts) accounts = [];
+
 const categories = ["Salário","Alimentação","Transporte","Lazer","Outros"];
 
-// SELECTS
-accounts.forEach(a=>account.innerHTML+=`<option>${a}</option>`);
-categories.forEach(c=>category.innerHTML+=`<option>${c}</option>`);
+// ELEMENTOS
+const form = document.getElementById("form");
+const list = document.getElementById("list");
+const balance = document.getElementById("balance");
+const accountsDiv = document.getElementById("accounts");
+const accountSelect = document.getElementById("account");
+const categorySelect = document.getElementById("category");
+const debtList = document.getElementById("debtList");
 
-// ADD
+// SELECTS
+function loadSelects(){
+  accountSelect.innerHTML = `<option value="" disabled selected>Conta</option>`;
+  categorySelect.innerHTML = `<option value="" disabled selected>Categoria</option>`;
+
+  accounts.forEach(a=>{
+    accountSelect.innerHTML += `<option>${a.name}</option>`;
+  });
+
+  categories.forEach(c=>{
+    categorySelect.innerHTML += `<option>${c}</option>`;
+  });
+}
+
+// ADD TRANSACTION
 form.onsubmit = e=>{
   e.preventDefault();
 
@@ -29,10 +50,51 @@ form.onsubmit = e=>{
   save();
 };
 
+// ADD ACCOUNT
+function addAccount(){
+
+  accounts.push({
+    name:a_name.value,
+    color:a_color.value,
+    card:a_card.value,
+    type:a_type.value
+  });
+
+  DB.set("accounts", accounts);
+  loadSelects();
+  render();
+}
+
+// ADD DEBT
+function addDebt(){
+  debts.push({
+    name:d_name.value,
+    value:Number(d_value.value),
+    total:Number(d_total.value),
+    paid:Number(d_paid.value)
+  });
+
+  save();
+}
+
+// PAGAR
+function payDebt(i){
+  debts[i].paid++;
+  save();
+}
+
+// DESFAZER
+function undoDebt(i){
+  if(debts[i].paid > 0){
+    debts[i].paid--;
+    save();
+  }
+}
+
 // SAVE
 function save(){
   DB.set("t",transactions);
-  DB.set("d",debts);
+  DB.set("debts",debts);
   render();
 }
 
@@ -47,69 +109,53 @@ function render(){
 
   balance.innerText="R$ "+total.toFixed(2);
 
-  list.innerHTML="";
+  // CONTAS
+  accountsDiv.innerHTML="";
 
-  transactions.forEach((t,i)=>{
+  accounts.forEach(acc=>{
+    let sum=0;
 
-    const li = document.createElement("li");
-
-    li.innerHTML = `
-      ${t.desc} (${t.category})<br>
-      R$ ${t.value}
-      <button class="swipe-delete">🗑</button>
-    `;
-
-    // SWIPE
-    let startX=0;
-
-    li.addEventListener("touchstart",e=>{
-      startX = e.touches[0].clientX;
-    });
-
-    li.addEventListener("touchmove",e=>{
-      let moveX = e.touches[0].clientX;
-      if(startX - moveX > 50){
-        li.classList.add("swiped");
+    transactions.forEach(t=>{
+      if(t.account===acc.name){
+        sum += t.type==="entrada"?t.value:-t.value;
       }
     });
 
-    li.querySelector(".swipe-delete").onclick=()=>{
-      transactions.splice(i,1);
-      save();
-    };
-
-    list.appendChild(li);
+    accountsDiv.innerHTML += `
+      <div class="account-card" style="background:${acc.color}">
+        <div>${acc.name}</div>
+        <div>R$ ${sum.toFixed(2)}</div>
+        <div>${acc.type} • **** ${acc.card}</div>
+      </div>
+    `;
   });
 
-  renderChart();
-}
-
-// CHART
-function renderChart(){
-
-  const data = {};
-
+  // LISTA
+  list.innerHTML="";
   transactions.forEach(t=>{
-    if(t.type==="saida"){
-      data[t.category] = (data[t.category]||0)+t.value;
-    }
+    list.innerHTML += `
+      <li>
+        ${t.desc} (${t.category})<br>
+        ${t.account} - R$ ${t.value}
+      </li>
+    `;
   });
 
-  const labels = Object.keys(data);
-  const values = Object.values(data);
+  // DÍVIDAS
+  debtList.innerHTML="";
 
-  if(window.chart) window.chart.destroy();
+  debts.forEach((d,i)=>{
+    const remaining = (d.total - d.paid) * d.value;
 
-  if(values.length===0){
-    emptyChart.innerText="Sem dados ainda";
-    return;
-  } else {
-    emptyChart.innerText="";
-  }
-
-  window.chart = new Chart(chart,{
-    type:"doughnut",
-    data:{labels,datasets:[{data:values}]}
+    debtList.innerHTML += `
+      <li>
+        ${d.name}<br>
+        Restante: R$ ${remaining.toFixed(2)}<br>
+        ${d.paid}/${d.total}
+        <button class="small-btn" onclick="payDebt(${i})">✔</button>
+        <button class="small-btn" onclick="undoDebt(${i})">↩</button>
+      </li>
+    `;
   });
 }
 
@@ -124,4 +170,6 @@ document.querySelectorAll(".tabbar button").forEach(btn=>{
   };
 });
 
+// INIT
+loadSelects();
 render();
