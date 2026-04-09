@@ -32,7 +32,7 @@
 <!-- LANÇAMENTOS -->
 <section id="transactions" class="screen">
 
-  <div class="card">
+  <div class="card form-card">
 
     <form id="form">
 
@@ -40,21 +40,23 @@
 
       <input id="value" type="number" placeholder="Valor" required>
 
-      <select id="type" required>
-        <option value="" disabled selected>Tipo</option>
-        <option value="entrada">Entrada</option>
-        <option value="saida">Saída</option>
-      </select>
+      <div class="row">
+        <select id="type" required>
+          <option value="" disabled selected>Tipo</option>
+          <option value="entrada">Entrada</option>
+          <option value="saida">Saída</option>
+        </select>
 
-      <select id="account" required>
-        <option value="" disabled selected>Conta</option>
-      </select>
+        <select id="account" required>
+          <option value="" disabled selected>Conta</option>
+        </select>
+      </div>
 
       <select id="category" required>
         <option value="" disabled selected>Categoria</option>
       </select>
 
-      <button type="submit">Adicionar</button>
+      <button type="submit" class="main-btn">Adicionar</button>
 
     </form>
 
@@ -72,11 +74,8 @@
   <div class="card">
 
     <input id="d_name" placeholder="Nome">
-
     <input id="d_value" type="number" placeholder="Valor parcela">
-
     <input id="d_total" type="number" placeholder="Total parcelas">
-
     <input id="d_paid" type="number" placeholder="Pagas">
 
     <button onclick="addDebt()">Salvar</button>
@@ -95,9 +94,7 @@
   <div class="card">
 
     <input id="a_name" placeholder="Nome da conta">
-
-    <input id="a_color" placeholder="Cor (#ex: #ff0000)">
-
+    <input id="a_color" placeholder="Cor (#)">
     <input id="a_card" placeholder="Últimos 4 dígitos">
 
     <select id="a_type">
