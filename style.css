@@ -12,33 +12,32 @@ body {
 
 header {
   padding:20px;
-  font-size:22px;
 }
 
 .card {
   background:#1e293b;
   margin:10px;
   padding:16px;
-  border-radius:16px;
+  border-radius:18px;
+  transition:0.2s;
 }
 
-.balance {
-  text-align:center;
+.card:active {
+  transform:scale(0.98);
 }
 
 .screen {
   display:none;
+  animation:fade 0.2s ease;
 }
 
 .screen.active {
   display:block;
 }
 
-.account-card {
-  margin:10px;
-  padding:16px;
-  border-radius:16px;
-  color:#fff;
+@keyframes fade {
+  from {opacity:0; transform:translateY(10px);}
+  to {opacity:1;}
 }
 
 input, select, button {
@@ -51,7 +50,6 @@ input, select, button {
 
 button {
   background:#22c55e;
-  font-weight:bold;
 }
 
 ul {
@@ -63,14 +61,21 @@ li {
   background:#334155;
   padding:12px;
   margin-top:8px;
-  border-radius:10px;
+  border-radius:12px;
+  position:relative;
+  transition:0.2s;
 }
 
-.small-btn {
-  margin-top:6px;
-  padding:6px;
-  font-size:12px;
-  background:#475569;
+.swipe-delete {
+  position:absolute;
+  right:10px;
+  top:50%;
+  transform:translateY(-50%);
+  opacity:0;
+}
+
+li.swiped .swipe-delete {
+  opacity:1;
 }
 
 .tabbar {
