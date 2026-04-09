@@ -78,3 +78,23 @@ li {
 .tabbar button.active {
   color:#22c55e;
 }
+
+.account-card {
+  transition: transform 0.2s ease;
+}
+
+.account-card:active {
+  transform: scale(0.97);
+}
+
+button:active {
+  transform: scale(0.95);
+}
+
+li {
+  transition: all 0.2s;
+}
+
+li:active {
+  transform: scale(0.98);
+}
