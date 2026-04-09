@@ -1,91 +1,86 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Orion Finance</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orion Finance</title>
 
-  <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css">
 
-  <meta name="theme-color" content="#0f172a"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
 
-  <div class="app">
+<div class="app">
 
-    <header class="header">
-      <h1>Orion</h1>
-      <span>Finance</span>
-    </header>
+<header class="header">
+  <h1>Orion</h1>
+</header>
 
-    <main class="screens">
+<main class="screens">
 
-      <section id="home" class="screen active">
-        <div class="card balance">
-          <p>Saldo</p>
-          <h2 id="balance">R$ 0</h2>
-        </div>
+<!-- HOME -->
+<section id="home" class="screen active">
 
-        <div class="summary">
-          <div class="card small">
-            <p>Entradas</p>
-            <h3 id="income">R$ 0</h3>
-          </div>
-          <div class="card small">
-            <p>Saídas</p>
-            <h3 id="expense">R$ 0</h3>
-          </div>
-        </div>
-      </section>
+  <div class="card balance">
+    <p>Saldo Total</p>
+    <h2 id="balance">R$ 0</h2>
+  </div>
 
-      <section id="transactions" class="screen">
-        <div class="card">
-          <h2>Novo</h2>
+  <div id="accounts"></div>
 
-          <form id="form">
-            <input type="text" id="desc" placeholder="Descrição" required />
-            <input type="number" id="value" placeholder="Valor" required />
+</section>
 
-            <select id="type">
-              <option value="entrada">Entrada</option>
-              <option value="saida">Saída</option>
-            </select>
+<!-- TRANSAÇÕES -->
+<section id="transactions" class="screen">
 
-            <button type="submit">Adicionar</button>
-          </form>
-        </div>
+  <div class="card">
 
-        <div class="card">
-          <h2>Lista</h2>
-          <ul id="list"></ul>
-        </div>
-      </section>
+    <form id="form">
 
-      <section id="reports" class="screen">
-        <div class="card">
-          <h2>Resumo</h2>
-          <p>Total de transações:</p>
-          <h3 id="totalCount">0</h3>
-        </div>
+      <input id="desc" placeholder="Descrição" required>
+      <input id="value" type="number" placeholder="Valor" required>
 
-        <div class="card">
-          <h2>Backup</h2>
-          <button onclick="exportData()">Exportar dados</button>
-          <input type="file" onchange="importData(event)" />
-        </div>
-      </section>
+      <select id="type">
+        <option value="entrada">Entrada</option>
+        <option value="saida">Saída</option>
+      </select>
 
-    </main>
+      <select id="account"></select>
+      <select id="category"></select>
 
-    <nav class="tabbar">
-      <button data-tab="home" class="active">🏠</button>
-      <button data-tab="transactions">💸</button>
-      <button data-tab="reports">📊</button>
-    </nav>
+      <button>Adicionar</button>
+
+    </form>
 
   </div>
 
-  <script src="app.js"></script>
+  <div class="card">
+    <ul id="list"></ul>
+  </div>
+
+</section>
+
+<!-- RELATÓRIOS -->
+<section id="reports" class="screen">
+
+  <div class="card">
+    <canvas id="chart"></canvas>
+  </div>
+
+</section>
+
+</main>
+
+<nav class="tabbar">
+  <button data-tab="home">🏠</button>
+  <button data-tab="transactions">💸</button>
+  <button data-tab="reports">📊</button>
+</nav>
+
+</div>
+
+<script src="app.js"></script>
 </body>
 </html>
