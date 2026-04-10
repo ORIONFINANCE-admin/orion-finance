@@ -7,40 +7,24 @@ body{
 
 header{
   padding:20px;
-  font-size:26px;
+  font-size:24px;
   font-weight:600;
 }
 
+/* 🔥 ESSA PARTE RESOLVE O BUG */
 .screen{
   display:none;
-  animation:fade .3s ease;
 }
 
 .screen.active{
   display:block;
 }
 
-@keyframes fade{
-  from{opacity:0;transform:translateX(10px);}
-  to{opacity:1;transform:translateX(0);}
-}
-
-/* BALANCE */
+/* UI */
 .balance{
   padding:0 20px;
 }
 
-.balance span{
-  font-size:13px;
-  opacity:.6;
-}
-
-.balance h1{
-  margin:5px 0;
-  font-size:32px;
-}
-
-/* SUMMARY */
 .summary{
   display:flex;
   gap:10px;
@@ -50,23 +34,21 @@ header{
 .summary div{
   flex:1;
   background:#111827;
-  padding:12px;
-  border-radius:12px;
+  padding:10px;
+  border-radius:10px;
 }
 
-/* CONTAS */
 .accounts{
   display:flex;
-  gap:12px;
   overflow-x:auto;
+  gap:10px;
   padding:10px 20px;
 }
 
 .card-bank{
-  min-width:180px;
-  padding:14px;
-  border-radius:16px;
-  font-size:14px;
+  min-width:160px;
+  padding:12px;
+  border-radius:14px;
 }
 
 .bradesco{background:#cc092f;}
@@ -74,34 +56,28 @@ header{
 .mp{background:#00b1ea;}
 .vr{background:#7c3aed;}
 
-/* CARD */
 .card{
   margin:10px;
-  background:#111827;
   padding:12px;
-  border-radius:14px;
+  background:#111827;
+  border-radius:12px;
 }
 
-/* INPUT */
 input, select, button{
   width:100%;
-  height:42px;
+  height:40px;
   margin-top:8px;
-  border-radius:10px;
   border:none;
-  font-size:14px;
+  border-radius:8px;
 }
 
-/* BUTTON */
 button{
   background:#22c55e;
-  color:#000;
-  font-weight:600;
+  font-weight:bold;
 }
 
-/* LIST */
 .list-box{
-  height:260px;
+  height:200px;
   overflow:auto;
   padding:10px;
 }
@@ -110,10 +86,9 @@ li{
   background:#1e293b;
   padding:10px;
   margin-bottom:8px;
-  border-radius:10px;
+  border-radius:8px;
 }
 
-/* TABBAR */
 .tabbar{
   position:fixed;
   bottom:0;
@@ -129,7 +104,6 @@ li{
   background:none;
   border:none;
   color:#6b7280;
-  font-size:18px;
 }
 
 .tabbar button.active{
