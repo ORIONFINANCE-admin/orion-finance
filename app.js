@@ -6,54 +6,36 @@ const DB = {
 let transactions = DB.get("t");
 let accounts = DB.get("accounts") || [];
 
+let editIndex = null;
+
 const list = document.getElementById("list");
 const balance = document.getElementById("balance");
 const accountsDiv = document.getElementById("accounts");
 
-// 🔥 CONFIG PADRÃO DAS CONTAS
-const defaultAccounts = {
-  "Bradesco": {color:"#cc092f", type:"Débito"},
-  "Banco Inter": {color:"#ff7a00", type:"Débito"},
-  "Mercado Pago": {color:"#00b1ea", type:"Crédito"},
-  "VR": {color:"#22c55e", type:"Benefício"}
-};
+const inTotal = document.getElementById("inTotal");
+const outTotal = document.getElementById("outTotal");
 
-// 🔥 GARANTE QUE CONTA EXISTA
-function ensureAccount(name){
+const submitBtn = document.getElementById("submitBtn");
 
-  let exists = accounts.find(a=>a.name===name);
-
-  if(!exists){
-
-    let config = defaultAccounts[name] || {color:"#64748b", type:"Conta"};
-
-    accounts.push({
-      name:name,
-      color:config.color,
-      type:config.type,
-      card:"0000"
-    });
-
-    DB.set("accounts",accounts);
-  }
-}
-
-// ADD
+// ADD / EDIT
 form.onsubmit = e=>{
   e.preventDefault();
 
-  const accName = account.value;
-
-  // 🔥 cria conta automaticamente
-  ensureAccount(accName);
-
-  transactions.unshift({
+  const data = {
     desc:desc.value,
     value:Number(value.value),
     type:type.value,
-    account:accName,
+    account:account.value,
     category:category.value
-  });
+  };
+
+  if(editIndex !== null){
+    transactions[editIndex] = data;
+    editIndex = null;
+    submitBtn.innerText = "Adicionar";
+  } else {
+    transactions.unshift(data);
+  }
 
   form.reset();
   save();
@@ -62,91 +44,99 @@ form.onsubmit = e=>{
 // SAVE
 function save(){
   DB.set("t",transactions);
-  DB.set("accounts",accounts);
   render();
 }
 
 // RENDER
 function render(){
 
-  let total=0;
+  let total=0, inSum=0, outSum=0;
 
   transactions.forEach(t=>{
-    total += t.type==="entrada"?t.value:-t.value;
+    if(t.type==="entrada"){
+      total+=t.value;
+      inSum+=t.value;
+    } else {
+      total-=t.value;
+      outSum+=t.value;
+    }
   });
 
   balance.innerText="R$ "+total.toFixed(2);
+  inTotal.innerText="R$ "+inSum.toFixed(2);
+  outTotal.innerText="R$ "+outSum.toFixed(2);
 
-  // 🔥 CONTAS DINÂMICAS
+  // CONTAS GRID
   accountsDiv.innerHTML="";
 
-  accounts.forEach(acc=>{
+  [...new Set(transactions.map(t=>t.account))].forEach(name=>{
 
     let sum=0;
 
     transactions.forEach(t=>{
-      if(t.account===acc.name){
+      if(t.account===name){
         sum += t.type==="entrada"?t.value:-t.value;
       }
     });
 
     accountsDiv.innerHTML += `
-      <div class="account-card" style="background:${acc.color}">
-        
-        <div class="acc-top">
-          <div class="acc-name">${acc.name}</div>
-          <div class="acc-type">${acc.type}</div>
-        </div>
-
-        <div class="acc-balance">
-          R$ ${sum.toFixed(2)}
-        </div>
-
-        <div class="acc-footer">
-          **** ${acc.card}
-        </div>
-
+      <div class="account-card">
+        ${name}<br>
+        R$ ${sum.toFixed(2)}
       </div>
     `;
   });
 
-  // LISTA
+  // LIST
   list.innerHTML="";
 
   transactions.forEach((t,i)=>{
-
     const li = document.createElement("li");
 
     li.innerHTML = `
-      <div class="desc">${t.desc}</div>
-      <div class="value ${t.type==='entrada'?'in':'out'}">
-        ${t.type==='entrada'?'+':'-'} R$ ${t.value.toFixed(2)}
-      </div>
-      <div class="meta">${t.account} • ${t.category}</div>
-      <div class="swipe-area">🗑</div>
+      ${t.desc}<br>
+      R$ ${t.value.toFixed(2)}<br>
+      <small>${t.account} • ${t.category}</small>
     `;
 
-    let startX=0;
+    // EDITAR
+    li.onclick=()=>{
+      desc.value = t.desc;
+      value.value = t.value;
+      type.value = t.type;
+      account.value = t.account;
+      category.value = t.category;
 
-    li.addEventListener("touchstart",e=>{
-      startX = e.touches[0].clientX;
-    });
-
-    li.addEventListener("touchmove",e=>{
-      if(startX - e.touches[0].clientX > 60){
-        li.classList.add("swiped");
-      }
-    });
-
-    li.querySelector(".swipe-area").onclick=()=>{
-      transactions.splice(i,1);
-      save();
+      editIndex = i;
+      submitBtn.innerText = "Atualizar";
     };
 
     list.appendChild(li);
   });
 
 }
+
+// TABS
+const names = {
+  home:"Home",
+  transactions:"Lançamentos",
+  debts:"Dívidas",
+  accountsScreen:"Contas"
+};
+
+document.querySelectorAll(".tabbar button").forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+    document.querySelectorAll(".tabbar button").forEach(b=>b.classList.remove("active"));
+
+    btn.classList.add("active");
+
+    const tab = btn.dataset.tab;
+    document.getElementById(tab).classList.add("active");
+
+    title.innerText = names[tab];
+  };
+});
 
 // INIT
 render();
