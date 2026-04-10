@@ -2,11 +2,17 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Orion</title>
 
 <link rel="stylesheet" href="style.css">
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f172a">
+
 </head>
 
 <body>
@@ -19,9 +25,7 @@
 
 <main class="content">
 
-<!-- HOME -->
 <section id="home" class="screen active">
-
   <div class="balance-card">
     <span>Saldo total</span>
     <h2 id="balance">R$ 0,00</h2>
@@ -33,17 +37,13 @@
     <div>Entradas: <span id="inTotal">R$ 0</span></div>
     <div>Saídas: <span id="outTotal">R$ 0</span></div>
   </div>
-
 </section>
 
-<!-- LANÇAMENTOS -->
 <section id="transactions" class="screen">
-
   <div class="card">
     <form id="form">
 
       <input id="desc" placeholder="Descrição" required>
-
       <input id="value" type="number" inputmode="decimal" placeholder="Valor" required>
 
       <div class="row">
@@ -74,7 +74,7 @@
         <option>Outros</option>
       </select>
 
-      <button type="submit" id="submitBtn">Adicionar</button>
+      <button type="submit">Adicionar</button>
 
     </form>
   </div>
@@ -82,24 +82,18 @@
   <div class="card">
     <ul id="list"></ul>
   </div>
-
 </section>
 
-<!-- DÍVIDAS -->
 <section id="debts" class="screen">
   <div class="card">
     <input id="d_name" placeholder="Nome">
-    <input id="d_value" type="number" placeholder="Parcela">
-    <input id="d_total" type="number" placeholder="Total">
-    <input id="d_paid" type="number" placeholder="Pagas">
+    <input id="d_value" type="number">
+    <input id="d_total" type="number">
+    <input id="d_paid" type="number">
     <button onclick="addDebt()">Salvar</button>
-  </div>
-  <div class="card">
-    <ul id="debtList"></ul>
   </div>
 </section>
 
-<!-- CONTAS -->
 <section id="accountsScreen" class="screen">
   <div class="card">
     <input id="a_name" placeholder="Nome da conta">
@@ -126,5 +120,13 @@
 </div>
 
 <script src="app.js"></script>
+
+<script>
+// 🔥 REGISTRA SERVICE WORKER
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("service-worker.js");
+}
+</script>
+
 </body>
 </html>
