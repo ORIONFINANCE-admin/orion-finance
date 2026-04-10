@@ -2,24 +2,18 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Orion Finance</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Orion</title>
 
 <link rel="stylesheet" href="style.css">
-<link rel="manifest" href="manifest.json">
 </head>
 
 <body>
 
-<div class="app">
-
-<header>
-  <h1 id="title">Home</h1>
-</header>
+<header id="title">Home</header>
 
 <main>
 
-<!-- HOME -->
 <section id="home" class="screen active">
   <div class="balance">
     <span>Saldo total</span>
@@ -27,28 +21,18 @@
   </div>
 
   <div class="summary">
-    <div>
-      <span>Entradas</span>
-      <strong id="inTotal">R$ 0</strong>
-    </div>
-    <div>
-      <span>Saídas</span>
-      <strong id="outTotal">R$ 0</strong>
-    </div>
+    <div>Entradas<br><b id="inTotal">0</b></div>
+    <div>Saídas<br><b id="outTotal">0</b></div>
   </div>
 
   <div id="accounts" class="accounts"></div>
 </section>
 
-<!-- LANÇAMENTOS -->
 <section id="transactions" class="screen">
-
   <div class="card">
     <form id="form">
-
-      <input id="desc" placeholder="Descrição" required>
-
-      <input id="value" type="number" inputmode="decimal" placeholder="Valor" required>
+      <input id="desc" placeholder="Descrição">
+      <input id="value" type="number" placeholder="Valor">
 
       <select id="type">
         <option value="entrada">Entrada</option>
@@ -57,54 +41,37 @@
 
       <select id="account">
         <option>Bradesco</option>
-        <option>Banco Inter</option>
+        <option>Inter</option>
         <option>Mercado Pago</option>
         <option>VR</option>
       </select>
 
-      <select id="category">
-        <option>Salário</option>
-        <option>Mercado</option>
-        <option>Investimentos</option>
-        <option>Rendimentos</option>
-        <option>Outros</option>
-      </select>
-
       <button type="submit">Adicionar</button>
-
     </form>
   </div>
 
   <div class="list-box">
     <ul id="list"></ul>
   </div>
-
 </section>
 
-<!-- DÍVIDAS -->
 <section id="debts" class="screen">
-
   <div class="card">
     <input id="d_name" placeholder="Nome">
-    <input id="d_parcela" type="number" placeholder="Valor da parcela">
+    <input id="d_valor" type="number" placeholder="Parcela">
     <input id="d_total" type="number" placeholder="Total">
-    <input id="d_qtd" type="number" placeholder="Parcelas totais">
     <input id="d_pago" type="number" placeholder="Pagas">
 
     <button onclick="addDebt()">Salvar</button>
   </div>
 
-  <div id="debtList" class="list-box"></div>
-
+  <div id="debtList"></div>
 </section>
 
-<!-- CONTAS -->
 <section id="accountsScreen" class="screen">
-
   <div class="card">
     <button onclick="resetAll()">Resetar tudo</button>
   </div>
-
 </section>
 
 </main>
@@ -115,8 +82,6 @@
   <button data-tab="debts">📉</button>
   <button data-tab="accountsScreen">💳</button>
 </nav>
-
-</div>
 
 <script src="app.js"></script>
 
