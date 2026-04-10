@@ -2,13 +2,11 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Orion</title>
 
 <link rel="stylesheet" href="style.css">
-
 </head>
 
 <body>
@@ -21,14 +19,24 @@
 
 <main class="content">
 
+<!-- HOME -->
 <section id="home" class="screen active">
+
   <div class="balance-card">
     <span>Saldo total</span>
     <h2 id="balance">R$ 0,00</h2>
   </div>
-  <div id="accounts"></div>
+
+  <div class="accounts-grid" id="accounts"></div>
+
+  <div class="card insights">
+    <div>Entradas: <span id="inTotal">R$ 0</span></div>
+    <div>Saídas: <span id="outTotal">R$ 0</span></div>
+  </div>
+
 </section>
 
+<!-- LANÇAMENTOS -->
 <section id="transactions" class="screen">
 
   <div class="card">
@@ -66,7 +74,7 @@
         <option>Outros</option>
       </select>
 
-      <button type="submit">Adicionar</button>
+      <button type="submit" id="submitBtn">Adicionar</button>
 
     </form>
   </div>
@@ -77,38 +85,32 @@
 
 </section>
 
+<!-- DÍVIDAS -->
 <section id="debts" class="screen">
   <div class="card">
-
     <input id="d_name" placeholder="Nome">
     <input id="d_value" type="number" placeholder="Parcela">
     <input id="d_total" type="number" placeholder="Total">
     <input id="d_paid" type="number" placeholder="Pagas">
-
     <button onclick="addDebt()">Salvar</button>
-
   </div>
-
   <div class="card">
     <ul id="debtList"></ul>
   </div>
 </section>
 
+<!-- CONTAS -->
 <section id="accountsScreen" class="screen">
   <div class="card">
-
     <input id="a_name" placeholder="Nome da conta">
     <input id="a_color" placeholder="Cor (#)">
     <input id="a_card" placeholder="Últimos 4 dígitos">
-
     <select id="a_type">
       <option>Crédito</option>
       <option>Débito</option>
       <option>Benefício</option>
     </select>
-
     <button onclick="addAccount()">Salvar</button>
-
   </div>
 </section>
 
