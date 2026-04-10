@@ -34,18 +34,63 @@ body {
   background:linear-gradient(135deg,#22c55e,#16a34a);
 }
 
-/* GRID CONTAS */
-.accounts-grid {
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
+/* 🔥 CONTAS HORIZONTAL */
+.accounts-scroll {
+  display:flex;
+  gap:12px;
+  overflow-x:auto;
   padding:10px;
 }
 
+.accounts-scroll::-webkit-scrollbar {
+  display:none;
+}
+
+/* CARD CONTA */
 .account-card {
-  padding:14px;
-  border-radius:16px;
-  font-size:14px;
+  min-width:220px;
+  height:130px;
+  padding:16px;
+  border-radius:20px;
+  color:#fff;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  box-shadow:0 10px 25px rgba(0,0,0,0.3);
+  flex-shrink:0;
+}
+
+/* TOPO */
+.acc-top {
+  display:flex;
+  justify-content:space-between;
+  font-size:13px;
+  opacity:0.9;
+}
+
+/* SALDO */
+.acc-balance {
+  font-size:18px;
+  font-weight:600;
+}
+
+/* RODAPÉ */
+.acc-footer {
+  font-size:12px;
+  opacity:0.8;
+}
+
+/* BOTÃO ADD */
+.add-card {
+  min-width:80px;
+  height:130px;
+  border-radius:20px;
+  background:#1e293b;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:24px;
+  opacity:0.7;
 }
 
 /* CARD */
@@ -64,51 +109,6 @@ input, select, button {
   border-radius:10px;
   border:none;
   font-size:16px;
-}
-
-/* 🔥 LISTA PREMIUM */
-li {
-  background:#1e293b;
-  padding:14px;
-  margin-top:10px;
-  border-radius:16px;
-  transition:0.2s;
-  border:1px solid #334155;
-}
-
-li:active {
-  transform:scale(0.97);
-}
-
-/* ESTRUTURA */
-.item-top {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-.desc {
-  font-size:15px;
-  font-weight:500;
-}
-
-.value {
-  font-size:16px;
-  font-weight:600;
-}
-
-.in {
-  color:#22c55e;
-}
-
-.out {
-  color:#ef4444;
-}
-
-.meta {
-  font-size:12px;
-  opacity:0.6;
-  margin-top:4px;
 }
 
 /* TABBAR */
