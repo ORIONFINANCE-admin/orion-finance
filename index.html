@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Orion</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Orion Finance</title>
 
 <link rel="stylesheet" href="style.css">
 <link rel="manifest" href="manifest.json">
@@ -21,26 +21,23 @@
 
 <!-- HOME -->
 <section id="home" class="screen active">
-  <div class="grid">
-
-    <div class="card">
-      <span>Saldo</span>
-      <h2 id="balance">R$ 0</h2>
-    </div>
-
-    <div class="card">
-      <span>Entradas</span>
-      <h3 id="inTotal">R$ 0</h3>
-    </div>
-
-    <div class="card">
-      <span>Saídas</span>
-      <h3 id="outTotal">R$ 0</h3>
-    </div>
-
+  <div class="balance">
+    <span>Saldo total</span>
+    <h1 id="balance">R$ 0.00</h1>
   </div>
 
-  <div id="accounts" class="accounts-row"></div>
+  <div class="summary">
+    <div>
+      <span>Entradas</span>
+      <strong id="inTotal">R$ 0</strong>
+    </div>
+    <div>
+      <span>Saídas</span>
+      <strong id="outTotal">R$ 0</strong>
+    </div>
+  </div>
+
+  <div id="accounts" class="accounts"></div>
 </section>
 
 <!-- LANÇAMENTOS -->
@@ -48,8 +45,10 @@
 
   <div class="card">
     <form id="form">
-      <input id="desc" placeholder="Descrição">
-      <input id="value" type="number" inputmode="decimal" placeholder="Valor">
+
+      <input id="desc" placeholder="Descrição" required>
+
+      <input id="value" type="number" inputmode="decimal" placeholder="Valor" required>
 
       <select id="type">
         <option value="entrada">Entrada</option>
@@ -71,7 +70,8 @@
         <option>Outros</option>
       </select>
 
-      <button id="submitBtn">Adicionar</button>
+      <button type="submit">Adicionar</button>
+
     </form>
   </div>
 
@@ -86,31 +86,20 @@
 
   <div class="card">
     <input id="d_name" placeholder="Nome">
-    <input id="d_value" type="number" placeholder="Parcela">
+    <input id="d_parcela" type="number" placeholder="Valor da parcela">
     <input id="d_total" type="number" placeholder="Total">
-    <input id="d_paid" type="number" placeholder="Pagas">
+    <input id="d_qtd" type="number" placeholder="Parcelas totais">
+    <input id="d_pago" type="number" placeholder="Pagas">
+
     <button onclick="addDebt()">Salvar</button>
   </div>
 
-  <div class="list-box" id="debtList"></div>
+  <div id="debtList" class="list-box"></div>
 
 </section>
 
 <!-- CONTAS -->
 <section id="accountsScreen" class="screen">
-
-  <div class="card">
-    <input id="acc_name" placeholder="Nome da conta">
-    <input id="acc_color" placeholder="Cor (#)">
-    <input id="acc_last" placeholder="Últimos 4 dígitos">
-
-    <select id="acc_type">
-      <option>Crédito</option>
-      <option>Débito</option>
-    </select>
-
-    <button>Salvar</button>
-  </div>
 
   <div class="card">
     <button onclick="resetAll()">Resetar tudo</button>
