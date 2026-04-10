@@ -1,39 +1,46 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Orion</title>
 
 <link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
 </head>
 
 <body>
 
 <div class="app">
 
-<header class="header">
+<header>
   <h1 id="title">Home</h1>
 </header>
 
-<main class="content">
+<main>
 
 <!-- HOME -->
 <section id="home" class="screen active">
+  <div class="grid">
 
-  <div class="balance-card">
-    <span>Saldo total</span>
-    <h2 id="balance">R$ 0,00</h2>
+    <div class="card">
+      <span>Saldo</span>
+      <h2 id="balance">R$ 0</h2>
+    </div>
+
+    <div class="card">
+      <span>Entradas</span>
+      <h3 id="inTotal">R$ 0</h3>
+    </div>
+
+    <div class="card">
+      <span>Saídas</span>
+      <h3 id="outTotal">R$ 0</h3>
+    </div>
+
   </div>
 
-  <div class="accounts-grid" id="accounts"></div>
-
-  <div class="card insights">
-    <div>Entradas: <span id="inTotal">R$ 0</span></div>
-    <div>Saídas: <span id="outTotal">R$ 0</span></div>
-  </div>
-
+  <div id="accounts" class="accounts-row"></div>
 </section>
 
 <!-- LANÇAMENTOS -->
@@ -41,44 +48,34 @@
 
   <div class="card">
     <form id="form">
+      <input id="desc" placeholder="Descrição">
+      <input id="value" type="number" inputmode="decimal" placeholder="Valor">
 
-      <input id="desc" placeholder="Descrição" required>
-      <input id="value" type="number" inputmode="decimal" placeholder="Valor" required>
+      <select id="type">
+        <option value="entrada">Entrada</option>
+        <option value="saida">Saída</option>
+      </select>
 
-      <div class="row">
-        <select id="type" required>
-          <option value="" disabled selected>Tipo</option>
-          <option value="entrada">Entrada</option>
-          <option value="saida">Saída</option>
-        </select>
+      <select id="account">
+        <option>Bradesco</option>
+        <option>Banco Inter</option>
+        <option>Mercado Pago</option>
+        <option>VR</option>
+      </select>
 
-        <select id="account" required>
-          <option value="" disabled selected>Conta</option>
-          <option>Bradesco</option>
-          <option>Banco Inter</option>
-          <option>Mercado Pago</option>
-          <option>VR</option>
-        </select>
-      </div>
-
-      <select id="category" required>
-        <option value="" disabled selected>Categoria</option>
+      <select id="category">
         <option>Salário</option>
         <option>Mercado</option>
-        <option>Alimentação</option>
-        <option>Transporte</option>
-        <option>Lazer</option>
         <option>Investimentos</option>
         <option>Rendimentos</option>
         <option>Outros</option>
       </select>
 
-      <button type="submit" id="submitBtn">Adicionar</button>
-
+      <button id="submitBtn">Adicionar</button>
     </form>
   </div>
 
-  <div class="card">
+  <div class="list-box">
     <ul id="list"></ul>
   </div>
 
@@ -86,41 +83,37 @@
 
 <!-- DÍVIDAS -->
 <section id="debts" class="screen">
+
   <div class="card">
     <input id="d_name" placeholder="Nome">
-    <input id="d_value" type="number">
-    <input id="d_total" type="number">
-    <input id="d_paid" type="number">
+    <input id="d_value" type="number" placeholder="Parcela">
+    <input id="d_total" type="number" placeholder="Total">
+    <input id="d_paid" type="number" placeholder="Pagas">
     <button onclick="addDebt()">Salvar</button>
   </div>
+
+  <div class="list-box" id="debtList"></div>
+
 </section>
 
-<!-- CONTAS + BACKUP -->
+<!-- CONTAS -->
 <section id="accountsScreen" class="screen">
 
   <div class="card">
-    <input id="a_name" placeholder="Nome da conta">
-    <input id="a_color" placeholder="Cor (#)">
-    <input id="a_card" placeholder="Últimos 4 dígitos">
-    <select id="a_type">
+    <input id="acc_name" placeholder="Nome da conta">
+    <input id="acc_color" placeholder="Cor (#)">
+    <input id="acc_last" placeholder="Últimos 4 dígitos">
+
+    <select id="acc_type">
       <option>Crédito</option>
       <option>Débito</option>
-      <option>Benefício</option>
     </select>
-    <button onclick="addAccount()">Salvar</button>
+
+    <button>Salvar</button>
   </div>
 
-  <!-- 🔥 BACKUP -->
   <div class="card">
-    <h3>Backup & Segurança</h3>
-
-    <button onclick="exportBackup()">Salvar cópia</button>
-
-    <input type="file" id="importFile" style="display:none">
-    <button onclick="document.getElementById('importFile').click()">
-      Restaurar dados
-    </button>
-
+    <button onclick="resetAll()">Resetar tudo</button>
   </div>
 
 </section>
@@ -128,7 +121,7 @@
 </main>
 
 <nav class="tabbar">
-  <button data-tab="home">🏠</button>
+  <button data-tab="home" class="active">🏠</button>
   <button data-tab="transactions">💸</button>
   <button data-tab="debts">📉</button>
   <button data-tab="accountsScreen">💳</button>
@@ -137,5 +130,6 @@
 </div>
 
 <script src="app.js"></script>
+
 </body>
 </html>
