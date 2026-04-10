@@ -1,78 +1,120 @@
-body {
+body{
   margin:0;
   background:#0b1220;
   color:#fff;
   font-family:-apple-system;
 }
 
-header {
+header{
   padding:20px;
   font-size:26px;
   font-weight:600;
 }
 
-/* SALDO */
-.balance {
+.screen{
+  display:none;
+  animation:fade .3s ease;
+}
+
+.screen.active{
+  display:block;
+}
+
+@keyframes fade{
+  from{opacity:0;transform:translateX(10px);}
+  to{opacity:1;transform:translateX(0);}
+}
+
+/* BALANCE */
+.balance{
   padding:0 20px;
 }
 
-.balance span {
-  font-size:14px;
-  opacity:0.6;
+.balance span{
+  font-size:13px;
+  opacity:.6;
 }
 
-.balance h1 {
-  font-size:34px;
-  margin:5px 0 0;
+.balance h1{
+  margin:5px 0;
+  font-size:32px;
 }
 
-/* RESUMO */
-.summary {
+/* SUMMARY */
+.summary{
   display:flex;
   gap:10px;
-  padding:15px 20px;
+  padding:10px 20px;
 }
 
-.summary div {
+.summary div{
   flex:1;
   background:#111827;
   padding:12px;
   border-radius:12px;
-  font-size:14px;
 }
 
 /* CONTAS */
-.accounts {
+.accounts{
   display:flex;
-  overflow-x:auto;
   gap:12px;
+  overflow-x:auto;
   padding:10px 20px;
 }
 
-.card-bank {
-  min-width:220px;
+.card-bank{
+  min-width:180px;
+  padding:14px;
   border-radius:16px;
-  padding:16px;
-  color:#fff;
-  box-shadow:0 8px 20px rgba(0,0,0,0.3);
+  font-size:14px;
 }
 
-.card-bank small {
-  opacity:0.7;
+.bradesco{background:#cc092f;}
+.inter{background:#ff7a00;}
+.mp{background:#00b1ea;}
+.vr{background:#7c3aed;}
+
+/* CARD */
+.card{
+  margin:10px;
+  background:#111827;
+  padding:12px;
+  border-radius:14px;
 }
 
-.card-bank h2 {
-  margin:10px 0;
+/* INPUT */
+input, select, button{
+  width:100%;
+  height:42px;
+  margin-top:8px;
+  border-radius:10px;
+  border:none;
+  font-size:14px;
 }
 
-/* CORES */
-.bradesco {background:linear-gradient(135deg,#cc092f,#8a001f);}
-.inter {background:linear-gradient(135deg,#ff7a00,#c45a00);}
-.mp {background:linear-gradient(135deg,#00b1ea,#007ea3);}
-.vr {background:linear-gradient(135deg,#7c3aed,#4c1d95);}
+/* BUTTON */
+button{
+  background:#22c55e;
+  color:#000;
+  font-weight:600;
+}
+
+/* LIST */
+.list-box{
+  height:260px;
+  overflow:auto;
+  padding:10px;
+}
+
+li{
+  background:#1e293b;
+  padding:10px;
+  margin-bottom:8px;
+  border-radius:10px;
+}
 
 /* TABBAR */
-.tabbar {
+.tabbar{
   position:fixed;
   bottom:0;
   left:0;
@@ -81,16 +123,15 @@ header {
   justify-content:space-around;
   padding:10px;
   background:#0b1220;
-  border-top:1px solid #1f2937;
 }
 
-.tabbar button {
+.tabbar button{
   background:none;
   border:none;
   color:#6b7280;
   font-size:18px;
 }
 
-.tabbar button.active {
+.tabbar button.active{
   color:#22c55e;
 }
