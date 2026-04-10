@@ -2,17 +2,11 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Orion</title>
 
 <link rel="stylesheet" href="style.css">
-
-<!-- PWA -->
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0f172a">
-
 </head>
 
 <body>
@@ -25,7 +19,9 @@
 
 <main class="content">
 
+<!-- HOME -->
 <section id="home" class="screen active">
+
   <div class="balance-card">
     <span>Saldo total</span>
     <h2 id="balance">R$ 0,00</h2>
@@ -37,9 +33,12 @@
     <div>Entradas: <span id="inTotal">R$ 0</span></div>
     <div>Saídas: <span id="outTotal">R$ 0</span></div>
   </div>
+
 </section>
 
+<!-- LANÇAMENTOS -->
 <section id="transactions" class="screen">
+
   <div class="card">
     <form id="form">
 
@@ -74,7 +73,7 @@
         <option>Outros</option>
       </select>
 
-      <button type="submit">Adicionar</button>
+      <button type="submit" id="submitBtn">Adicionar</button>
 
     </form>
   </div>
@@ -82,8 +81,10 @@
   <div class="card">
     <ul id="list"></ul>
   </div>
+
 </section>
 
+<!-- DÍVIDAS -->
 <section id="debts" class="screen">
   <div class="card">
     <input id="d_name" placeholder="Nome">
@@ -94,7 +95,9 @@
   </div>
 </section>
 
+<!-- CONTAS + BACKUP -->
 <section id="accountsScreen" class="screen">
+
   <div class="card">
     <input id="a_name" placeholder="Nome da conta">
     <input id="a_color" placeholder="Cor (#)">
@@ -106,6 +109,20 @@
     </select>
     <button onclick="addAccount()">Salvar</button>
   </div>
+
+  <!-- 🔥 BACKUP -->
+  <div class="card">
+    <h3>Backup & Segurança</h3>
+
+    <button onclick="exportBackup()">Salvar cópia</button>
+
+    <input type="file" id="importFile" style="display:none">
+    <button onclick="document.getElementById('importFile').click()">
+      Restaurar dados
+    </button>
+
+  </div>
+
 </section>
 
 </main>
@@ -120,13 +137,5 @@
 </div>
 
 <script src="app.js"></script>
-
-<script>
-// 🔥 REGISTRA SERVICE WORKER
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("service-worker.js");
-}
-</script>
-
 </body>
 </html>
