@@ -5,6 +5,7 @@ const DB = {
 
 let transactions = DB.get("t");
 let accounts = DB.get("accounts") || [];
+let debts = DB.get("debts") || [];
 
 let editIndex = null;
 
@@ -16,6 +17,21 @@ const inTotal = document.getElementById("inTotal");
 const outTotal = document.getElementById("outTotal");
 
 const submitBtn = document.getElementById("submitBtn");
+
+// 🔥 AUTO BACKUP
+function autoBackup(){
+
+  let backups = DB.get("backup_auto");
+
+  backups.unshift({
+    date: new Date().toISOString(),
+    data:{transactions,accounts,debts}
+  });
+
+  backups = backups.slice(0,5);
+
+  DB.set("backup_auto",backups);
+}
 
 // ADD / EDIT
 form.onsubmit = e=>{
@@ -44,8 +60,56 @@ form.onsubmit = e=>{
 // SAVE
 function save(){
   DB.set("t",transactions);
+  DB.set("accounts",accounts);
+  DB.set("debts",debts);
+
+  autoBackup();
   render();
 }
+
+// EXPORT
+function exportBackup(){
+
+  const data = {
+    transactions,
+    accounts,
+    debts
+  };
+
+  const blob = new Blob([JSON.stringify(data)], {type:"application/json"});
+
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+
+  const date = new Date().toISOString().slice(0,10);
+
+  a.href = url;
+  a.download = `orion-backup-${date}.json`;
+  a.click();
+}
+
+// IMPORT
+document.getElementById("importFile").addEventListener("change", e=>{
+
+  const file = e.target.files[0];
+  if(!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = function(){
+
+    const data = JSON.parse(reader.result);
+
+    transactions = data.transactions || [];
+    accounts = data.accounts || [];
+    debts = data.debts || [];
+
+    save();
+  };
+
+  reader.readAsText(file);
+});
 
 // RENDER
 function render(){
@@ -66,7 +130,6 @@ function render(){
   inTotal.innerText="R$ "+inSum.toFixed(2);
   outTotal.innerText="R$ "+outSum.toFixed(2);
 
-  // CONTAS GRID
   accountsDiv.innerHTML="";
 
   [...new Set(transactions.map(t=>t.account))].forEach(name=>{
@@ -87,7 +150,6 @@ function render(){
     `;
   });
 
-  // LIST
   list.innerHTML="";
 
   transactions.forEach((t,i)=>{
@@ -99,7 +161,6 @@ function render(){
       <small>${t.account} • ${t.category}</small>
     `;
 
-    // EDITAR
     li.onclick=()=>{
       desc.value = t.desc;
       value.value = t.value;
@@ -116,7 +177,7 @@ function render(){
 
 }
 
-// TABS
+// TABS (🔥 corrigido definitivo)
 const names = {
   home:"Home",
   transactions:"Lançamentos",
@@ -125,7 +186,8 @@ const names = {
 };
 
 document.querySelectorAll(".tabbar button").forEach(btn=>{
-  btn.onclick=()=>{
+  btn.addEventListener("click",()=>{
+
     document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
     document.querySelectorAll(".tabbar button").forEach(b=>b.classList.remove("active"));
 
@@ -135,7 +197,7 @@ document.querySelectorAll(".tabbar button").forEach(btn=>{
     document.getElementById(tab).classList.add("active");
 
     title.innerText = names[tab];
-  };
+  });
 });
 
 // INIT
