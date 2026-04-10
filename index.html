@@ -94,9 +94,17 @@
 
 <!-- CONTAS -->
 <section id="accountsScreen" class="screen">
+
   <div class="card">
+    <h3>Backup & Segurança</h3>
+
+    <button onclick="exportData()">Salvar backup</button>
+
+    <input type="file" onchange="importData(event)">
+
     <button onclick="resetAll()">Resetar tudo</button>
   </div>
+
 </section>
 
 </main>
