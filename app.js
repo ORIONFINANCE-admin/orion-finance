@@ -18,7 +18,7 @@ const outTotal = document.getElementById("outTotal");
 
 const submitBtn = document.getElementById("submitBtn");
 
-// 🎨 CORES DAS CONTAS
+// 🎨 CORES
 const colors = {
   "Bradesco":"#cc092f",
   "Banco Inter":"#ff7a00",
@@ -26,7 +26,99 @@ const colors = {
   "VR":"#7c3aed"
 };
 
-// ADD / EDIT
+// RENDER
+function render(){
+
+  let total=0, inSum=0, outSum=0;
+
+  transactions.forEach(t=>{
+    if(t.type==="entrada"){
+      total+=t.value;
+      inSum+=t.value;
+    } else {
+      total-=t.value;
+      outSum+=t.value;
+    }
+  });
+
+  balance.innerText="R$ "+total.toFixed(2);
+  inTotal.innerText="R$ "+inSum.toFixed(2);
+  outTotal.innerText="R$ "+outSum.toFixed(2);
+
+  // 🔥 CONTAS PREMIUM
+  accountsDiv.className = "accounts-scroll";
+  accountsDiv.innerHTML = "";
+
+  [...new Set(transactions.map(t=>t.account))].forEach(name=>{
+
+    let sum=0;
+
+    transactions.forEach(t=>{
+      if(t.account===name){
+        sum += t.type==="entrada"?t.value:-t.value;
+      }
+    });
+
+    accountsDiv.innerHTML += `
+      <div class="account-card" style="background:${colors[name] || '#334155'}">
+        
+        <div class="acc-top">
+          <div>${name}</div>
+          <div>Conta</div>
+        </div>
+
+        <div class="acc-balance">
+          R$ ${sum.toFixed(2)}
+        </div>
+
+        <div class="acc-footer">
+          **** ${Math.floor(1000 + Math.random()*9000)}
+        </div>
+
+      </div>
+    `;
+  });
+
+  // ➕ ADD
+  accountsDiv.innerHTML += `
+    <div class="add-card">+</div>
+  `;
+
+  // LISTA (mantida)
+  list.innerHTML="";
+
+  transactions.forEach((t,i)=>{
+    const li = document.createElement("li");
+
+    li.innerHTML = `
+      ${t.desc}<br>
+      R$ ${t.value.toFixed(2)}<br>
+      <small>${t.account} • ${t.category}</small>
+    `;
+
+    li.onclick=()=>{
+      desc.value = t.desc;
+      value.value = t.value;
+      type.value = t.type;
+      account.value = t.account;
+      category.value = t.category;
+
+      editIndex = i;
+      submitBtn.innerText = "Atualizar";
+    };
+
+    list.appendChild(li);
+  });
+
+}
+
+// SAVE
+function save(){
+  DB.set("t",transactions);
+  render();
+}
+
+// ADD
 form.onsubmit = e=>{
   e.preventDefault();
 
@@ -49,87 +141,6 @@ form.onsubmit = e=>{
   form.reset();
   save();
 };
-
-// SAVE
-function save(){
-  DB.set("t",transactions);
-  DB.set("accounts",accounts);
-  DB.set("debts",debts);
-  render();
-}
-
-// RENDER
-function render(){
-
-  let total=0, inSum=0, outSum=0;
-
-  transactions.forEach(t=>{
-    if(t.type==="entrada"){
-      total+=t.value;
-      inSum+=t.value;
-    } else {
-      total-=t.value;
-      outSum+=t.value;
-    }
-  });
-
-  balance.innerText="R$ "+total.toFixed(2);
-  inTotal.innerText="R$ "+inSum.toFixed(2);
-  outTotal.innerText="R$ "+outSum.toFixed(2);
-
-  // CONTAS
-  accountsDiv.innerHTML="";
-
-  [...new Set(transactions.map(t=>t.account))].forEach(name=>{
-
-    let sum=0;
-
-    transactions.forEach(t=>{
-      if(t.account===name){
-        sum += t.type==="entrada"?t.value:-t.value;
-      }
-    });
-
-    accountsDiv.innerHTML += `
-      <div class="account-card" style="background:${colors[name] || '#334155'}">
-        ${name}<br>
-        R$ ${sum.toFixed(2)}
-      </div>
-    `;
-  });
-
-  // LISTA PREMIUM
-  list.innerHTML="";
-
-  transactions.forEach((t,i)=>{
-    const li = document.createElement("li");
-
-    li.innerHTML = `
-      <div class="item-top">
-        <div class="desc">${t.desc}</div>
-        <div class="value ${t.type==='entrada'?'in':'out'}">
-          ${t.type==='entrada'?'+':'-'} R$ ${t.value.toFixed(2)}
-        </div>
-      </div>
-      <div class="meta">${t.account} • ${t.category}</div>
-    `;
-
-    // EDITAR
-    li.onclick=()=>{
-      desc.value = t.desc;
-      value.value = t.value;
-      type.value = t.type;
-      account.value = t.account;
-      category.value = t.category;
-
-      editIndex = i;
-      submitBtn.innerText = "Atualizar";
-    };
-
-    list.appendChild(li);
-  });
-
-}
 
 // TABS
 const names = {
