@@ -4,166 +4,83 @@ const DB = {
 };
 
 let transactions = DB.get("t");
-let accounts = DB.get("accounts") || [];
 let debts = DB.get("debts") || [];
 
-let editIndex = null;
+const debtList = document.getElementById("debtList");
 
-const list = document.getElementById("list");
-const balance = document.getElementById("balance");
-const accountsDiv = document.getElementById("accounts");
+// ➕ ADD DÍVIDA
+function addDebt(){
 
-const inTotal = document.getElementById("inTotal");
-const outTotal = document.getElementById("outTotal");
-
-const submitBtn = document.getElementById("submitBtn");
-
-// 🎨 CORES
-const colors = {
-  "Bradesco":"#cc092f",
-  "Banco Inter":"#ff7a00",
-  "Mercado Pago":"#00b1ea",
-  "VR":"#7c3aed"
-};
-
-// RENDER
-function render(){
-
-  let total=0, inSum=0, outSum=0;
-
-  transactions.forEach(t=>{
-    if(t.type==="entrada"){
-      total+=t.value;
-      inSum+=t.value;
-    } else {
-      total-=t.value;
-      outSum+=t.value;
-    }
+  debts.push({
+    name: d_name.value,
+    parcela: Number(d_value.value),
+    total: Number(d_total.value),
+    paid: Number(d_paid.value) || 0
   });
 
-  balance.innerText="R$ "+total.toFixed(2);
-  inTotal.innerText="R$ "+inSum.toFixed(2);
-  outTotal.innerText="R$ "+outSum.toFixed(2);
+  d_name.value = "";
+  d_value.value = "";
+  d_total.value = "";
+  d_paid.value = "";
 
-  // 🔥 CONTAS PREMIUM
-  accountsDiv.className = "accounts-scroll";
-  accountsDiv.innerHTML = "";
+  save();
+}
 
-  [...new Set(transactions.map(t=>t.account))].forEach(name=>{
+// 💾 SAVE
+function save(){
+  DB.set("debts",debts);
+  renderDebts();
+}
 
-    let sum=0;
+// 🔥 RENDER DÍVIDAS
+function renderDebts(){
 
-    transactions.forEach(t=>{
-      if(t.account===name){
-        sum += t.type==="entrada"?t.value:-t.value;
-      }
-    });
+  debtList.innerHTML="";
 
-    accountsDiv.innerHTML += `
-      <div class="account-card" style="background:${colors[name] || '#334155'}">
-        
-        <div class="acc-top">
-          <div>${name}</div>
-          <div>Conta</div>
+  debts.forEach((d,i)=>{
+
+    const restante = d.total - (d.parcela * d.paid);
+    const progresso = (d.parcela * d.paid) / d.total * 100;
+
+    debtList.innerHTML += `
+      <div class="debt-item">
+
+        <div class="debt-top">
+          <div class="debt-name">${d.name}</div>
+          <div>${d.paid}x</div>
         </div>
 
-        <div class="acc-balance">
-          R$ ${sum.toFixed(2)}
+        <div class="debt-values">
+          Parcela: R$ ${d.parcela.toFixed(2)} • Restante: R$ ${restante.toFixed(2)}
         </div>
 
-        <div class="acc-footer">
-          **** ${Math.floor(1000 + Math.random()*9000)}
+        <div class="progress">
+          <div class="progress-bar" style="width:${progresso}%"></div>
+        </div>
+
+        <div class="debt-actions">
+          <button class="btn-pay" onclick="pay(${i})">Pagar</button>
+          <button class="btn-undo" onclick="undo(${i})">↩</button>
         </div>
 
       </div>
     `;
   });
-
-  // ➕ ADD
-  accountsDiv.innerHTML += `
-    <div class="add-card">+</div>
-  `;
-
-  // LISTA (mantida)
-  list.innerHTML="";
-
-  transactions.forEach((t,i)=>{
-    const li = document.createElement("li");
-
-    li.innerHTML = `
-      ${t.desc}<br>
-      R$ ${t.value.toFixed(2)}<br>
-      <small>${t.account} • ${t.category}</small>
-    `;
-
-    li.onclick=()=>{
-      desc.value = t.desc;
-      value.value = t.value;
-      type.value = t.type;
-      account.value = t.account;
-      category.value = t.category;
-
-      editIndex = i;
-      submitBtn.innerText = "Atualizar";
-    };
-
-    list.appendChild(li);
-  });
-
 }
 
-// SAVE
-function save(){
-  DB.set("t",transactions);
-  render();
-}
-
-// ADD
-form.onsubmit = e=>{
-  e.preventDefault();
-
-  const data = {
-    desc:desc.value,
-    value:Number(value.value),
-    type:type.value,
-    account:account.value,
-    category:category.value
-  };
-
-  if(editIndex !== null){
-    transactions[editIndex] = data;
-    editIndex = null;
-    submitBtn.innerText = "Adicionar";
-  } else {
-    transactions.unshift(data);
-  }
-
-  form.reset();
+// ✔ PAGAR
+function pay(i){
+  debts[i].paid++;
   save();
-};
+}
 
-// TABS
-const names = {
-  home:"Home",
-  transactions:"Lançamentos",
-  debts:"Dívidas",
-  accountsScreen:"Contas"
-};
-
-document.querySelectorAll(".tabbar button").forEach(btn=>{
-  btn.addEventListener("click",()=>{
-
-    document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
-    document.querySelectorAll(".tabbar button").forEach(b=>b.classList.remove("active"));
-
-    btn.classList.add("active");
-
-    const tab = btn.dataset.tab;
-    document.getElementById(tab).classList.add("active");
-
-    title.innerText = names[tab];
-  });
-});
+// 🔙 DESFAZER
+function undo(i){
+  if(debts[i].paid > 0){
+    debts[i].paid--;
+    save();
+  }
+}
 
 // INIT
-render();
+renderDebts();
