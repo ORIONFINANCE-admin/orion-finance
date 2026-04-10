@@ -1,15 +1,96 @@
-{
-  "name": "Orion Finance",
-  "short_name": "Orion",
-  "start_url": ".",
-  "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#0f172a",
-  "icons": [
-    {
-      "src": "icon.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
-  ]
+body {
+  margin:0;
+  background:#0b1220;
+  color:#fff;
+  font-family:-apple-system;
+}
+
+header {
+  padding:20px;
+  font-size:26px;
+  font-weight:600;
+}
+
+/* SALDO */
+.balance {
+  padding:0 20px;
+}
+
+.balance span {
+  font-size:14px;
+  opacity:0.6;
+}
+
+.balance h1 {
+  font-size:34px;
+  margin:5px 0 0;
+}
+
+/* RESUMO */
+.summary {
+  display:flex;
+  gap:10px;
+  padding:15px 20px;
+}
+
+.summary div {
+  flex:1;
+  background:#111827;
+  padding:12px;
+  border-radius:12px;
+  font-size:14px;
+}
+
+/* CONTAS */
+.accounts {
+  display:flex;
+  overflow-x:auto;
+  gap:12px;
+  padding:10px 20px;
+}
+
+.card-bank {
+  min-width:220px;
+  border-radius:16px;
+  padding:16px;
+  color:#fff;
+  box-shadow:0 8px 20px rgba(0,0,0,0.3);
+}
+
+.card-bank small {
+  opacity:0.7;
+}
+
+.card-bank h2 {
+  margin:10px 0;
+}
+
+/* CORES */
+.bradesco {background:linear-gradient(135deg,#cc092f,#8a001f);}
+.inter {background:linear-gradient(135deg,#ff7a00,#c45a00);}
+.mp {background:linear-gradient(135deg,#00b1ea,#007ea3);}
+.vr {background:linear-gradient(135deg,#7c3aed,#4c1d95);}
+
+/* TABBAR */
+.tabbar {
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  display:flex;
+  justify-content:space-around;
+  padding:10px;
+  background:#0b1220;
+  border-top:1px solid #1f2937;
+}
+
+.tabbar button {
+  background:none;
+  border:none;
+  color:#6b7280;
+  font-size:18px;
+}
+
+.tabbar button.active {
+  color:#22c55e;
 }
