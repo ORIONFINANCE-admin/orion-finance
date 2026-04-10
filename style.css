@@ -11,19 +11,11 @@ header{
   font-weight:600;
 }
 
-/* 🔥 ESSA PARTE RESOLVE O BUG */
-.screen{
-  display:none;
-}
+.screen{display:none;}
+.screen.active{display:block;}
 
-.screen.active{
-  display:block;
-}
-
-/* UI */
-.balance{
-  padding:0 20px;
-}
+/* BALANCE */
+.balance{padding:0 20px;}
 
 .summary{
   display:flex;
@@ -38,24 +30,26 @@ header{
   border-radius:10px;
 }
 
+/* CONTAS GRID */
 .accounts{
-  display:flex;
-  overflow-x:auto;
+  display:grid;
+  grid-template-columns:1fr 1fr;
   gap:10px;
   padding:10px 20px;
 }
 
 .card-bank{
-  min-width:160px;
   padding:12px;
   border-radius:14px;
+  font-size:14px;
 }
 
 .bradesco{background:#cc092f;}
 .inter{background:#ff7a00;}
 .mp{background:#00b1ea;}
-.vr{background:#7c3aed;}
+.vr{background:#6d28d9;}
 
+/* CARD */
 .card{
   margin:10px;
   padding:12px;
@@ -65,7 +59,7 @@ header{
 
 input, select, button{
   width:100%;
-  height:40px;
+  height:42px;
   margin-top:8px;
   border:none;
   border-radius:8px;
@@ -77,7 +71,7 @@ button{
 }
 
 .list-box{
-  height:200px;
+  height:220px;
   overflow:auto;
   padding:10px;
 }
@@ -89,6 +83,7 @@ li{
   border-radius:8px;
 }
 
+/* TABBAR */
 .tabbar{
   position:fixed;
   bottom:0;
@@ -108,4 +103,37 @@ li{
 
 .tabbar button.active{
   color:#22c55e;
+}
+
+/* BOTÃO + */
+.fab{
+  position:fixed;
+  bottom:70px;
+  right:20px;
+  width:55px;
+  height:55px;
+  border-radius:50%;
+  background:#22c55e;
+  color:#000;
+  font-size:28px;
+  border:none;
+}
+
+/* MODAL */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.6);
+  display:none;
+  justify-content:center;
+  align-items:flex-end;
+}
+
+.modal.active{display:flex;}
+
+.modal-content{
+  background:#111827;
+  width:100%;
+  padding:20px;
+  border-radius:20px 20px 0 0;
 }
