@@ -18,20 +18,13 @@ const outTotal = document.getElementById("outTotal");
 
 const submitBtn = document.getElementById("submitBtn");
 
-// 🔥 AUTO BACKUP
-function autoBackup(){
-
-  let backups = DB.get("backup_auto");
-
-  backups.unshift({
-    date: new Date().toISOString(),
-    data:{transactions,accounts,debts}
-  });
-
-  backups = backups.slice(0,5);
-
-  DB.set("backup_auto",backups);
-}
+// 🎨 CORES DAS CONTAS
+const colors = {
+  "Bradesco":"#cc092f",
+  "Banco Inter":"#ff7a00",
+  "Mercado Pago":"#00b1ea",
+  "VR":"#7c3aed"
+};
 
 // ADD / EDIT
 form.onsubmit = e=>{
@@ -62,54 +55,8 @@ function save(){
   DB.set("t",transactions);
   DB.set("accounts",accounts);
   DB.set("debts",debts);
-
-  autoBackup();
   render();
 }
-
-// EXPORT
-function exportBackup(){
-
-  const data = {
-    transactions,
-    accounts,
-    debts
-  };
-
-  const blob = new Blob([JSON.stringify(data)], {type:"application/json"});
-
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-
-  const date = new Date().toISOString().slice(0,10);
-
-  a.href = url;
-  a.download = `orion-backup-${date}.json`;
-  a.click();
-}
-
-// IMPORT
-document.getElementById("importFile").addEventListener("change", e=>{
-
-  const file = e.target.files[0];
-  if(!file) return;
-
-  const reader = new FileReader();
-
-  reader.onload = function(){
-
-    const data = JSON.parse(reader.result);
-
-    transactions = data.transactions || [];
-    accounts = data.accounts || [];
-    debts = data.debts || [];
-
-    save();
-  };
-
-  reader.readAsText(file);
-});
 
 // RENDER
 function render(){
@@ -130,6 +77,7 @@ function render(){
   inTotal.innerText="R$ "+inSum.toFixed(2);
   outTotal.innerText="R$ "+outSum.toFixed(2);
 
+  // CONTAS
   accountsDiv.innerHTML="";
 
   [...new Set(transactions.map(t=>t.account))].forEach(name=>{
@@ -143,24 +91,30 @@ function render(){
     });
 
     accountsDiv.innerHTML += `
-      <div class="account-card">
+      <div class="account-card" style="background:${colors[name] || '#334155'}">
         ${name}<br>
         R$ ${sum.toFixed(2)}
       </div>
     `;
   });
 
+  // LISTA PREMIUM
   list.innerHTML="";
 
   transactions.forEach((t,i)=>{
     const li = document.createElement("li");
 
     li.innerHTML = `
-      ${t.desc}<br>
-      R$ ${t.value.toFixed(2)}<br>
-      <small>${t.account} • ${t.category}</small>
+      <div class="item-top">
+        <div class="desc">${t.desc}</div>
+        <div class="value ${t.type==='entrada'?'in':'out'}">
+          ${t.type==='entrada'?'+':'-'} R$ ${t.value.toFixed(2)}
+        </div>
+      </div>
+      <div class="meta">${t.account} • ${t.category}</div>
     `;
 
+    // EDITAR
     li.onclick=()=>{
       desc.value = t.desc;
       value.value = t.value;
@@ -177,7 +131,7 @@ function render(){
 
 }
 
-// TABS (🔥 corrigido definitivo)
+// TABS
 const names = {
   home:"Home",
   transactions:"Lançamentos",
