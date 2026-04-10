@@ -26,73 +26,6 @@ body {
   display:block;
 }
 
-/* BALANCE */
-.balance-card {
-  margin:10px;
-  padding:18px;
-  border-radius:18px;
-  background:linear-gradient(135deg,#22c55e,#16a34a);
-}
-
-/* 🔥 CONTAS HORIZONTAL */
-.accounts-scroll {
-  display:flex;
-  gap:12px;
-  overflow-x:auto;
-  padding:10px;
-}
-
-.accounts-scroll::-webkit-scrollbar {
-  display:none;
-}
-
-/* CARD CONTA */
-.account-card {
-  min-width:220px;
-  height:130px;
-  padding:16px;
-  border-radius:20px;
-  color:#fff;
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
-  box-shadow:0 10px 25px rgba(0,0,0,0.3);
-  flex-shrink:0;
-}
-
-/* TOPO */
-.acc-top {
-  display:flex;
-  justify-content:space-between;
-  font-size:13px;
-  opacity:0.9;
-}
-
-/* SALDO */
-.acc-balance {
-  font-size:18px;
-  font-weight:600;
-}
-
-/* RODAPÉ */
-.acc-footer {
-  font-size:12px;
-  opacity:0.8;
-}
-
-/* BOTÃO ADD */
-.add-card {
-  min-width:80px;
-  height:130px;
-  border-radius:20px;
-  background:#1e293b;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:24px;
-  opacity:0.7;
-}
-
 /* CARD */
 .card {
   background:#1e293b;
@@ -101,7 +34,7 @@ body {
   border-radius:14px;
 }
 
-/* FORM */
+/* INPUT */
 input, select, button {
   width:100%;
   height:44px;
@@ -109,6 +42,65 @@ input, select, button {
   border-radius:10px;
   border:none;
   font-size:16px;
+}
+
+/* 🔥 DÍVIDA */
+.debt-item {
+  background:#1e293b;
+  padding:14px;
+  margin-top:10px;
+  border-radius:16px;
+  border:1px solid #334155;
+}
+
+.debt-top {
+  display:flex;
+  justify-content:space-between;
+  font-size:14px;
+}
+
+.debt-name {
+  font-weight:600;
+}
+
+.debt-values {
+  font-size:12px;
+  opacity:0.7;
+  margin-top:4px;
+}
+
+/* PROGRESSO */
+.progress {
+  height:6px;
+  background:#334155;
+  border-radius:10px;
+  margin-top:8px;
+  overflow:hidden;
+}
+
+.progress-bar {
+  height:100%;
+  background:#22c55e;
+  width:0%;
+  transition:0.3s;
+}
+
+/* AÇÕES */
+.debt-actions {
+  display:flex;
+  justify-content:space-between;
+  margin-top:10px;
+}
+
+.btn-pay {
+  flex:1;
+  margin-right:6px;
+  background:#22c55e;
+}
+
+.btn-undo {
+  width:50px;
+  background:#334155;
 }
 
 /* TABBAR */
