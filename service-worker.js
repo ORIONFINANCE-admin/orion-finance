@@ -1,4 +1,4 @@
-const CACHE = "orion-v1";
+const CACHE = "orion-v2";
 
 const FILES = [
   "/",
