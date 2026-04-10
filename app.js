@@ -1,68 +1,93 @@
 const DB = {
-  get:k=>JSON.parse(localStorage.getItem(k))||[],
-  set:(k,v)=>localStorage.setItem(k,JSON.stringify(v))
+  get: (k) => JSON.parse(localStorage.getItem(k)) || [],
+  set: (k, v) => localStorage.setItem(k, JSON.stringify(v))
 };
 
 let transactions = DB.get("t");
-let debts = DB.get("d");
-let accounts = DB.get("acc");
-
-// FORMATAR REAL
-function money(v){
-  return v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
-}
+let accounts = DB.get("acc") || [];
 
 // ELEMENTOS
 const balance = document.getElementById("balance");
 const inTotal = document.getElementById("inTotal");
 const outTotal = document.getElementById("outTotal");
 const accountsDiv = document.getElementById("accounts");
-const modal = document.getElementById("modal");
 
+const modal = document.getElementById("modal");
+const hasCard = document.getElementById("hasCard");
+const cardFields = document.getElementById("cardFields");
+
+// FORMATAR REAL
+function money(v) {
+  return Number(v || 0).toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL"
+  });
+}
+
+// =========================
 // MODAL
-function openModal(){ modal.classList.add("active"); }
-function closeModal(){ modal.classList.remove("active"); }
+// =========================
+
+function openModal() {
+  modal.classList.add("active");
+}
+
+function closeModal() {
+  modal.classList.remove("active");
+}
 
 // MOSTRAR CAMPOS CARTÃO
-hasCard.onchange = ()=>{
-  cardFields.style.display = hasCard.checked ? "block":"none";
-};
-
-// SALVAR CONTA
-function saveAccount(){
-
-  accounts.push({
-    name:acc_name.value,
-    balance:Number(acc_balance.value),
-    card:hasCard.checked,
-    final:card_final.value,
-    type:card_type.value
+if (hasCard) {
+  hasCard.addEventListener("change", () => {
+    cardFields.style.display = hasCard.checked ? "block" : "none";
   });
+}
 
-  DB.set("acc",accounts);
+// =========================
+// SALVAR CONTA
+// =========================
+
+function saveAccount() {
+  const name = document.getElementById("acc_name").value;
+  const balanceValue = Number(document.getElementById("acc_balance").value);
+
+  if (!balanceValue || balanceValue <= 0) {
+    alert("Informe um saldo válido");
+    return;
+  }
+
+  const account = {
+    name,
+    balance: balanceValue,
+    card: document.getElementById("hasCard").checked,
+    final: document.getElementById("card_final").value || "",
+    type: document.getElementById("card_type").value || ""
+  };
+
+  accounts.push(account);
+  DB.set("acc", accounts);
 
   closeModal();
   renderHome();
 }
 
-// RESET
-function resetAll(){
-  localStorage.clear();
-  location.reload();
-}
-
+// =========================
 // HOME
-function renderHome(){
+// =========================
 
-  let total=0, inS=0, outS=0;
+function renderHome() {
 
-  transactions.forEach(t=>{
-    if(t.type==="entrada"){
-      total+=t.value;
-      inS+=t.value;
-    }else{
-      total-=t.value;
-      outS+=t.value;
+  let total = 0;
+  let inS = 0;
+  let outS = 0;
+
+  transactions.forEach(t => {
+    if (t.type === "entrada") {
+      total += t.value;
+      inS += t.value;
+    } else {
+      total -= t.value;
+      outS += t.value;
     }
   });
 
@@ -70,63 +95,100 @@ function renderHome(){
   inTotal.innerText = money(inS);
   outTotal.innerText = money(outS);
 
-  accountsDiv.innerHTML="";
+  accountsDiv.innerHTML = "";
 
-  accounts
-    .filter(a=>a.balance>0)
-    .forEach(a=>{
+  // 🚫 NÃO MOSTRAR contas zeradas
+  const validAccounts = accounts.filter(a => a.balance > 0);
 
-      let color = "mp";
-      if(a.name.includes("Bradesco")) color="bradesco";
-      if(a.name.includes("Inter")) color="inter";
-      if(a.name.includes("VR")) color="vr";
+  if (validAccounts.length === 0) {
+    accountsDiv.innerHTML = `<p style="opacity:0.5">Nenhuma conta ainda</p>`;
+    return;
+  }
 
-      accountsDiv.innerHTML += `
-        <div class="card-bank ${color}">
-          <strong>${a.name}</strong><br>
-          ${money(a.balance)}<br>
-          ${a.card ? a.type+" • **** "+a.final : ""}
-        </div>
-      `;
-    });
+  validAccounts.forEach(a => {
 
+    let color = "mp";
+
+    if (a.name.includes("Bradesco")) color = "bradesco";
+    if (a.name.includes("Inter")) color = "inter";
+    if (a.name.includes("VR")) color = "vr";
+
+    accountsDiv.innerHTML += `
+      <div class="card-bank ${color}">
+        <strong>${a.name}</strong><br>
+        ${money(a.balance)}<br>
+        ${a.card ? `${a.type} • **** ${a.final}` : ""}
+      </div>
+    `;
+  });
 }
 
+// =========================
 // TRANSAÇÕES
-form.onsubmit=e=>{
-  e.preventDefault();
+// =========================
 
-  transactions.push({
-    desc:desc.value,
-    value:Number(value.value),
-    type:type.value
-  });
+const form = document.getElementById("form");
 
-  form.reset();
-  DB.set("t",transactions);
-  renderHome();
-};
+if (form) {
+  form.onsubmit = (e) => {
+    e.preventDefault();
 
-// TABS (mantido)
-document.querySelectorAll(".tabbar button").forEach(btn=>{
-  btn.onclick=()=>{
+    const desc = document.getElementById("desc").value;
+    const value = Number(document.getElementById("value").value);
+    const type = document.getElementById("type").value;
 
-    document.querySelectorAll(".tabbar button")
-      .forEach(b=>b.classList.remove("active"));
+    transactions.push({
+      desc,
+      value,
+      type
+    });
 
-    btn.classList.add("active");
-
-    document.querySelectorAll(".screen")
-      .forEach(s=>s.classList.remove("active"));
-
-    document.getElementById(btn.dataset.tab)
-      .classList.add("active");
-
-    title.innerText = btn.innerText;
+    DB.set("t", transactions);
+    form.reset();
 
     renderHome();
   };
+}
+
+// =========================
+// TABS (CORRIGIDO)
+// =========================
+
+const tabs = document.querySelectorAll(".tabbar button");
+const screens = document.querySelectorAll(".screen");
+const title = document.getElementById("title");
+
+tabs.forEach(btn => {
+  btn.addEventListener("click", () => {
+
+    tabs.forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+
+    screens.forEach(s => s.classList.remove("active"));
+
+    const target = btn.getAttribute("data-tab");
+    const screen = document.getElementById(target);
+
+    if (screen) screen.classList.add("active");
+
+    // título
+    if (target === "home") title.innerText = "Home";
+    if (target === "transactions") title.innerText = "Lançamentos";
+    if (target === "debts") title.innerText = "Dívidas";
+    if (target === "accountsScreen") title.innerText = "Contas";
+  });
 });
+
+// =========================
+// RESET
+// =========================
+
+function resetAll() {
+  if (confirm("Deseja apagar tudo?")) {
+    localStorage.clear();
+    location.reload();
+  }
+}
 
 // INIT
 renderHome();
