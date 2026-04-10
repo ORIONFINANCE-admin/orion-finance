@@ -7,14 +7,15 @@ body{
 
 header{
   padding:20px;
-  font-size:24px;
+  font-size:22px;
   font-weight:600;
 }
 
+/* TELAS */
 .screen{display:none;}
 .screen.active{display:block;}
 
-/* BALANCE */
+/* HOME */
 .balance{padding:0 20px;}
 
 .summary{
@@ -30,7 +31,7 @@ header{
   border-radius:10px;
 }
 
-/* CONTAS GRID */
+/* CONTAS */
 .accounts{
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -57,12 +58,13 @@ header{
   border-radius:12px;
 }
 
+/* INPUTS */
 input, select, button{
   width:100%;
   height:42px;
   margin-top:8px;
   border:none;
-  border-radius:8px;
+  border-radius:10px;
 }
 
 button{
@@ -70,6 +72,7 @@ button{
   font-weight:bold;
 }
 
+/* LISTA */
 .list-box{
   height:220px;
   overflow:auto;
@@ -83,7 +86,7 @@ li{
   border-radius:8px;
 }
 
-/* TABBAR */
+/* TABBAR PREMIUM */
 .tabbar{
   position:fixed;
   bottom:0;
@@ -91,24 +94,29 @@ li{
   right:0;
   display:flex;
   justify-content:space-around;
-  padding:10px;
+  padding:12px;
   background:#0b1220;
+  border-top:1px solid #1f2937;
 }
 
 .tabbar button{
-  background:none;
-  border:none;
-  color:#6b7280;
+  background:#111827;
+  padding:10px 14px;
+  border-radius:12px;
+  font-size:16px;
+  color:#9ca3af;
+  transition:0.2s;
 }
 
 .tabbar button.active{
-  color:#22c55e;
+  background:#22c55e;
+  color:#000;
 }
 
 /* BOTÃO + */
 .fab{
   position:fixed;
-  bottom:70px;
+  bottom:75px;
   right:20px;
   width:55px;
   height:55px;
@@ -117,6 +125,7 @@ li{
   color:#000;
   font-size:28px;
   border:none;
+  display:none;
 }
 
 /* MODAL */
