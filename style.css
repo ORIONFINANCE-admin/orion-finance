@@ -34,7 +34,7 @@ body {
   background:linear-gradient(135deg,#22c55e,#16a34a);
 }
 
-/* 🔥 GRID CONTAS */
+/* GRID CONTAS */
 .accounts-grid {
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -46,13 +46,6 @@ body {
   padding:14px;
   border-radius:16px;
   font-size:14px;
-  animation:fadeIn 0.3s ease;
-}
-
-/* INSIGHTS */
-.insights {
-  display:flex;
-  justify-content:space-between;
 }
 
 /* CARD */
@@ -73,23 +66,49 @@ input, select, button {
   font-size:16px;
 }
 
-/* LIST */
+/* 🔥 LISTA PREMIUM */
 li {
-  background:#334155;
+  background:#1e293b;
   padding:14px;
   margin-top:10px;
-  border-radius:14px;
+  border-radius:16px;
   transition:0.2s;
+  border:1px solid #334155;
 }
 
 li:active {
   transform:scale(0.97);
 }
 
-/* ANIMAÇÃO */
-@keyframes fadeIn {
-  from {opacity:0; transform:translateY(10px);}
-  to {opacity:1; transform:translateY(0);}
+/* ESTRUTURA */
+.item-top {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.desc {
+  font-size:15px;
+  font-weight:500;
+}
+
+.value {
+  font-size:16px;
+  font-weight:600;
+}
+
+.in {
+  color:#22c55e;
+}
+
+.out {
+  color:#ef4444;
+}
+
+.meta {
+  font-size:12px;
+  opacity:0.6;
+  margin-top:4px;
 }
 
 /* TABBAR */
