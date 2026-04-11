@@ -138,6 +138,20 @@ li{
   align-items:flex-end;
 }
 
+/* FIX CHECKBOX HORIZONTAL (USAR CARTÃO) */
+label{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  width:100%;
+  overflow:hidden;
+}
+
+label input[type="checkbox"]{
+  width:auto;
+  flex-shrink:0;
+}
+
 .modal.active{display:flex;}
 
 .modal-content{
