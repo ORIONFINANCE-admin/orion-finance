@@ -13,7 +13,6 @@ function migrateData(){
 
 let changed = false;
 
-// 🔹 CONTAS
 accounts = accounts.map(acc => {
 
   if(acc.initialBalance === undefined){
@@ -34,7 +33,6 @@ accounts = accounts.map(acc => {
   return acc;
 });
 
-// 🔹 TRANSAÇÕES
 transactions = transactions.map(t => {
 
   if(t.account === undefined){
@@ -60,7 +58,6 @@ transactions = transactions.map(t => {
   return t;
 });
 
-// 🔹 SALVAR SE HOUVER MUDANÇA
 if(changed){
   DB.set("acc", accounts);
   DB.set("t", transactions);
@@ -87,6 +84,9 @@ const account = document.getElementById("account");
 const category = document.getElementById("category");
 const list = document.getElementById("list");
 
+// 🔍 BUSCA
+const searchInput = document.getElementById("searchInput");
+
 // DÍVIDAS
 const debtList = document.getElementById("debtList");
 
@@ -97,9 +97,11 @@ const cardFields = document.getElementById("cardFields");
 const fab = document.querySelector(".fab");
 const useCard = document.getElementById("useCard");
 const paymentType = document.getElementById("paymentType");
-
-// 🔥 NOVO ELEMENTO (LIMITE)
 const card_limit = document.getElementById("card_limit");
+
+// EXTRATO VIEW
+const transactionView = document.getElementById("transactionView");
+const extractView = document.getElementById("extractView");
 
 // ================= FORMAT =================
 
@@ -160,7 +162,7 @@ used: 0,
 
 DB.set("acc",accounts);
 
-// 🔥 LIMPAR MODAL
+// LIMPAR MODAL
 acc_balance.value = "";
 card_final.value = "";
 card_limit.value = "";
@@ -177,7 +179,6 @@ function renderHome(){
 
 let total=0, inS=0, outS=0;
 
-// 🔥 SOMAR SALDO INICIAL
 accounts.forEach(a=>{
 total += (a.initialBalance ?? a.balance ?? 0);
 });
@@ -277,6 +278,64 @@ list.appendChild(li);
 });
 }
 
+// ================= FILTRO =================
+
+function filterTransactions(query){
+
+const q = query.toLowerCase();
+
+const filtered = transactions.filter(t=>{
+return (
+(t.desc && t.desc.toLowerCase().includes(q)) ||
+(t.account && t.account.toLowerCase().includes(q)) ||
+(t.category && t.category.toLowerCase().includes(q))
+);
+});
+
+renderFilteredTransactions(filtered);
+}
+
+function renderFilteredTransactions(data){
+
+list.innerHTML = "";
+
+if(data.length === 0){
+list.innerHTML = "<li style='opacity:.5'>Nenhum resultado</li>";
+return;
+}
+
+data.forEach(t => {
+
+const li = document.createElement("li");
+
+const color = t.type === "entrada" ? "#22c55e" : "#ef4444";
+
+li.innerHTML = `
+  <div style="display:flex; justify-content:space-between;">
+    <span>${t.desc} <small style="opacity:.6">(${t.account || "Sem conta"})</small></span>
+    <strong style="color:${color}">
+      ${t.type === "saida" ? "-" : "+"} ${money(t.value)}
+    </strong>
+  </div>
+`;
+
+list.appendChild(li);
+
+});
+}
+
+if(searchInput){
+searchInput.addEventListener("input", function(){
+if(this.value.trim() === ""){
+renderTransactions();
+}else{
+filterTransactions(this.value);
+}
+});
+}
+
+// ================= SUBMIT =================
+
 form.onsubmit = e => {
 e.preventDefault();
 
@@ -299,6 +358,23 @@ paymentType.style.display = "none";
 renderHome();
 renderTransactions();
 };
+
+// ================= EXTRATO =================
+
+function showExtract(){
+if(transactionView && extractView){
+transactionView.style.display = "none";
+extractView.style.display = "block";
+renderTransactions();
+}
+}
+
+function hideExtract(){
+if(transactionView && extractView){
+extractView.style.display = "none";
+transactionView.style.display = "block";
+}
+}
 
 // ================= DÍVIDAS =================
 
@@ -409,76 +485,56 @@ location.reload();
 
 function initTabs(){
 
-  const tabs = document.querySelectorAll(".tabbar button");
-  const screens = document.querySelectorAll(".screen");
-  const title = document.getElementById("title");
+const tabs = document.querySelectorAll(".tabbar button");
+const screens = document.querySelectorAll(".screen");
+const title = document.getElementById("title");
 
-  if(!tabs || tabs.length === 0){
-    console.log("Tabs não encontradas");
-    return;
-  }
+if(!tabs || tabs.length === 0){
+console.log("Tabs não encontradas");
+return;
+}
 
-  tabs.forEach(btn=>{
-    btn.addEventListener("click", function(){
+tabs.forEach(btn=>{
+btn.addEventListener("click", function(){
 
-      tabs.forEach(b=>b.classList.remove("active"));
-      this.classList.add("active");
+tabs.forEach(b=>b.classList.remove("active"));
+this.classList.add("active");
 
-      screens.forEach(s=>s.classList.remove("active"));
+screens.forEach(s=>s.classList.remove("active"));
 
-      const target = this.dataset.tab;
-      const el = document.getElementById(target);
+const target = this.dataset.tab;
+const el = document.getElementById(target);
 
-      if(!el){
-        console.log("Tela não encontrada:", target);
-        return;
-      }
+if(!el){
+console.log("Tela não encontrada:", target);
+return;
+}
 
-      el.classList.add("active");
+el.classList.add("active");
 
-      if(target==="home") title.innerText="Home";
-      if(target==="transactions") title.innerText="Lançamentos";
-      if(target==="debts"){
-        title.innerText="Dívidas";
-        renderDebts();
-      }
-      if(target==="accountsScreen") title.innerText="Contas";
+if(target==="home") title.innerText="Home";
+if(target==="transactions") title.innerText="Lançamentos";
+if(target==="debts"){
+title.innerText="Dívidas";
+renderDebts();
+}
+if(target==="accountsScreen") title.innerText="Contas";
 
-      fab.style.display = target==="transactions" ? "block":"none";
+fab.style.display = target==="transactions" ? "block":"none";
 
-    });
-  });
+});
+});
 }
 
 if(document.readyState === "loading"){
-  document.addEventListener("DOMContentLoaded", initTabs);
+document.addEventListener("DOMContentLoaded", initTabs);
 }else{
-  initTabs();
+initTabs();
 }
 
 window.addEventListener("error", function(e){
-  console.log("ERRO DETECTADO:", e.message);
+console.log("ERRO DETECTADO:", e.message);
 });
-
-// ================= EXTRATO =================
-
-const transactionView = document.getElementById("transactionView");
-const extractView = document.getElementById("extractView");
-
-function showExtract(){
-  if(transactionView && extractView){
-    transactionView.style.display = "none";
-    extractView.style.display = "block";
-    renderTransactions();
-  }
-}
-
-function hideExtract(){
-  if(transactionView && extractView){
-    extractView.style.display = "none";
-    transactionView.style.display = "block";
-  }
-}
 
 // INIT
 renderHome();
