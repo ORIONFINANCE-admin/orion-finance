@@ -394,17 +394,29 @@ filterTransactions(this.value);
 form.onsubmit = e => {
 e.preventDefault();
 
+const isCredit = useCard.checked && paymentType.value === "credito";
+
 transactions.push({
-desc: desc.value,
-value: Number(value.value),
-type: type.value,
-account: account.value,
-category: category.value,
-paymentType: useCard.checked ? paymentType.value : null,
-isCredit: useCard.checked && paymentType.value === "credito",
-date: Date.now(),
-customDate: null
+  desc: desc.value,
+  value: Number(value.value),
+  type: type.value,
+  account: account.value,
+  category: category.value,
+  paymentType: useCard.checked ? paymentType.value : null,
+  isCredit,
+  date: Date.now(),
+  customDate: null
 });
+
+// 💳 ATUALIZA LIMITE DO CARTÃO
+if(isCredit){
+  const acc = accounts.find(a => a.name === account.value);
+
+  if(acc && acc.limit){
+    acc.used = (acc.used || 0) + Number(value.value);
+    DB.set("acc", accounts);
+  }
+}
 
 DB.set("t", transactions);
 form.reset();
