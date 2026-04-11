@@ -244,6 +244,7 @@ function payInvoice(accountName, amount){
 // ================= HOME =================
 
 function renderHome(){
+  accountsDiv.innerHTML = "";
 
 let total=0, inS=0, outS=0;
 
