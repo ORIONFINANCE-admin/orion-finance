@@ -1,6 +1,7 @@
-const CACHE = "orion-v13";
+// 🔥 versão automática baseada em timestamp (FORÇA INVALIDAÇÃO REAL)
+const VERSION = Date.now();
+const CACHE = `orion-${VERSION}`;
 
-// arquivos essenciais (app shell)
 const FILES = [
   "/",
   "/index.html",
@@ -28,18 +29,18 @@ self.addEventListener("activate", (event) => {
     caches.keys().then((keys) => {
       return Promise.all(
         keys
-          .filter((key) => key !== CACHE)
+          .filter((key) => key.startsWith("orion-") && key !== CACHE)
           .map((key) => caches.delete(key))
       );
     })
   );
 });
 
-// ================= FETCH (HÍBRIDO INTELIGENTE) =================
+// ================= FETCH (CACHE LIMPO + SEM MISTURA) =================
 self.addEventListener("fetch", (event) => {
   const request = event.request;
 
-  // 🔥 HTML sempre network-first (evita versão antiga)
+  // 🔥 HTML SEMPRE NETWORK FIRST (garante atualização real)
   if (request.mode === "navigate") {
     event.respondWith(
       fetch(request)
@@ -49,14 +50,12 @@ self.addEventListener("fetch", (event) => {
             return response;
           });
         })
-        .catch(() => {
-          return caches.match("/index.html");
-        })
+        .catch(() => caches.match("/index.html"))
     );
     return;
   }
 
-  // 🔥 JS e CSS: network-first com fallback cache
+  // 🔥 JS / CSS SEMPRE NETWORK FIRST (evita versão antiga)
   if (
     request.url.includes(".js") ||
     request.url.includes(".css")
@@ -74,7 +73,7 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // 🔥 padrão: cache-first (rápido e offline)
+  // 🔥 fallback seguro
   event.respondWith(
     caches.match(request).then((cached) => {
       return (
