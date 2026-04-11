@@ -152,7 +152,7 @@ balance: balanceValue,
 card:hasCard.checked,
 final:card_final.value,
 type:card_type.value,
-limit: 0,
+limit: Number(card_limit.value) || 0,
 used: 0,
 });
 
