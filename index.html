@@ -14,6 +14,7 @@
 
 <main>
 
+<!-- HOME -->
 <section id="home" class="screen active">
   <div class="balance">
     <span>Saldo total</span>
@@ -34,69 +35,88 @@
   <div id="accounts" class="accounts"></div>
 </section>
 
+<!-- LANÇAMENTOS -->
 <section id="transactions" class="screen">
 
-  <div class="card">
-    <form id="form">
+  <!-- VIEW FORM -->
+  <div id="transactionView">
 
-      <input id="desc" placeholder="Descrição" required>
+    <div class="card">
+      <form id="form">
 
-      <input id="value" type="number" inputmode="decimal" placeholder="Valor" required>
+        <input id="desc" placeholder="Descrição" required>
 
-      <select id="type">
-        <option value="entrada">Entrada</option>
-        <option value="saida">Saída</option>
-      </select>
+        <input id="value" type="number" inputmode="decimal" placeholder="Valor" required>
 
-      <select id="account">
-        <option>Bradesco</option>
-        <option>Banco Inter</option>
-        <option>Mercado Pago</option>
-        <option>VR</option>
-      </select>
+        <select id="type">
+          <option value="entrada">Entrada</option>
+          <option value="saida">Saída</option>
+        </select>
 
-      <!-- 🔥 NOVO BLOCO -->
-      <label style="display:flex; align-items:center; gap:8px; margin-top:10px;">
-        <input type="checkbox" id="useCard">
-        Usar cartão
-      </label>
+        <select id="account">
+          <option>Bradesco</option>
+          <option>Banco Inter</option>
+          <option>Mercado Pago</option>
+          <option>VR</option>
+        </select>
 
-      <select id="paymentType" style="display:none;">
-        <option value="debito">Débito</option>
-        <option value="credito">Crédito</option>
-      </select>
+        <select id="category">
+          <option>Salário</option>
+          <option>Mercado</option>
+          <option>Investimentos</option>
+          <option>Rendimentos</option>
+          <option>Outros</option>
+        </select>
 
-      <select id="category">
-        <option>Salário</option>
-        <option>Freelance</option>
-        <option>Mercado</option>
-        <option>Restaurante</option>
-        <option>Transporte</option>
-        <option>Assinaturas</option>
-        <option>Investimentos</option>
-        <option>Rendimentos</option>
-        <option>Saúde</option>
-        <option>Educação</option>
-        <option>Outros</option>
-      </select>
+        <!-- USO DO CARTÃO -->
+        <label style="display:flex; align-items:center; gap:8px;">
+          <input type="checkbox" id="useCard">
+          <span>Usar cartão</span>
+        </label>
 
-      <button type="submit">Adicionar</button>
+        <select id="paymentType" style="display:none;">
+          <option value="credito">Crédito</option>
+          <option value="debito">Débito</option>
+        </select>
 
-    </form>
+        <button type="submit">Adicionar</button>
+
+      </form>
+    </div>
+
+    <!-- BOTÃO EXTRATO -->
+    <div style="padding:10px;">
+      <button onclick="showExtract()" style="background:#374151;color:#fff;">
+        Ver extrato
+      </button>
+    </div>
+
   </div>
 
-  <div class="list-box">
-    <ul id="list"></ul>
+  <!-- VIEW EXTRATO -->
+  <div id="extractView" style="display:none;">
+
+    <div style="padding:10px;">
+      <button onclick="hideExtract()" style="background:#374151;color:#fff;">
+        ← Voltar
+      </button>
+    </div>
+
+    <div class="list-box">
+      <ul id="list"></ul>
+    </div>
+
   </div>
 
 </section>
 
+<!-- DÍVIDAS -->
 <section id="debts" class="screen">
 
   <div class="card">
     <input id="d_name" placeholder="Nome">
-    <input id="d_valor" type="number" inputmode="decimal" placeholder="Valor da parcela">
-    <input id="d_total" type="number" inputmode="decimal" placeholder="Total">
+    <input id="d_valor" type="number" inputmode="numeric" placeholder="Valor da parcela">
+    <input id="d_total" type="number" inputmode="numeric" placeholder="Total">
     <input id="d_pago" type="number" inputmode="numeric" placeholder="Parcelas pagas">
 
     <button onclick="addDebt()">Salvar</button>
@@ -106,13 +126,16 @@
 
 </section>
 
+<!-- CONTAS -->
 <section id="accountsScreen" class="screen">
 
   <div class="card">
     <h3>Backup & Segurança</h3>
 
     <button onclick="exportData()">Salvar backup</button>
+
     <input type="file" onchange="importData(event)">
+
     <button onclick="resetAll()">Resetar tudo</button>
   </div>
 
@@ -120,8 +143,10 @@
 
 </main>
 
+<!-- BOTÃO FLUTUANTE -->
 <button class="fab" onclick="openModal()">+</button>
 
+<!-- MODAL -->
 <div id="modal" class="modal">
   <div class="modal-content">
 
@@ -134,7 +159,7 @@
       <option>VR</option>
     </select>
 
-    <input id="acc_balance" type="number" inputmode="decimal" placeholder="Saldo inicial">
+    <input id="acc_balance" type="number" placeholder="Saldo inicial">
 
     <label style="display:flex; align-items:center; gap:8px; margin-top:10px;">
       <input type="checkbox" id="hasCard">
@@ -142,7 +167,7 @@
     </label>
 
     <div id="cardFields" style="display:none;">
-      <input id="card_final" inputmode="numeric" placeholder="Final do cartão (4 dígitos)">
+      <input id="card_final" placeholder="Final do cartão (4 dígitos)">
       <select id="card_type">
         <option>Crédito</option>
         <option>Débito</option>
@@ -156,6 +181,7 @@
   </div>
 </div>
 
+<!-- TABBAR -->
 <nav class="tabbar">
   <button data-tab="home" class="active">🏠</button>
   <button data-tab="transactions">💸</button>
