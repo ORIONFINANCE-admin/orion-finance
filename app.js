@@ -460,6 +460,26 @@ window.addEventListener("error", function(e){
   console.log("ERRO DETECTADO:", e.message);
 });
 
+// ================= EXTRATO =================
+
+const transactionView = document.getElementById("transactionView");
+const extractView = document.getElementById("extractView");
+
+function showExtract(){
+  if(transactionView && extractView){
+    transactionView.style.display = "none";
+    extractView.style.display = "block";
+    renderTransactions();
+  }
+}
+
+function hideExtract(){
+  if(transactionView && extractView){
+    extractView.style.display = "none";
+    transactionView.style.display = "block";
+  }
+}
+
 // INIT
 renderHome();
 renderTransactions();
