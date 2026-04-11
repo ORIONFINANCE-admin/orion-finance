@@ -269,19 +269,6 @@ balance.innerText = money(total);
 inTotal.innerText = money(inS);
 outTotal.innerText = money(outS);
 
-accountsDiv.innerHTML+=`
-  <div class="card-bank ${color}">
-    <strong>${a.name}</strong><br>
-    ${money(saldo)}<br>
-    ${a.card ? a.type+" • **** "+a.final : ""}
-    ${a.limit > 0 ? `
-      <br>Limite: ${money(a.limit)}
-      <br>Disponível: ${money(a.limit - (a.used || 0))}
-      ${a.used > 0 ? `<br>Fatura: ${money(a.used)}` : ""}
-    ` : ""}
-  </div>
-`;
-
 if(accounts.length===0){
 accountsDiv.innerHTML="<p style='opacity:.5'>Nenhuma conta</p>";
 return;
