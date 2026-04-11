@@ -71,7 +71,8 @@ function saveAccount(){
 
   accounts.push({
     name,
-    balance:balanceValue,
+    initialBalance: balanceValue, // novo padrão
+    balance: balanceValue, // compatibilidade antiga
     card:hasCard.checked,
     final:card_final.value,
     type:card_type.value
@@ -105,14 +106,23 @@ function renderHome(){
 
   accountsDiv.innerHTML="";
 
-  const valid = accounts.filter(a=>a.balance>0);
-
-  if(valid.length===0){
+  if(accounts.length===0){
     accountsDiv.innerHTML="<p style='opacity:.5'>Nenhuma conta</p>";
     return;
   }
 
-  valid.forEach(a=>{
+  accounts.forEach(a=>{
+
+    // 🔥 base inicial (compatível com versões antigas)
+    let saldo = a.initialBalance ?? a.balance ?? 0;
+
+    // 🔥 aplicar transações vinculadas
+    transactions.forEach(t=>{
+      if(t.account === a.name){
+        if(t.type === "entrada") saldo += t.value;
+        else saldo -= t.value;
+      }
+    });
 
     let color="mp";
     if(a.name.includes("Bradesco")) color="bradesco";
@@ -122,7 +132,7 @@ function renderHome(){
     accountsDiv.innerHTML+=`
       <div class="card-bank ${color}">
         <strong>${a.name}</strong><br>
-        ${money(a.balance)}<br>
+        ${money(saldo)}<br>
         ${a.card ? a.type+" • **** "+a.final : ""}
       </div>
     `;
@@ -147,7 +157,7 @@ function renderTransactions(){
 
     li.innerHTML = `
       <div style="display:flex; justify-content:space-between;">
-        <span>${t.desc}</span>
+        <span>${t.desc} <small style="opacity:.6">(${t.account || "Sem conta"})</small></span>
         <strong style="color:${color}">
           ${t.type === "saida" ? "-" : "+"} ${money(t.value)}
         </strong>
@@ -164,7 +174,8 @@ form.onsubmit = e => {
   transactions.push({
     desc: desc.value,
     value: Number(value.value),
-    type: type.value
+    type: type.value,
+    account: account.value // 🔥 conexão aqui
   });
 
   DB.set("t", transactions);
