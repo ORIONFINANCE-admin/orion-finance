@@ -179,6 +179,38 @@ useCard.addEventListener("change", updateCardUI);
 
 function saveAccount(){
 
+function payInvoice(accountName, amount){
+
+  const acc = accounts.find(a => a.name === accountName);
+  if(!acc) return;
+
+  const value = Number(amount);
+
+  if(value <= 0) return;
+
+  // reduz limite usado
+  acc.used = Math.max(0, (acc.used || 0) - value);
+
+  // registra transação de pagamento
+  transactions.push({
+    desc: "Pagamento de fatura",
+    value: value,
+    type: "saida",
+    account: accountName,
+    category: "Cartão de crédito",
+    paymentType: null,
+    isCredit: false,
+    date: Date.now(),
+    customDate: null
+  });
+
+  DB.set("acc", accounts);
+  DB.set("t", transactions);
+
+  renderHome();
+  renderTransactions();
+}
+
 const name = acc_name.value;
 const balanceValue = Number(acc_balance.value);
 
@@ -237,7 +269,18 @@ balance.innerText = money(total);
 inTotal.innerText = money(inS);
 outTotal.innerText = money(outS);
 
-accountsDiv.innerHTML="";
+accountsDiv.innerHTML+=`
+  <div class="card-bank ${color}">
+    <strong>${a.name}</strong><br>
+    ${money(saldo)}<br>
+    ${a.card ? a.type+" • **** "+a.final : ""}
+    ${a.limit > 0 ? `
+      <br>Limite: ${money(a.limit)}
+      <br>Disponível: ${money(a.limit - (a.used || 0))}
+      ${a.used > 0 ? `<br>Fatura: ${money(a.used)}` : ""}
+    ` : ""}
+  </div>
+`;
 
 if(accounts.length===0){
 accountsDiv.innerHTML="<p style='opacity:.5'>Nenhuma conta</p>";
