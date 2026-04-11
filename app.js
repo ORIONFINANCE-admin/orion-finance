@@ -196,7 +196,6 @@ const li = document.createElement("li");
 const color = t.type === "entrada" ? "#22c55e" : "#ef4444";
 
 li.innerHTML = `
-
   <div style="display:flex; justify-content:space-between;">
     <span>${t.desc} <small style="opacity:.6">(${t.account || "Sem conta"})</small></span>
     <strong style="color:${color}">
@@ -268,19 +267,16 @@ const totalParcelas = Math.ceil(d.totalValor / d.valor);
 const restante = totalParcelas - d.pago;
 
 debtList.innerHTML += `
-
   <div class="card">
     <strong>${d.name}</strong><br>
     Parcela: ${money(d.valor)}<br>
     Progresso: ${d.pago}/${totalParcelas}<br>
     Restam: ${restante} parcelas
 
-```
-<div style="display:flex; gap:6px; margin-top:8px;">
-  <button onclick="payInstallment(${i})">+1</button>
-  <button onclick="undoInstallment(${i})" style="background:#374151;color:#fff;">Desfazer</button>
-</div>
-```
+    <div style="display:flex; gap:6px; margin-top:8px;">
+      <button onclick="payInstallment(${i})">+1</button>
+      <button onclick="undoInstallment(${i})" style="background:#374151;color:#fff;">Desfazer</button>
+    </div>
 
   </div>
 `;
@@ -386,7 +382,6 @@ function initTabs(){
   });
 }
 
-// execução blindada
 if(document.readyState === "loading"){
   document.addEventListener("DOMContentLoaded", initTabs);
 }else{
