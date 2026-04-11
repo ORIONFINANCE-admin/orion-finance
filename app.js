@@ -7,12 +7,13 @@ let transactions = DB.get("t");
 let accounts = DB.get("acc") || [];
 let debts = DB.get("debts") || [];
 
-// ================= MIGRAÇÃO AUTOMÁTICA =================
+// ================= MIGRAÇÃO =================
 
 function migrateData(){
 
 let changed = false;
 
+// ACCOUNTS
 accounts = accounts.map(acc => {
 
   if(acc.initialBalance === undefined){
@@ -33,6 +34,7 @@ accounts = accounts.map(acc => {
   return acc;
 });
 
+// TRANSACTIONS
 transactions = transactions.map(t => {
 
   if(t.account === undefined){
@@ -55,6 +57,17 @@ transactions = transactions.map(t => {
     changed = true;
   }
 
+  // 🔥 NOVO: DATA
+  if(t.date === undefined){
+    t.date = Date.now();
+    changed = true;
+  }
+
+  if(t.customDate === undefined){
+    t.customDate = null;
+    changed = true;
+  }
+
   return t;
 });
 
@@ -69,13 +82,11 @@ migrateData();
 
 // ================= ELEMENTOS =================
 
-// HOME
 const balance = document.getElementById("balance");
 const inTotal = document.getElementById("inTotal");
 const outTotal = document.getElementById("outTotal");
 const accountsDiv = document.getElementById("accounts");
 
-// FORM
 const form = document.getElementById("form");
 const desc = document.getElementById("desc");
 const value = document.getElementById("value");
@@ -84,13 +95,10 @@ const account = document.getElementById("account");
 const category = document.getElementById("category");
 const list = document.getElementById("list");
 
-// 🔍 BUSCA
 const searchInput = document.getElementById("searchInput");
 
-// DÍVIDAS
 const debtList = document.getElementById("debtList");
 
-// MODAL
 const modal = document.getElementById("modal");
 const hasCard = document.getElementById("hasCard");
 const cardFields = document.getElementById("cardFields");
@@ -99,7 +107,6 @@ const useCard = document.getElementById("useCard");
 const paymentType = document.getElementById("paymentType");
 const card_limit = document.getElementById("card_limit");
 
-// EXTRATO VIEW
 const transactionView = document.getElementById("transactionView");
 const extractView = document.getElementById("extractView");
 
@@ -107,6 +114,27 @@ const extractView = document.getElementById("extractView");
 
 function money(v){
 return Number(v||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+}
+
+// ================= DATA FORMAT =================
+
+function formatDateLabel(timestamp){
+
+const d = new Date(timestamp);
+const today = new Date();
+const yesterday = new Date();
+
+yesterday.setDate(today.getDate() - 1);
+
+if(d.toDateString() === today.toDateString()){
+return "Hoje";
+}
+
+if(d.toDateString() === yesterday.toDateString()){
+return "Ontem";
+}
+
+return d.toLocaleDateString("pt-BR");
 }
 
 // ================= MODAL =================
@@ -128,11 +156,7 @@ cardFields.style.display = hasCard.checked ? "block":"none";
 });
 
 function updateCardUI(){
-if(useCard.checked){
-paymentType.style.display = "block";
-}else{
-paymentType.style.display = "none";
-}
+paymentType.style.display = useCard.checked ? "block" : "none";
 }
 
 useCard.addEventListener("change", updateCardUI);
@@ -162,7 +186,7 @@ used: 0,
 
 DB.set("acc",accounts);
 
-// LIMPAR MODAL
+// LIMPAR
 acc_balance.value = "";
 card_final.value = "";
 card_limit.value = "";
@@ -235,7 +259,6 @@ if(a.name.includes("Inter")) color="inter";
 if(a.name.includes("VR")) color="vr";
 
 accountsDiv.innerHTML+=`
-
   <div class="card-bank ${color}">
     <strong>${a.name}</strong><br>
     ${money(saldo)}<br>
@@ -244,13 +267,14 @@ accountsDiv.innerHTML+=`
     ${creditUsed > 0 ? "<br>Fatura: " + money(creditUsed) : ""}
   </div>
 `;
-
 });
+
 }
 
-// ================= TRANSAÇÕES =================
+// ================= TRANSAÇÕES AGRUPADAS =================
 
 function renderTransactions(){
+
 list.innerHTML = "";
 
 if(transactions.length === 0){
@@ -258,15 +282,43 @@ list.innerHTML = "<li style='opacity:.5'>Nenhuma transação</li>";
 return;
 }
 
-transactions.forEach(t => {
+// 🔥 ordenar por data (mais recente)
+const sorted = [...transactions].sort((a,b)=>{
+const da = a.customDate || a.date;
+const db = b.customDate || b.date;
+return db - da;
+});
 
+let currentLabel = "";
+
+sorted.forEach(t => {
+
+const date = t.customDate || t.date;
+const label = formatDateLabel(date);
+
+// 🔹 grupo
+if(label !== currentLabel){
+currentLabel = label;
+
+const header = document.createElement("li");
+header.innerHTML = `<strong style="opacity:.6;">${label}</strong>`;
+list.appendChild(header);
+}
+
+// 🔹 item
 const li = document.createElement("li");
 
 const color = t.type === "entrada" ? "#22c55e" : "#ef4444";
 
 li.innerHTML = `
   <div style="display:flex; justify-content:space-between;">
-    <span>${t.desc} <small style="opacity:.6">(${t.account || "Sem conta"})</small></span>
+    <span>
+      ${t.desc}
+      <br>
+      <small style="opacity:.6;">
+        ${t.category} • ${t.account || "Sem conta"}
+      </small>
+    </span>
     <strong style="color:${color}">
       ${t.type === "saida" ? "-" : "+"} ${money(t.value)}
     </strong>
@@ -276,9 +328,10 @@ li.innerHTML = `
 list.appendChild(li);
 
 });
+
 }
 
-// ================= FILTRO =================
+// ================= BUSCA =================
 
 function filterTransactions(query){
 
@@ -299,24 +352,12 @@ function renderFilteredTransactions(data){
 
 list.innerHTML = "";
 
-if(data.length === 0){
-list.innerHTML = "<li style='opacity:.5'>Nenhum resultado</li>";
-return;
-}
-
 data.forEach(t => {
 
 const li = document.createElement("li");
 
-const color = t.type === "entrada" ? "#22c55e" : "#ef4444";
-
 li.innerHTML = `
-  <div style="display:flex; justify-content:space-between;">
-    <span>${t.desc} <small style="opacity:.6">(${t.account || "Sem conta"})</small></span>
-    <strong style="color:${color}">
-      ${t.type === "saida" ? "-" : "+"} ${money(t.value)}
-    </strong>
-  </div>
+  ${t.desc} - ${money(t.value)}
 `;
 
 list.appendChild(li);
@@ -346,7 +387,9 @@ type: type.value,
 account: account.value,
 category: category.value,
 paymentType: useCard.checked ? paymentType.value : null,
-isCredit: useCard.checked && paymentType.value === "credito"
+isCredit: useCard.checked && paymentType.value === "credito",
+date: Date.now(),
+customDate: null
 });
 
 DB.set("t", transactions);
@@ -424,8 +467,8 @@ debtList.innerHTML += `
 
   </div>
 `;
-
 });
+
 }
 
 function payInstallment(i){
@@ -490,7 +533,6 @@ const screens = document.querySelectorAll(".screen");
 const title = document.getElementById("title");
 
 if(!tabs || tabs.length === 0){
-console.log("Tabs não encontradas");
 return;
 }
 
@@ -505,12 +547,7 @@ screens.forEach(s=>s.classList.remove("active"));
 const target = this.dataset.tab;
 const el = document.getElementById(target);
 
-if(!el){
-console.log("Tela não encontrada:", target);
-return;
-}
-
-el.classList.add("active");
+if(el) el.classList.add("active");
 
 if(target==="home") title.innerText="Home";
 if(target==="transactions") title.innerText="Lançamentos";
@@ -531,10 +568,6 @@ document.addEventListener("DOMContentLoaded", initTabs);
 }else{
 initTabs();
 }
-
-window.addEventListener("error", function(e){
-console.log("ERRO DETECTADO:", e.message);
-});
 
 // INIT
 renderHome();
