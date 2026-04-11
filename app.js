@@ -277,7 +277,10 @@ accountsDiv.innerHTML+=`
     <strong>${a.name}</strong><br>
     ${money(saldo)}<br>
     ${a.card ? a.type+" • **** "+a.final : ""}
-    ${a.limit > 0 ? "<br>Limite: " + money(a.limit) : ""}
+    ${a.limit > 0 ? `
+  <br>Limite: ${money(a.limit)}
+  <br>Disponível: ${money(a.limit - (a.used || 0))}
+` : ""}
     ${creditUsed > 0 ? "<br>Fatura: " + money(creditUsed) : ""}
   </div>
 `;
