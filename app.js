@@ -68,7 +68,6 @@ if(changed){
 
 }
 
-// 🔥 EXECUTA MIGRAÇÃO
 migrateData();
 
 // ================= ELEMENTOS =================
@@ -98,6 +97,9 @@ const cardFields = document.getElementById("cardFields");
 const fab = document.querySelector(".fab");
 const useCard = document.getElementById("useCard");
 const paymentType = document.getElementById("paymentType");
+
+// 🔥 NOVO ELEMENTO (LIMITE)
+const card_limit = document.getElementById("card_limit");
 
 // ================= FORMAT =================
 
@@ -161,6 +163,7 @@ DB.set("acc",accounts);
 // 🔥 LIMPAR MODAL
 acc_balance.value = "";
 card_final.value = "";
+card_limit.value = "";
 hasCard.checked = false;
 cardFields.style.display = "none";
 
@@ -236,6 +239,7 @@ accountsDiv.innerHTML+=`
     <strong>${a.name}</strong><br>
     ${money(saldo)}<br>
     ${a.card ? a.type+" • **** "+a.final : ""}
+    ${a.limit > 0 ? "<br>Limite: " + money(a.limit) : ""}
     ${creditUsed > 0 ? "<br>Fatura: " + money(creditUsed) : ""}
   </div>
 `;
