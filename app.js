@@ -387,6 +387,10 @@ document.addEventListener("DOMContentLoaded", initTabs);
 initTabs();
 }
 
+window.addEventListener("error", function(e){
+  console.log("ERRO DETECTADO:", e.message);
+});
+
 // INIT
 renderHome();
 renderTransactions();
