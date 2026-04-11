@@ -301,7 +301,6 @@ accountsDiv.innerHTML+=`
   <br>Limite: ${money(a.limit)}
   <br>Disponível: ${money(a.limit - (a.used || 0))}
 ` : ""}
-    ${creditUsed > 0 ? "<br>Fatura: " + money(creditUsed) : ""}
   </div>
 `;
 });
