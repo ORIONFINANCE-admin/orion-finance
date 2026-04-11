@@ -521,9 +521,10 @@ debtList.innerHTML += `
     Restam: ${restante} parcelas
 
     <div style="display:flex; gap:6px; margin-top:8px;">
-      <button onclick="payInstallment(${i})">+1</button>
-      <button onclick="undoInstallment(${i})" style="background:#374151;color:#fff;">Desfazer</button>
-    </div>
+  <button onclick="payDebt(${i})">Pagar fatura</button>
+  <button onclick="payInstallment(${i})">+1</button>
+  <button onclick="undoInstallment(${i})" style="background:#374151;color:#fff;">Desfazer</button>
+</div>
 
   </div>
 `;
