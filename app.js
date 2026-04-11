@@ -6,6 +6,20 @@ set: (k, v) => localStorage.setItem(k, JSON.stringify(v))
 let transactions = DB.get("t");
 let accounts = DB.get("acc") || [];
 let debts = DB.get("debts") || [];
+const categories = [
+  "Salário",
+  "Mercado",
+  "Investimentos",
+  "Rendimentos",
+  "Moradia",
+  "Aluguel",
+  "Internet",
+  "Saúde",
+  "Transporte",
+  "Lazer",
+  "Educação",
+  "Outros"
+];
 
 // ================= MIGRAÇÃO =================
 
@@ -575,7 +589,22 @@ if ('serviceWorker' in navigator) {
     .catch(err => console.log('SW erro', err));
 }
 
+function loadCategories(){
+  const select = document.getElementById("category");
+  if(!select) return;
+
+  select.innerHTML = "";
+
+  categories.forEach(cat => {
+    const opt = document.createElement("option");
+    opt.value = cat;
+    opt.textContent = cat;
+    select.appendChild(opt);
+  });
+}
+
 // INIT
 renderHome();
 renderTransactions();
 renderDebts();
+loadCategories();
