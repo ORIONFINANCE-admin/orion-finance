@@ -316,32 +316,36 @@ location.reload();
 
 // ================= TABS =================
 
+document.addEventListener("DOMContentLoaded", () => {
+
 const tabs = document.querySelectorAll(".tabbar button");
 const screens = document.querySelectorAll(".screen");
 const title = document.getElementById("title");
 
 tabs.forEach(btn=>{
-btn.onclick=()=>{
+  btn.onclick=()=>{
 
-tabs.forEach(b=>b.classList.remove("active"));
-btn.classList.add("active");
+    tabs.forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
 
-screens.forEach(s=>s.classList.remove("active"));
+    screens.forEach(s=>s.classList.remove("active"));
 
-const target = btn.dataset.tab;
-document.getElementById(target).classList.add("active");
+    const target = btn.dataset.tab;
+    document.getElementById(target).classList.add("active");
 
-if(target==="home") title.innerText="Home";
-if(target==="transactions") title.innerText="Lançamentos";
-if(target==="debts") {
-  title.innerText="Dívidas";
-  renderDebts();
-}
-if(target==="accountsScreen") title.innerText="Contas";
+    if(target==="home") title.innerText="Home";
+    if(target==="transactions") title.innerText="Lançamentos";
+    if(target==="debts") {
+      title.innerText="Dívidas";
+      renderDebts();
+    }
+    if(target==="accountsScreen") title.innerText="Contas";
 
-fab.style.display = target==="transactions" ? "block":"none";
+    fab.style.display = target==="transactions" ? "block":"none";
 
-};
+  };
+});
+
 });
 
 // INIT
