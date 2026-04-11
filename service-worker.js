@@ -1,6 +1,5 @@
-// 🔥 versão automática baseada em timestamp (FORÇA INVALIDAÇÃO REAL)
-const VERSION = Date.now();
-const CACHE = `orion-${VERSION}`;
+const VERSION = "orion-" + Date.now();
+const CACHE = VERSION;
 
 const FILES = [
   "/",
@@ -12,19 +11,17 @@ const FILES = [
 
 // ================= INSTALL =================
 self.addEventListener("install", (event) => {
-  self.skipWaiting();
-
+  // ⚠️ NÃO usar skipWaiting agressivo no iOS sozinho
   event.waitUntil(
     caches.open(CACHE).then((cache) => {
       return cache.addAll(FILES);
     })
   );
+  self.skipWaiting();
 });
 
 // ================= ACTIVATE =================
 self.addEventListener("activate", (event) => {
-  self.clients.claim();
-
   event.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
@@ -34,20 +31,23 @@ self.addEventListener("activate", (event) => {
       );
     })
   );
+
+  // ⚠️ importante: só claim depois de limpar cache
+  return self.clients.claim();
 });
 
-// ================= FETCH (CACHE LIMPO + SEM MISTURA) =================
+// ================= FETCH (SEM CACHE QUEBRANDO UI) =================
 self.addEventListener("fetch", (event) => {
-  const request = event.request;
+  const req = event.request;
 
-  // 🔥 HTML SEMPRE NETWORK FIRST (garante atualização real)
-  if (request.mode === "navigate") {
+  // 🔥 HTML sempre network-first (CRÍTICO)
+  if (req.mode === "navigate") {
     event.respondWith(
-      fetch(request)
-        .then((response) => {
+      fetch(req)
+        .then((res) => {
           return caches.open(CACHE).then((cache) => {
-            cache.put(request, response.clone());
-            return response;
+            cache.put(req, res.clone());
+            return res;
           });
         })
         .catch(() => caches.match("/index.html"))
@@ -55,36 +55,23 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // 🔥 JS / CSS SEMPRE NETWORK FIRST (evita versão antiga)
-  if (
-    request.url.includes(".js") ||
-    request.url.includes(".css")
-  ) {
+  // 🔥 JS e CSS SEM cache antigo
+  if (req.url.includes(".js") || req.url.includes(".css")) {
     event.respondWith(
-      fetch(request)
-        .then((response) => {
+      fetch(req)
+        .then((res) => {
           return caches.open(CACHE).then((cache) => {
-            cache.put(request, response.clone());
-            return response;
+            cache.put(req, res.clone());
+            return res;
           });
         })
-        .catch(() => caches.match(request))
+        .catch(() => fetch(req))
     );
     return;
   }
 
-  // 🔥 fallback seguro
+  // fallback seguro
   event.respondWith(
-    caches.match(request).then((cached) => {
-      return (
-        cached ||
-        fetch(request).then((response) => {
-          return caches.open(CACHE).then((cache) => {
-            cache.put(request, response.clone());
-            return response;
-          });
-        })
-      );
-    })
+    fetch(req).catch(() => caches.match(req))
   );
 });
