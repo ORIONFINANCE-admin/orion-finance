@@ -569,6 +569,12 @@ document.addEventListener("DOMContentLoaded", initTabs);
 initTabs();
 }
 
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/service-worker.js')
+    .then(() => console.log('SW registrado'))
+    .catch(err => console.log('SW erro', err));
+}
+
 // INIT
 renderHome();
 renderTransactions();
