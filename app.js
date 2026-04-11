@@ -5,6 +5,7 @@ const DB = {
 
 let transactions = DB.get("t");
 let accounts = DB.get("acc") || [];
+let debts = DB.get("debts") || [];
 
 // ================= ELEMENTOS =================
 
@@ -22,6 +23,9 @@ const type = document.getElementById("type");
 const account = document.getElementById("account");
 const category = document.getElementById("category");
 const list = document.getElementById("list");
+
+// DÍVIDAS
+const debtList = document.getElementById("debtList");
 
 // MODAL
 const modal = document.getElementById("modal");
@@ -142,7 +146,7 @@ function renderTransactions(){
     const color = t.type === "entrada" ? "#22c55e" : "#ef4444";
 
     li.innerHTML = `
-      <div style="display:flex; justify-content:space-between; align-items:center;">
+      <div style="display:flex; justify-content:space-between;">
         <span>${t.desc}</span>
         <strong style="color:${color}">
           ${t.type === "saida" ? "-" : "+"} ${money(t.value)}
@@ -169,6 +173,71 @@ form.onsubmit = e => {
   renderHome();
   renderTransactions();
 };
+
+// ================= DÍVIDAS =================
+
+function addDebt(){
+
+  const name = d_name.value;
+  const valor = Number(d_valor.value);
+  const total = Number(d_total.value);
+  const pago = Number(d_pago.value);
+
+  if(!name || !valor || !total){
+    alert("Preencha os campos corretamente");
+    return;
+  }
+
+  debts.push({ name, valor, total, pago });
+
+  DB.set("debts", debts);
+  renderDebts();
+}
+
+function renderDebts(){
+
+  debtList.innerHTML = "";
+
+  if(debts.length === 0){
+    debtList.innerHTML = "<p style='opacity:.5'>Nenhuma dívida</p>";
+    return;
+  }
+
+  debts.forEach((d, i)=>{
+
+    const restante = d.total - d.pago;
+
+    debtList.innerHTML += `
+      <div class="card">
+        <strong>${d.name}</strong><br>
+        Parcela: ${money(d.valor)}<br>
+        Progresso: ${d.pago}/${d.total}<br>
+        Restam: ${restante}
+
+        <div style="display:flex; gap:6px; margin-top:8px;">
+          <button onclick="payInstallment(${i})">+1</button>
+          <button onclick="undoInstallment(${i})" style="background:#374151;color:#fff;">Desfazer</button>
+        </div>
+      </div>
+    `;
+  });
+}
+
+function payInstallment(i){
+  if(debts[i].pago < debts[i].total){
+    debts[i].pago++;
+    DB.set("debts", debts);
+    renderDebts();
+  }
+}
+
+function undoInstallment(i){
+  if(debts[i].pago > 0){
+    debts[i].pago--;
+    DB.set("debts", debts);
+    renderDebts();
+  }
+}
 
 // ================= BACKUP =================
 
@@ -224,7 +293,10 @@ tabs.forEach(btn=>{
 
     if(target==="home") title.innerText="Home";
     if(target==="transactions") title.innerText="Lançamentos";
-    if(target==="debts") title.innerText="Dívidas";
+    if(target==="debts") {
+      title.innerText="Dívidas";
+      renderDebts();
+    }
     if(target==="accountsScreen") title.innerText="Contas";
 
     fab.style.display = target==="transactions" ? "block":"none";
@@ -234,3 +306,4 @@ tabs.forEach(btn=>{
 // INIT
 renderHome();
 renderTransactions();
+renderDebts();
