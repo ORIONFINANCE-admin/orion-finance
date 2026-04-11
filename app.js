@@ -7,6 +7,70 @@ let transactions = DB.get("t");
 let accounts = DB.get("acc") || [];
 let debts = DB.get("debts") || [];
 
+// ================= MIGRAÇÃO AUTOMÁTICA =================
+
+function migrateData(){
+
+let changed = false;
+
+// 🔹 CONTAS
+accounts = accounts.map(acc => {
+
+  if(acc.initialBalance === undefined){
+    acc.initialBalance = acc.balance ?? 0;
+    changed = true;
+  }
+
+  if(acc.limit === undefined){
+    acc.limit = 0;
+    changed = true;
+  }
+
+  if(acc.used === undefined){
+    acc.used = 0;
+    changed = true;
+  }
+
+  return acc;
+});
+
+// 🔹 TRANSAÇÕES
+transactions = transactions.map(t => {
+
+  if(t.account === undefined){
+    t.account = "Sem conta";
+    changed = true;
+  }
+
+  if(t.category === undefined){
+    t.category = "Outros";
+    changed = true;
+  }
+
+  if(t.paymentType === undefined){
+    t.paymentType = null;
+    changed = true;
+  }
+
+  if(t.isCredit === undefined){
+    t.isCredit = false;
+    changed = true;
+  }
+
+  return t;
+});
+
+// 🔹 SALVAR SE HOUVER MUDANÇA
+if(changed){
+  DB.set("acc", accounts);
+  DB.set("t", transactions);
+}
+
+}
+
+// 🔥 EXECUTA MIGRAÇÃO
+migrateData();
+
 // ================= ELEMENTOS =================
 
 // HOME
