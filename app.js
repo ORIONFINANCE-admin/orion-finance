@@ -550,6 +550,26 @@ renderDebts();
 }
 }
 
+function payDebt(i){
+
+  const d = debts[i];
+  if(!d) return;
+
+  const acc = accounts.find(a => a.name === d.account);
+
+  if(acc){
+    acc.used = Math.max(0, (acc.used || 0) - d.valor);
+  }
+
+  debts.splice(i, 1);
+
+  DB.set("debts", debts);
+  DB.set("acc", accounts);
+
+  renderDebts();
+  renderHome();
+}
+
 // ================= BACKUP =================
 
 function exportData(){
