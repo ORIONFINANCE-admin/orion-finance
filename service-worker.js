@@ -1,5 +1,6 @@
-const CACHE = "orion-v12";
+const CACHE = "orion-v13";
 
+// arquivos essenciais (app shell)
 const FILES = [
   "/",
   "/index.html",
@@ -8,35 +9,83 @@ const FILES = [
   "/manifest.json"
 ];
 
-// INSTALA
-self.addEventListener("install", e=>{
+// ================= INSTALL =================
+self.addEventListener("install", (event) => {
   self.skipWaiting();
 
-  e.waitUntil(
-    caches.open(CACHE).then(cache=>{
+  event.waitUntil(
+    caches.open(CACHE).then((cache) => {
       return cache.addAll(FILES);
     })
   );
 });
 
-// ATIVA
-self.addEventListener("activate", e=>{
+// ================= ACTIVATE =================
+self.addEventListener("activate", (event) => {
   self.clients.claim();
 
-  e.waitUntil(
-    caches.keys().then(keys=>{
+  event.waitUntil(
+    caches.keys().then((keys) => {
       return Promise.all(
-        keys.filter(k=>k!==CACHE).map(k=>caches.delete(k))
+        keys
+          .filter((key) => key !== CACHE)
+          .map((key) => caches.delete(key))
       );
     })
   );
 });
 
-// FETCH (OFFLINE)
-self.addEventListener("fetch", e=>{
-  e.respondWith(
-    caches.match(e.request).then(res=>{
-      return res || fetch(e.request);
+// ================= FETCH (HÍBRIDO INTELIGENTE) =================
+self.addEventListener("fetch", (event) => {
+  const request = event.request;
+
+  // 🔥 HTML sempre network-first (evita versão antiga)
+  if (request.mode === "navigate") {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          return caches.open(CACHE).then((cache) => {
+            cache.put(request, response.clone());
+            return response;
+          });
+        })
+        .catch(() => {
+          return caches.match("/index.html");
+        })
+    );
+    return;
+  }
+
+  // 🔥 JS e CSS: network-first com fallback cache
+  if (
+    request.url.includes(".js") ||
+    request.url.includes(".css")
+  ) {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          return caches.open(CACHE).then((cache) => {
+            cache.put(request, response.clone());
+            return response;
+          });
+        })
+        .catch(() => caches.match(request))
+    );
+    return;
+  }
+
+  // 🔥 padrão: cache-first (rápido e offline)
+  event.respondWith(
+    caches.match(request).then((cached) => {
+      return (
+        cached ||
+        fetch(request).then((response) => {
+          return caches.open(CACHE).then((cache) => {
+            cache.put(request, response.clone());
+            return response;
+          });
+        })
+      );
     })
   );
 });
