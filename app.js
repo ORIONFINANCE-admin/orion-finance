@@ -179,38 +179,6 @@ useCard.addEventListener("change", updateCardUI);
 
 function saveAccount(){
 
-function payInvoice(accountName, amount){
-
-  const acc = accounts.find(a => a.name === accountName);
-  if(!acc) return;
-
-  const value = Number(amount);
-
-  if(value <= 0) return;
-
-  // reduz limite usado
-  acc.used = Math.max(0, (acc.used || 0) - value);
-
-  // registra transação de pagamento
-  transactions.push({
-    desc: "Pagamento de fatura",
-    value: value,
-    type: "saida",
-    account: accountName,
-    category: "Cartão de crédito",
-    paymentType: null,
-    isCredit: false,
-    date: Date.now(),
-    customDate: null
-  });
-
-  DB.set("acc", accounts);
-  DB.set("t", transactions);
-
-  renderHome();
-  renderTransactions();
-}
-
 const name = acc_name.value;
 const balanceValue = Number(acc_balance.value);
 
@@ -241,6 +209,36 @@ cardFields.style.display = "none";
 
 closeModal();
 renderHome();
+}
+
+function payInvoice(accountName, amount){
+
+  const acc = accounts.find(a => a.name === accountName);
+  if(!acc) return;
+
+  const value = Number(amount);
+
+  if(value <= 0) return;
+
+  acc.used = Math.max(0, (acc.used || 0) - value);
+
+  transactions.push({
+    desc: "Pagamento de fatura",
+    value: value,
+    type: "saida",
+    account: accountName,
+    category: "Cartão de crédito",
+    paymentType: null,
+    isCredit: false,
+    date: Date.now(),
+    customDate: null
+  });
+
+  DB.set("acc", accounts);
+  DB.set("t", transactions);
+
+  renderHome();
+  renderTransactions();
 }
 
 // ================= HOME =================
@@ -286,14 +284,6 @@ if(t.paymentType !== "credito" || !t.paymentType){
 saldo -= t.value;
 }
 }
-}
-});
-
-let creditUsed = 0;
-
-transactions.forEach(t=>{
-if(t.account === a.name && t.isCredit){
-creditUsed += t.value;
 }
 });
 
