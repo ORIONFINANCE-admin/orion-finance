@@ -3,64 +3,64 @@ get: (k) => JSON.parse(localStorage.getItem(k)) || [],
 set: (k, v) => localStorage.setItem(k, JSON.stringify(v))
 };
 
-let transactions = DB.get(“t”);
-let accounts = DB.get(“acc”) || [];
-let debts = DB.get(“debts”) || [];
+let transactions = DB.get("t");
+let accounts = DB.get("acc") || [];
+let debts = DB.get("debts") || [];
 
 // ================= ELEMENTOS =================
 
 // HOME
-const balance = document.getElementById(“balance”);
-const inTotal = document.getElementById(“inTotal”);
-const outTotal = document.getElementById(“outTotal”);
-const accountsDiv = document.getElementById(“accounts”);
+const balance = document.getElementById("balance");
+const inTotal = document.getElementById("inTotal");
+const outTotal = document.getElementById("outTotal");
+const accountsDiv = document.getElementById("accounts");
 
 // FORM
-const form = document.getElementById(“form”);
-const desc = document.getElementById(“desc”);
-const value = document.getElementById(“value”);
-const type = document.getElementById(“type”);
-const account = document.getElementById(“account”);
-const category = document.getElementById(“category”);
-const list = document.getElementById(“list”);
+const form = document.getElementById("form");
+const desc = document.getElementById("desc");
+const value = document.getElementById("value");
+const type = document.getElementById("type");
+const account = document.getElementById("account");
+const category = document.getElementById("category");
+const list = document.getElementById("list");
 
 // DÍVIDAS
-const debtList = document.getElementById(“debtList”);
+const debtList = document.getElementById("debtList");
 
 // MODAL
-const modal = document.getElementById(“modal”);
-const hasCard = document.getElementById(“hasCard”);
-const cardFields = document.getElementById(“cardFields”);
-const fab = document.querySelector(”.fab”);
-const useCard = document.getElementById(“useCard”);
-const paymentType = document.getElementById(“paymentType”);
+const modal = document.getElementById("modal");
+const hasCard = document.getElementById("hasCard");
+const cardFields = document.getElementById("cardFields");
+const fab = document.querySelector(".fab");
+const useCard = document.getElementById("useCard");
+const paymentType = document.getElementById("paymentType");
 
 // ================= FORMAT =================
 
 function money(v){
-return Number(v||0).toLocaleString(“pt-BR”,{style:“currency”,currency:“BRL”});
+return Number(v||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
 }
 
 // ================= MODAL =================
 
 function openModal(){
-modal.classList.add(“active”);
+modal.classList.add("active");
 }
 
 function closeModal(){
-modal.classList.remove(“active”);
+modal.classList.remove("active");
 }
 
-modal.addEventListener(“click”,(e)=>{
+modal.addEventListener("click",(e)=>{
 if(e.target === modal) closeModal();
 });
 
-hasCard.addEventListener(“change”,()=>{
-cardFields.style.display = hasCard.checked ? “block”:“none”;
+hasCard.addEventListener("change",()=>{
+cardFields.style.display = hasCard.checked ? "block":"none";
 });
 
-useCard.addEventListener(“change”, ()=>{
-paymentType.style.display = useCard.checked ? “block” : “none”;
+useCard.addEventListener("change", ()=>{
+paymentType.style.display = useCard.checked ? "block" : "none";
 });
 
 // ================= CONTAS =================
@@ -71,20 +71,26 @@ const name = acc_name.value;
 const balanceValue = Number(acc_balance.value);
 
 if(!balanceValue || balanceValue <= 0){
-alert(“Saldo inválido”);
+alert("Saldo inválido");
 return;
 }
 
 accounts.push({
 name,
-initialBalance: balanceValue, // novo padrão
-balance: balanceValue, // compatibilidade antiga
+initialBalance: balanceValue,
+balance: balanceValue,
 card:hasCard.checked,
 final:card_final.value,
 type:card_type.value
 });
 
-DB.set(“acc”,accounts);
+DB.set("acc",accounts);
+
+// 🔥 LIMPAR MODAL
+acc_balance.value = "";
+card_final.value = "";
+hasCard.checked = false;
+cardFields.style.display = "none";
 
 closeModal();
 renderHome();
@@ -96,12 +102,17 @@ function renderHome(){
 
 let total=0, inS=0, outS=0;
 
+// 🔥 SOMAR SALDO INICIAL
+accounts.forEach(a=>{
+  total += (a.initialBalance ?? a.balance ?? 0);
+});
+
 transactions.forEach(t=>{
-if(t.type===“entrada”){
+if(t.type==="entrada"){
 total+=t.value;
 inS+=t.value;
 }else{
-if(t.paymentType !== “credito” || !t.paymentType){
+if(t.paymentType !== "credito" || !t.paymentType){
 total-=t.value;
 }
 outS+=t.value;
@@ -112,20 +123,17 @@ balance.innerText = money(total);
 inTotal.innerText = money(inS);
 outTotal.innerText = money(outS);
 
-accountsDiv.innerHTML=””;
+accountsDiv.innerHTML="";
 
 if(accounts.length===0){
-accountsDiv.innerHTML=”<p style='opacity:.5'>Nenhuma conta</p>”;
+accountsDiv.innerHTML="<p style='opacity:.5'>Nenhuma conta</p>";
 return;
 }
 
 accounts.forEach(a=>{
 
-```
-// 🔥 base inicial (compatível com versões antigas)
 let saldo = a.initialBalance ?? a.balance ?? 0;
 
-// 🔥 aplicar transações vinculadas
 transactions.forEach(t=>{
   if(t.account === a.name){
     if(t.type === "entrada") saldo += t.value;
@@ -149,7 +157,6 @@ accountsDiv.innerHTML+=`
     ${a.card ? a.type+" • **** "+a.final : ""}
   </div>
 `;
-```
 
 });
 }
@@ -157,16 +164,15 @@ accountsDiv.innerHTML+=`
 // ================= TRANSAÇÕES =================
 
 function renderTransactions(){
-list.innerHTML = “”;
+list.innerHTML = "";
 
 if(transactions.length === 0){
-list.innerHTML = “<li style='opacity:.5'>Nenhuma transação</li>”;
+list.innerHTML = "<li style='opacity:.5'>Nenhuma transação</li>";
 return;
 }
 
 transactions.forEach(t => {
 
-```
 const li = document.createElement("li");
 
 const color = t.type === "entrada" ? "#22c55e" : "#ef4444";
@@ -181,7 +187,6 @@ li.innerHTML = `
 `;
 
 list.appendChild(li);
-```
 
 });
 }
@@ -198,7 +203,7 @@ category: category.value,
 paymentType: useCard.checked ? paymentType.value : null
 });
 
-DB.set(“t”, transactions);
+DB.set("t", transactions);
 form.reset();
 
 renderHome();
@@ -215,28 +220,27 @@ const totalValor = Number(d_total.value);
 const pago = Number(d_pago.value);
 
 if(!name || !valor || !totalValor){
-alert(“Preencha os campos corretamente”);
+alert("Preencha os campos corretamente");
 return;
 }
 
 debts.push({ name, valor, totalValor, pago });
 
-DB.set(“debts”, debts);
+DB.set("debts", debts);
 renderDebts();
 }
 
 function renderDebts(){
 
-debtList.innerHTML = “”;
+debtList.innerHTML = "";
 
 if(debts.length === 0){
-debtList.innerHTML = “<p style='opacity:.5'>Nenhuma dívida</p>”;
+debtList.innerHTML = "<p style='opacity:.5'>Nenhuma dívida</p>";
 return;
 }
 
 debts.forEach((d, i)=>{
 
-```
 const totalParcelas = Math.ceil(d.totalValor / d.valor);
 const restante = totalParcelas - d.pago;
 
@@ -253,7 +257,6 @@ debtList.innerHTML += `
     </div>
   </div>
 `;
-```
 
 });
 }
@@ -263,15 +266,15 @@ const totalParcelas = Math.ceil(debts[i].totalValor / debts[i].valor);
 
 if(debts[i].pago < totalParcelas){
 debts[i].pago++;
-DB.set(“debts”, debts);
+DB.set("debts", debts);
 renderDebts();
 }
 }
 
 function undoInstallment(i){
 if(debts[i].pago > 0){
-debts[i].pago–;
-DB.set(“debts”, debts);
+debts[i].pago--;
+DB.set("debts", debts);
 renderDebts();
 }
 }
@@ -280,10 +283,10 @@ renderDebts();
 
 function exportData(){
 const data = JSON.stringify(localStorage);
-const blob = new Blob([data],{type:“application/json”});
-const a = document.createElement(“a”);
+const blob = new Blob([data],{type:"application/json"});
+const a = document.createElement("a");
 a.href = URL.createObjectURL(blob);
-a.download = “orion-backup.json”;
+a.download = "orion-backup.json";
 a.click();
 }
 
@@ -305,7 +308,7 @@ reader.readAsText(file);
 // ================= RESET =================
 
 function resetAll(){
-if(confirm(“Apagar tudo?”)){
+if(confirm("Apagar tudo?")){
 localStorage.clear();
 location.reload();
 }
@@ -313,14 +316,13 @@ location.reload();
 
 // ================= TABS =================
 
-const tabs = document.querySelectorAll(”.tabbar button”);
-const screens = document.querySelectorAll(”.screen”);
-const title = document.getElementById(“title”);
+const tabs = document.querySelectorAll(".tabbar button");
+const screens = document.querySelectorAll(".screen");
+const title = document.getElementById("title");
 
 tabs.forEach(btn=>{
 btn.onclick=()=>{
 
-```
 tabs.forEach(b=>b.classList.remove("active"));
 btn.classList.add("active");
 
@@ -338,7 +340,6 @@ if(target==="debts") {
 if(target==="accountsScreen") title.innerText="Contas";
 
 fab.style.display = target==="transactions" ? "block":"none";
-```
 
 };
 });
