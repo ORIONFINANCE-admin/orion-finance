@@ -180,15 +180,15 @@ function addDebt(){
 
   const name = d_name.value;
   const valor = Number(d_valor.value);
-  const total = Number(d_total.value);
+  const totalValor = Number(d_total.value);
   const pago = Number(d_pago.value);
 
-  if(!name || !valor || !total){
+  if(!name || !valor || !totalValor){
     alert("Preencha os campos corretamente");
     return;
   }
 
-  debts.push({ name, valor, total, pago });
+  debts.push({ name, valor, totalValor, pago });
 
   DB.set("debts", debts);
   renderDebts();
@@ -205,14 +205,15 @@ function renderDebts(){
 
   debts.forEach((d, i)=>{
 
-    const restante = d.total - d.pago;
+    const totalParcelas = Math.ceil(d.totalValor / d.valor);
+    const restante = totalParcelas - d.pago;
 
     debtList.innerHTML += `
       <div class="card">
         <strong>${d.name}</strong><br>
         Parcela: ${money(d.valor)}<br>
-        Progresso: ${d.pago}/${d.total}<br>
-        Restam: ${restante}
+        Progresso: ${d.pago}/${totalParcelas}<br>
+        Restam: ${restante} parcelas
 
         <div style="display:flex; gap:6px; margin-top:8px;">
           <button onclick="payInstallment(${i})">+1</button>
@@ -224,7 +225,9 @@ function renderDebts(){
 }
 
 function payInstallment(i){
-  if(debts[i].pago < debts[i].total){
+  const totalParcelas = Math.ceil(debts[i].totalValor / debts[i].valor);
+
+  if(debts[i].pago < totalParcelas){
     debts[i].pago++;
     DB.set("debts", debts);
     renderDebts();
