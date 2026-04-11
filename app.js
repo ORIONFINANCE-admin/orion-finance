@@ -345,46 +345,52 @@ location.reload();
 
 function initTabs(){
 
-const tabs = document.querySelectorAll(".tabbar button");
-const screens = document.querySelectorAll(".screen");
-const title = document.getElementById("title");
+  const tabs = document.querySelectorAll(".tabbar button");
+  const screens = document.querySelectorAll(".screen");
+  const title = document.getElementById("title");
 
-if(!tabs.length) return;
-
-tabs.forEach(btn=>{
-btn.onclick=()=>{
-
-```
-  tabs.forEach(b=>b.classList.remove("active"));
-  btn.classList.add("active");
-
-  screens.forEach(s=>s.classList.remove("active"));
-
-  const target = btn.dataset.tab;
-  const el = document.getElementById(target);
-
-  if(el) el.classList.add("active");
-
-  if(target==="home") title.innerText="Home";
-  if(target==="transactions") title.innerText="Lançamentos";
-  if(target==="debts"){
-    title.innerText="Dívidas";
-    renderDebts();
+  if(!tabs || tabs.length === 0){
+    console.log("Tabs não encontradas");
+    return;
   }
-  if(target==="accountsScreen") title.innerText="Contas";
 
-  fab.style.display = target==="transactions" ? "block":"none";
+  tabs.forEach(btn=>{
+    btn.addEventListener("click", function(){
 
-};
-```
+      tabs.forEach(b=>b.classList.remove("active"));
+      this.classList.add("active");
 
-});
+      screens.forEach(s=>s.classList.remove("active"));
+
+      const target = this.dataset.tab;
+      const el = document.getElementById(target);
+
+      if(!el){
+        console.log("Tela não encontrada:", target);
+        return;
+      }
+
+      el.classList.add("active");
+
+      if(target==="home") title.innerText="Home";
+      if(target==="transactions") title.innerText="Lançamentos";
+      if(target==="debts"){
+        title.innerText="Dívidas";
+        renderDebts();
+      }
+      if(target==="accountsScreen") title.innerText="Contas";
+
+      fab.style.display = target==="transactions" ? "block":"none";
+
+    });
+  });
 }
 
+// execução blindada
 if(document.readyState === "loading"){
-document.addEventListener("DOMContentLoaded", initTabs);
+  document.addEventListener("DOMContentLoaded", initTabs);
 }else{
-initTabs();
+  initTabs();
 }
 
 window.addEventListener("error", function(e){
