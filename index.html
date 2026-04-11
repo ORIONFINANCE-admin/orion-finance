@@ -94,19 +94,29 @@
   </div>
 
   <!-- VIEW EXTRATO -->
-  <div id="extractView" style="display:none;">
+  <!-- VIEW EXTRATO -->
+<div id="extractView" style="display:none;">
 
-    <div style="padding:10px;">
-      <button onclick="hideExtract()" style="background:#374151;color:#fff;">
-        ← Voltar
-      </button>
-    </div>
-
-    <div class="list-box">
-      <ul id="list"></ul>
-    </div>
-
+  <div style="padding:10px;">
+    <button onclick="hideExtract()" style="background:#374151;color:#fff;">
+      ← Voltar
+    </button>
   </div>
+
+  <!-- 🔍 BUSCA -->
+  <div style="padding:10px;">
+    <input 
+      id="searchInput" 
+      placeholder="Buscar por descrição, conta ou categoria..."
+      style="width:100%; padding:10px; border-radius:10px; border:none;"
+    >
+  </div>
+
+  <div class="list-box">
+    <ul id="list"></ul>
+  </div>
+
+</div>
 
 </section>
 
