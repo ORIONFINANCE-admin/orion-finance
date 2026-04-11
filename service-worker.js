@@ -1,4 +1,4 @@
-const CACHE = "orion-v11";
+const CACHE = "orion-v12";
 
 const FILES = [
   "/",
@@ -10,7 +10,7 @@ const FILES = [
 
 // INSTALA
 self.addEventListener("install", e=>{
-  self.skipWaiting(); // 🔥 força ativação imediata
+  self.skipWaiting();
 
   e.waitUntil(
     caches.open(CACHE).then(cache=>{
@@ -21,7 +21,7 @@ self.addEventListener("install", e=>{
 
 // ATIVA
 self.addEventListener("activate", e=>{
-  self.clients.claim(); // 🔥 assume controle imediato
+  self.clients.claim();
 
   e.waitUntil(
     caches.keys().then(keys=>{
