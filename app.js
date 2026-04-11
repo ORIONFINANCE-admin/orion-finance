@@ -6,18 +6,31 @@ const DB = {
 let transactions = DB.get("t");
 let accounts = DB.get("acc") || [];
 
-// ELEMENTOS
+// ================= ELEMENTOS =================
+
+// HOME
 const balance = document.getElementById("balance");
 const inTotal = document.getElementById("inTotal");
 const outTotal = document.getElementById("outTotal");
 const accountsDiv = document.getElementById("accounts");
 
+// FORM
+const form = document.getElementById("form");
+const desc = document.getElementById("desc");
+const value = document.getElementById("value");
+const type = document.getElementById("type");
+const account = document.getElementById("account");
+const category = document.getElementById("category");
+const list = document.getElementById("list");
+
+// MODAL
 const modal = document.getElementById("modal");
 const hasCard = document.getElementById("hasCard");
 const cardFields = document.getElementById("cardFields");
 const fab = document.querySelector(".fab");
 
-// FORMATAR REAL
+// ================= FORMAT =================
+
 function money(v){
   return Number(v||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
 }
@@ -32,12 +45,10 @@ function closeModal(){
   modal.classList.remove("active");
 }
 
-// FECHAR CLICANDO FORA
 modal.addEventListener("click",(e)=>{
   if(e.target === modal) closeModal();
 });
 
-// CARTÃO
 hasCard.addEventListener("change",()=>{
   cardFields.style.display = hasCard.checked ? "block":"none";
 });
@@ -116,19 +127,47 @@ function renderHome(){
 
 // ================= TRANSAÇÕES =================
 
-form.onsubmit=e=>{
+function renderTransactions(){
+  list.innerHTML = "";
+
+  if(transactions.length === 0){
+    list.innerHTML = "<li style='opacity:.5'>Nenhuma transação</li>";
+    return;
+  }
+
+  transactions.forEach(t => {
+
+    const li = document.createElement("li");
+
+    const color = t.type === "entrada" ? "#22c55e" : "#ef4444";
+
+    li.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span>${t.desc}</span>
+        <strong style="color:${color}">
+          ${t.type === "saida" ? "-" : "+"} ${money(t.value)}
+        </strong>
+      </div>
+    `;
+
+    list.appendChild(li);
+  });
+}
+
+form.onsubmit = e => {
   e.preventDefault();
 
   transactions.push({
-    desc:desc.value,
-    value:Number(value.value),
-    type:type.value
+    desc: desc.value,
+    value: Number(value.value),
+    type: type.value
   });
 
-  DB.set("t",transactions);
+  DB.set("t", transactions);
   form.reset();
 
   renderHome();
+  renderTransactions();
 };
 
 // ================= BACKUP =================
@@ -183,16 +222,15 @@ tabs.forEach(btn=>{
     const target = btn.dataset.tab;
     document.getElementById(target).classList.add("active");
 
-    // título
     if(target==="home") title.innerText="Home";
     if(target==="transactions") title.innerText="Lançamentos";
     if(target==="debts") title.innerText="Dívidas";
     if(target==="accountsScreen") title.innerText="Contas";
 
-    // FAB só na aba lançamentos
     fab.style.display = target==="transactions" ? "block":"none";
   };
 });
 
 // INIT
 renderHome();
+renderTransactions();
