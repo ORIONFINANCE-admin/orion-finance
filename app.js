@@ -245,6 +245,8 @@ function payInvoice(accountName, amount){
 
 function renderHome(){
 
+  if(!accounts || !transactions) return;
+
   accountsDiv.innerHTML = "";
 
   let total=0, inS=0, outS=0;
@@ -500,9 +502,10 @@ form.reset();
 useCard.checked = false;
 paymentType.style.display = "none";
 
-renderHome();
-renderTransactions();
-};
+requestAnimationFrame(() => {
+  renderHome();
+  renderTransactions();
+});
 
 // ================= EXTRATO =================
 
