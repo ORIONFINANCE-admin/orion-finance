@@ -674,7 +674,7 @@ renderDebts();
 }
 if(target==="accountsScreen") title.innerText="Contas";
 
-fab.style.display = target==="transactions" ? "block":"none";
+if(fab){   fab.style.display = target==="transactions" ? "block":"none"; }
 
 });
 });
