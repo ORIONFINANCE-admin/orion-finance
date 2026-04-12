@@ -422,7 +422,7 @@ form.onsubmit = e => {
 
   const isCredit = useCard.checked && paymentType.value === "credito";
 
-  transactions.push({
+  const newTransaction = {
     desc: desc.value,
     value: Number(value.value),
     type: type.value,
@@ -432,40 +432,45 @@ form.onsubmit = e => {
     isCredit,
     date: Date.now(),
     customDate: null
-  });
+  };
 
+  transactions.push(newTransaction);
+
+  // 💳 TRATAMENTO DE CARTÃO DE CRÉDITO
   if(isCredit){
     const acc = accounts.find(a => a.name === account.value);
 
     if(acc && acc.limit){
-      acc.used = (acc.used || 0) + Number(value.value);
+      acc.used = (acc.used || 0) + newTransaction.value;
 
       debts.push({
         name: "Fatura " + acc.name,
-        valor: Number(value.value),
-        totalValor: Number(value.value),
+        valor: newTransaction.value,
+        totalValor: newTransaction.value,
         pago: 0,
         isCard: true,
         account: acc.name
       });
 
-};
-
-    DB.set("debts", debts);
-    DB.set("acc", accounts);
+      DB.set("debts", debts);
+      DB.set("acc", accounts);
+    }
   }
-}
 
-DB.set("t", transactions);
-form.reset();
+  // 💾 SALVAR TRANSAÇÕES
+  DB.set("t", transactions);
 
-useCard.checked = false;
-paymentType.style.display = "none";
+  // 🔄 RESET UI
+  form.reset();
+  useCard.checked = false;
+  paymentType.style.display = "none";
 
-requestAnimationFrame(() => {
-  renderHome();
-  renderTransactions();
-});
+  // 🔁 RE-RENDER
+  requestAnimationFrame(() => {
+    renderHome();
+    renderTransactions();
+  });
+};
 
 // ================= EXTRATO =================
 
