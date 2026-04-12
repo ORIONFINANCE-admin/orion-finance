@@ -1,6 +1,5 @@
-const VERSION = "orion-" + Date.now();
+const CACHE = "orion-v14";
 const BASE = "/orion-finance/";
-const CACHE = VERSION;
 
 const FILES = [
   BASE,
@@ -15,9 +14,7 @@ self.addEventListener("install", (event) => {
   self.skipWaiting();
 
   event.waitUntil(
-    caches.open(CACHE).then((cache) => {
-      return cache.addAll(FILES);
-    })
+    caches.open(CACHE).then((cache) => cache.addAll(FILES))
   );
 });
 
@@ -27,20 +24,17 @@ self.addEventListener("activate", (event) => {
     caches.keys().then((keys) => {
       return Promise.all(
         keys
-          .filter((key) => key.startsWith("orion-") && key !== CACHE)
+          .filter((key) => key !== CACHE)
           .map((key) => caches.delete(key))
       );
-    })
+    }).then(() => self.clients.claim())
   );
-
-  return self.clients.claim();
 });
 
 // ================= FETCH =================
 self.addEventListener("fetch", (event) => {
   const req = event.request;
 
-  // sempre atualiza HTML principal
   if (req.mode === "navigate") {
     event.respondWith(
       fetch(req).catch(() => caches.match(BASE + "index.html"))
@@ -49,8 +43,6 @@ self.addEventListener("fetch", (event) => {
   }
 
   event.respondWith(
-    caches.match(req).then((cached) => {
-      return cached || fetch(req);
-    })
+    caches.match(req).then((cached) => cached || fetch(req))
   );
 });
