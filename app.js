@@ -244,33 +244,70 @@ function payInvoice(accountName, amount){
 // ================= HOME =================
 
 function renderHome(){
-  requestAnimationFrame(() => {
-    accountsDiv.innerHTML = "";
-    ...
+
+  accountsDiv.innerHTML = "";
+
+  let total=0, inS=0, outS=0;
+
+  accounts.forEach(a=>{
+    total += (a.initialBalance ?? a.balance ?? 0);
+  });
+
+  transactions.forEach(t=>{
+    if(t.type==="entrada"){
+      total+=t.value;
+      inS+=t.value;
+    } else {
+      if(t.paymentType !== "credito" || !t.paymentType){
+        total-=t.value;
+      }
+      outS+=t.value;
+    }
+  });
+
+  balance.innerText = money(total);
+  inTotal.innerText = money(inS);
+  outTotal.innerText = money(outS);
+
+  if(accounts.length===0){
+    accountsDiv.innerHTML="<p style='opacity:.5'>Nenhuma conta</p>";
+    return;
+  }
+
+  accounts.forEach(a=>{
+
+    let saldo = a.initialBalance ?? a.balance ?? 0;
+
+    transactions.forEach(t=>{
+      if(t.account === a.name){
+        if(t.type === "entrada") saldo += t.value;
+        else{
+          if(t.paymentType !== "credito" || !t.paymentType){
+            saldo -= t.value;
+          }
+        }
+      }
+    });
+
+    let color="mp";
+    if(a.name.includes("Bradesco")) color="bradesco";
+    if(a.name.includes("Inter")) color="inter";
+    if(a.name.includes("VR")) color="vr";
+
+    accountsDiv.insertAdjacentHTML("beforeend", `
+      <div class="card-bank ${color}">
+        <strong>${a.name}</strong><br>
+        ${money(saldo)}<br>
+        ${a.card ? a.type+" • **** "+a.final : ""}
+        ${a.limit > 0 ? `
+          <br>Limite: ${money(a.limit)}
+          <br>Disponível: ${money(a.limit - (a.used || 0))}
+        ` : ""}
+      </div>
+    `);
+
   });
 }
-
-let total=0, inS=0, outS=0;
-
-accounts.forEach(a=>{
-total += (a.initialBalance ?? a.balance ?? 0);
-});
-
-transactions.forEach(t=>{
-if(t.type==="entrada"){
-total+=t.value;
-inS+=t.value;
-}else{
-if(t.paymentType !== "credito" || !t.paymentType){
-total-=t.value;
-}
-outS+=t.value;
-}
-});
-
-balance.innerText = money(total);
-inTotal.innerText = money(inS);
-outTotal.innerText = money(outS);
 
 if(accounts.length===0){
 accountsDiv.innerHTML="<p style='opacity:.5'>Nenhuma conta</p>";
