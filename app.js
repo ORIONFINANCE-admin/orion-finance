@@ -118,8 +118,11 @@ const hasCard = document.getElementById("hasCard");
 const cardFields = document.getElementById("cardFields");
 const fab = document.querySelector(".fab");
 const useCard = document.getElementById("useCard");
+const hasCard = document.getElementById("hasCard");
 const paymentType = document.getElementById("paymentType");
-const card_limit = document.getElementById("card_limit");
+
+function safe(el){
+  return el !== null && el !== undefined;
 
 const transactionView = document.getElementById("transactionView");
 const extractView = document.getElementById("extractView");
