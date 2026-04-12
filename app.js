@@ -243,9 +243,6 @@ function payInvoice(accountName, amount){
 
 // ================= HOME =================
 
-if(renderHome.locked) return;
-renderHome.locked = true;
-
 function renderHome(){
   accountsDiv.innerHTML = "";
 
@@ -310,8 +307,6 @@ accountsDiv.insertAdjacentHTML("beforeend", `
 });
 
 }
-
-renderHome.locked = false;
 
 // ================= TRANSAÇÕES AGRUPADAS =================
 
