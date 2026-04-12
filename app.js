@@ -123,6 +123,7 @@ const paymentType = document.getElementById("paymentType");
 
 function safe(el){
   return el !== null && el !== undefined;
+  }
 
 const transactionView = document.getElementById("transactionView");
 const extractView = document.getElementById("extractView");
@@ -465,22 +466,6 @@ form.onsubmit = e => {
     renderTransactions();
   });
 };
-// 💳 ATUALIZA LIMITE DO CARTÃO
-if(isCredit){
-  const acc = accounts.find(a => a.name === account.value);
-
-  if(acc && acc.limit){
-    acc.used = (acc.used || 0) + Number(value.value);
-
-    // 💳 CRIA "DÍVIDA DE CARTÃO"
-    debts.push({
-      name: "Fatura " + acc.name,
-      valor: Number(value.value),
-      totalValor: Number(value.value),
-      pago: 0,
-      isCard: true,
-      account: acc.name
-    });
 
     DB.set("debts", debts);
     DB.set("acc", accounts);
