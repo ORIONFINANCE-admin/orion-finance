@@ -118,12 +118,11 @@ const hasCard = document.getElementById("hasCard");
 const cardFields = document.getElementById("cardFields");
 const fab = document.querySelector(".fab");
 const useCard = document.getElementById("useCard");
-const hasCard = document.getElementById("hasCard");
 const paymentType = document.getElementById("paymentType");
 
 function safe(el){
   return el !== null && el !== undefined;
-  }
+}
 
 const transactionView = document.getElementById("transactionView");
 const extractView = document.getElementById("extractView");
@@ -450,21 +449,6 @@ form.onsubmit = e => {
         account: acc.name
       });
 
-      DB.set("debts", debts);
-      DB.set("acc", accounts);
-    }
-  }
-
-  DB.set("t", transactions);
-  form.reset();
-
-  useCard.checked = false;
-  paymentType.style.display = "none";
-
-  requestAnimationFrame(() => {
-    renderHome();
-    renderTransactions();
-  });
 };
 
     DB.set("debts", debts);
