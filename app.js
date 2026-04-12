@@ -243,6 +243,9 @@ function payInvoice(accountName, amount){
 
 // ================= HOME =================
 
+if(renderHome.locked) return;
+renderHome.locked = true;
+
 function renderHome(){
   accountsDiv.innerHTML = "";
 
@@ -293,7 +296,7 @@ if(a.name.includes("Bradesco")) color="bradesco";
 if(a.name.includes("Inter")) color="inter";
 if(a.name.includes("VR")) color="vr";
 
-accountsDiv.innerHTML+=`
+accountsDiv.insertAdjacentHTML("beforeend", `
   <div class="card-bank ${color}">
     <strong>${a.name}</strong><br>
     ${money(saldo)}<br>
@@ -307,6 +310,8 @@ accountsDiv.innerHTML+=`
 });
 
 }
+
+renderHome.locked = false;
 
 // ================= TRANSAÇÕES AGRUPADAS =================
 
