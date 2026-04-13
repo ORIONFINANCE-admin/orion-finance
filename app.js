@@ -122,7 +122,8 @@ if(accounts.length === 0){
       name: "Mercado Pago",
       initialBalance: 0,
       balance: 0,
-      card: false,
+      card: true,
+      type: "Débito",
       limit: 0,
       used: 0
     },
@@ -436,21 +437,17 @@ filterTransactions(this.value);
 form.onsubmit = e => {
   e.preventDefault();
 
-  const isCredit = useCard.checked && paymentType.value === "credito";
+  const acc = accounts.find(a => a.name === account.value);
 
-  transactions.push({
-    desc: desc.value,
-    value: Number(value.value),
-    type: type.value,
-    account: account.value,
-    category: category.value,
-    paymentType: useCard.checked ? paymentType.value : null,
-    isCredit,
-    date: Date.now(),
-    customDate: null
-  });
+const isRealCredit = (
+  useCard.checked &&
+  paymentType.value === "credito" &&
+  acc &&
+  acc.card === true &&
+  acc.type === "Crédito REAL"
+);
 
-  if(isCredit){
+  if(isRealCredit){
     const acc = accounts.find(a => a.name === account.value);
 
     if(acc && acc.limit){
