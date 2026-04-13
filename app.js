@@ -98,44 +98,31 @@ migrateData();
 
 if(accounts.length === 0){
   accounts = [
-    {
-      name: "Bradesco",
-      initialBalance: 0,
-      balance: 0,
-      card: false,
-      type: "Crédito REAL",
-      final: "0000",
-      limit: 0,
-      used: 0
-    },
-    {
-      name: "Banco Inter",
-      initialBalance: 0,
-      balance: 0,
-      card: false,
-      type: "Crédito REAL",
-      final: "0000",
-      limit: 0,
-      used: 0
-    },
-    {
-      name: "Mercado Pago",
-      initialBalance: 0,
-      balance: 0,
-      card: true,
-      type: "Débito",
-      limit: 0,
-      used: 0
-    },
-    {
-      name: "VR",
-      initialBalance: 0,
-      balance: 0,
-      card: false,
-      limit: 0,
-      used: 0
-    }
-  ];
+  {
+    name: "Bradesco",
+    initialBalance: 0,
+    balance: 0,
+    card: false
+  },
+  {
+    name: "Banco Inter",
+    initialBalance: 0,
+    balance: 0,
+    card: true // pode usar "crédito fake"
+  },
+  {
+    name: "Mercado Pago",
+    initialBalance: 0,
+    balance: 0,
+    card: true // crédito fake também
+  },
+  {
+    name: "VR",
+    initialBalance: 0,
+    balance: 0,
+    card: false
+  }
+];
 
   DB.set("acc", accounts);
 }
@@ -318,18 +305,6 @@ function renderHome(){
         <div style="font-size:20px; font-weight:bold; margin:4px 0;">
           ${money(saldo)}
         </div>
-
-        ${a.card ? `
-          <div style="margin-top:6px;">
-            <small onclick="setLimit('${a.name}')" style="cursor:pointer; opacity:0.7;">
-              Limite: ${money(a.limit)}
-            </small><br>
-
-            <small style="opacity:0.6;">
-              Disponível: ${money(a.limit - (a.used || 0))}
-            </small>
-          </div>
-        ` : ""}
       </div>
     `);
 
