@@ -303,7 +303,6 @@ function renderHome(){
         ${money(saldo)}<br>
         ${a.card ? a.type+" • **** "+a.final : ""}
         ${a.limit > 0 ? `
-          <br>Limite: ${money(a.limit)}
           <br>Disponível: ${money(a.limit - (a.used || 0))}
         ` : ""}
       </div>
