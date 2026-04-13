@@ -602,7 +602,7 @@ renderDebts();
 }
 if(target==="accountsScreen") title.innerText="Contas";
 
-// removido FAB}
+// removido FAB
 
 });
 });
