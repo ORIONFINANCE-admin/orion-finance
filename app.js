@@ -108,13 +108,14 @@ if(accounts.length === 0){
     name: "Banco Inter",
     initialBalance: 0,
     balance: 0,
-    card: true // pode usar "crédito fake"
+    card: false // 👈 começa SEM crédito
   },
   {
     name: "Mercado Pago",
     initialBalance: 0,
     balance: 0,
-    card: true // crédito fake também
+    card: true,
+    type: "fake" // 👈 AQUI
   },
   {
     name: "VR",
@@ -235,11 +236,14 @@ function setLimit(accountName){
   const acc = accounts.find(a => a.name === accountName);
   if(!acc) return;
 
-  const novoLimite = Number(prompt("Novo limite:"));
+  const novoLimite = Number(prompt("Valor do CDB (limite):"));
 
-  if(isNaN(novoLimite)) return;
+  if(isNaN(novoLimite) || novoLimite <= 0) return;
 
   acc.limit = novoLimite;
+  acc.used = 0;
+  acc.card = true;
+  acc.type = "real";
 
   DB.set("acc", accounts);
   renderHome();
@@ -426,7 +430,7 @@ const isRealCredit = (
   paymentType.value === "credito" &&
   acc &&
   acc.card === true &&
-  acc.type === "Crédito REAL"
+  acc.type === "real"
 );
 
   if(isRealCredit){
