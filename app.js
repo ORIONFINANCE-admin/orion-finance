@@ -314,9 +314,13 @@ function renderHome(){
       <div class="card-bank ${color}">
         <strong>${a.name}</strong><br>
         ${money(saldo)}<br>
-        ${a.card ? a.type+" • **** "+a.final : ""}
-        ${a.limit > 0 ? `
-          <br>Disponível: ${money(a.limit - (a.used || 0))}
+
+        ${a.card ? `
+          <small onclick="setLimit('${a.name}')" style="cursor:pointer;">
+            Limite: ${money(a.limit)}
+          </small>
+          <br>
+          Disponível: ${money(a.limit - (a.used || 0))}
         ` : ""}
       </div>
     `);
