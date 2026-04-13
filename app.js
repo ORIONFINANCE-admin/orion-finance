@@ -303,14 +303,30 @@ function renderHome(){
     if(a.name.includes("VR")) color="vr";
 
     accountsDiv.insertAdjacentHTML("beforeend", `
-      <div class="card-bank ${color}">
-        <strong>${a.name}</strong><br>
+  <div class="card-bank ${color}">
+    <strong>${a.name}</strong><br>
 
-        <div style="font-size:20px; font-weight:bold; margin:4px 0;">
-          ${money(saldo)}
-        </div>
-      </div>
-    `);
+    <div style="font-size:20px; font-weight:bold; margin:4px 0;">
+      ${money(saldo)}
+    </div>
+
+    ${a.name === "Banco Inter" && !a.card ? `
+      <button onclick="setLimit('Banco Inter')" style="margin-top:6px;">
+        Ativar crédito
+      </button>
+    ` : ""}
+
+    ${a.card && a.type === "real" ? `
+      <small onclick="setLimit('${a.name}')" style="cursor:pointer; opacity:0.7;">
+        Limite: ${money(a.limit)}
+      </small><br>
+
+      <small style="opacity:0.6;">
+        Disponível: ${money(a.limit - (a.used || 0))}
+      </small>
+    ` : ""}
+  </div>
+`);
 
   });
 }
