@@ -102,8 +102,8 @@ if(accounts.length === 0){
       name: "Bradesco",
       initialBalance: 0,
       balance: 0,
-      card: true,
-      type: "Crédito",
+      card: false,
+      type: "Crédito REAL",
       final: "0000",
       limit: 0,
       used: 0
@@ -112,8 +112,8 @@ if(accounts.length === 0){
       name: "Banco Inter",
       initialBalance: 0,
       balance: 0,
-      card: true,
-      type: "Crédito",
+      card: false,
+      type: "Crédito REAL",
       final: "0000",
       limit: 0,
       used: 0
@@ -314,14 +314,21 @@ function renderHome(){
     accountsDiv.insertAdjacentHTML("beforeend", `
       <div class="card-bank ${color}">
         <strong>${a.name}</strong><br>
-        ${money(saldo)}<br>
+
+        <div style="font-size:20px; font-weight:bold; margin:4px 0;">
+          ${money(saldo)}
+        </div>
 
         ${a.card ? `
-          <small onclick="setLimit('${a.name}')" style="cursor:pointer;">
-            Limite: ${money(a.limit)}
-          </small>
-          <br>
-          Disponível: ${money(a.limit - (a.used || 0))}
+          <div style="margin-top:6px;">
+            <small onclick="setLimit('${a.name}')" style="cursor:pointer; opacity:0.7;">
+              Limite: ${money(a.limit)}
+            </small><br>
+
+            <small style="opacity:0.6;">
+              Disponível: ${money(a.limit - (a.used || 0))}
+            </small>
+          </div>
         ` : ""}
       </div>
     `);
