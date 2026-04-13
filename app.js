@@ -113,10 +113,6 @@ const searchInput = document.getElementById("searchInput");
 
 const debtList = document.getElementById("debtList");
 
-const modal = document.getElementById("modal");
-const hasCard = document.getElementById("hasCard");
-const cardFields = document.getElementById("cardFields");
-const fab = document.querySelector(".fab");
 const useCard = document.getElementById("useCard");
 const paymentType = document.getElementById("paymentType");
 
@@ -156,18 +152,6 @@ return d.toLocaleDateString("pt-BR");
 
 // ================= MODAL =================
 
-function openModal(){
-modal.classList.add("active");
-}
-
-function closeModal(){
-modal.classList.remove("active");
-}
-
-modal.addEventListener("click",(e)=>{
-if(e.target === modal) closeModal();
-});
-
 hasCard.addEventListener("change",()=>{
 cardFields.style.display = hasCard.checked ? "block":"none";
 });
@@ -179,16 +163,6 @@ paymentType.style.display = useCard.checked ? "block" : "none";
 useCard.addEventListener("change", updateCardUI);
 
 // ================= CONTAS =================
-
-function saveAccount(){
-
-const name = acc_name.value;
-const balanceValue = Number(acc_balance.value);
-
-if(!balanceValue || balanceValue <= 0){
-alert("Saldo inválido");
-return;
-}
 
 accounts.push({
 name,
@@ -647,7 +621,7 @@ renderDebts();
 }
 if(target==="accountsScreen") title.innerText="Contas";
 
-if(fab){   fab.style.display = target==="transactions" ? "block":"none"; }
+// removido FAB}
 
 });
 });
