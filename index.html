@@ -159,44 +159,6 @@
 
 </main>
 
-<!-- BOTÃO FLUTUANTE -->
-<button class="fab" onclick="openModal()">+</button>
-
-<!-- MODAL -->
-<div id="modal" class="modal">
-  <div class="modal-content">
-
-    <h3>Nova conta</h3>
-
-    <select id="acc_name">
-      <option>Bradesco</option>
-      <option>Banco Inter</option>
-      <option>Mercado Pago</option>
-      <option>VR</option>
-    </select>
-
-    <input id="acc_balance" type="number" inputmode="decimal" step="0.01" placeholder="Saldo inicial">
-
-    <label style="display:flex; align-items:center; gap:8px; margin-top:10px;">
-      <input type="checkbox" id="hasCard">
-      Possui cartão vinculado
-    </label>
-
-    <div id="cardFields" style="display:none;">
-      <input id="card_final" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="Final do cartão (4 dígitos)">
-      <select id="card_type">
-        <option>Crédito</option>
-        <option>Débito</option>
-      </select>
-      <input id="card_limit" type="number" inputmode="numeric" placeholder="Limite do cartão">
-    </div>
-
-    <button onclick="saveAccount()">Salvar</button>
-    <button onclick="closeModal()" style="background:#374151;color:#fff;">Cancelar</button>
-
-  </div>
-</div>
-
 <!-- TABBAR -->
 <nav class="tabbar">
   <button data-tab="home" class="active">🏠</button>
