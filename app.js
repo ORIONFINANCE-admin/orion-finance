@@ -416,14 +416,20 @@ form.onsubmit = e => {
     if(acc && acc.limit){
       acc.used = (acc.used || 0) + newTransaction.value;
 
-      debts.push({
-        name: "Fatura " + acc.name,
-        valor: newTransaction.value,
-        totalValor: newTransaction.value,
-        pago: 0,
-        isCard: true,
-        account: acc.name
-      });
+      let fatura = debts.find(d => d.isCard && d.account === acc.name);
+
+if(fatura){
+  fatura.totalValor += Number(value.value);
+} else {
+  debts.push({
+    name: "Fatura " + acc.name,
+    valor: 0,
+    totalValor: Number(value.value),
+    pago: 0,
+    isCard: true,
+    account: acc.name
+  });
+}
 
       DB.set("debts", debts);
       DB.set("acc", accounts);
@@ -493,7 +499,9 @@ return;
 
 debts.forEach((d, i)=>{
 
-const totalParcelas = Math.ceil(d.totalValor / d.valor);
+const totalParcelas = d.valor > 0
+  ? Math.ceil(d.totalValor / d.valor)
+  : 1;
 const restante = totalParcelas - d.pago;
 
 debtList.innerHTML += `
