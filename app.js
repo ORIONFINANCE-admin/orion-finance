@@ -94,6 +94,51 @@ if(changed){
 
 migrateData();
 
+// ================= CONTAS FIXAS =================
+
+if(accounts.length === 0){
+  accounts = [
+    {
+      name: "Bradesco",
+      initialBalance: 0,
+      balance: 0,
+      card: true,
+      type: "Crédito",
+      final: "0000",
+      limit: 0,
+      used: 0
+    },
+    {
+      name: "Banco Inter",
+      initialBalance: 0,
+      balance: 0,
+      card: true,
+      type: "Crédito",
+      final: "0000",
+      limit: 0,
+      used: 0
+    },
+    {
+      name: "Mercado Pago",
+      initialBalance: 0,
+      balance: 0,
+      card: false,
+      limit: 0,
+      used: 0
+    },
+    {
+      name: "VR",
+      initialBalance: 0,
+      balance: 0,
+      card: false,
+      limit: 0,
+      used: 0
+    }
+  ];
+
+  DB.set("acc", accounts);
+}
+
 // ================= ELEMENTOS =================
 
 const balance = document.getElementById("balance");
