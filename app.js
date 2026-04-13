@@ -116,6 +116,9 @@ const debtList = document.getElementById("debtList");
 const useCard = document.getElementById("useCard");
 const paymentType = document.getElementById("paymentType");
 
+const hasCard = document.getElementById("hasCard");
+const cardFields = document.getElementById("cardFields");
+
 function safe(el){
   return el !== null && el !== undefined;
 }
@@ -163,30 +166,6 @@ paymentType.style.display = useCard.checked ? "block" : "none";
 useCard.addEventListener("change", updateCardUI);
 
 // ================= CONTAS =================
-
-accounts.push({
-name,
-initialBalance: balanceValue,
-balance: balanceValue,
-card:hasCard.checked,
-final:card_final.value,
-type:card_type.value,
-limit: Number(card_limit.value) || 0,
-used: 0,
-});
-
-DB.set("acc",accounts);
-
-// LIMPAR
-acc_balance.value = "";
-card_final.value = "";
-card_limit.value = "";
-hasCard.checked = false;
-cardFields.style.display = "none";
-
-closeModal();
-renderHome();
-}
 
 function payInvoice(accountName, amount){
 
