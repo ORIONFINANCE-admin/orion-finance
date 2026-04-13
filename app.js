@@ -167,6 +167,34 @@ useCard.addEventListener("change", updateCardUI);
 
 // ================= CONTAS =================
 
+function addAccount(){
+
+  const name = prompt("Nome da conta:");
+  if(!name) return;
+
+  const initialBalance = Number(prompt("Saldo inicial:")) || 0;
+
+  const hasCredit = confirm("Possui cartão de crédito?");
+
+  let limit = 0;
+
+  if(hasCredit){
+    limit = Number(prompt("Limite do cartão:")) || 0;
+  }
+
+  accounts.push({
+    name,
+    initialBalance,
+    balance: initialBalance,
+    card: hasCredit,
+    limit,
+    used: 0
+  });
+
+  DB.set("acc", accounts);
+  renderHome();
+}
+
 function payInvoice(accountName, amount){
 
   const acc = accounts.find(a => a.name === accountName);
