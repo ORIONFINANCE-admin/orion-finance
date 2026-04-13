@@ -155,9 +155,9 @@ return d.toLocaleDateString("pt-BR");
 
 // ================= MODAL =================
 
-hasCard.addEventListener("change",()=>{
-cardFields.style.display = hasCard.checked ? "block":"none";
-});
+// hasCard.addEventListener("change",()=>{
+// cardFields.style.display = hasCard.checked ? "block":"none";
+// });
 
 function updateCardUI(){
 paymentType.style.display = useCard.checked ? "block" : "none";
@@ -601,8 +601,6 @@ title.innerText="Dívidas";
 renderDebts();
 }
 if(target==="accountsScreen") title.innerText="Contas";
-
-// removido FAB
 
 });
 });
