@@ -1,7 +1,32 @@
-const DB = {
-get: (k) => JSON.parse(localStorage.getItem(k)) || [],
-set: (k, v) => localStorage.setItem(k, JSON.stringify(v))
+// 🔒 CAPTURA GLOBAL DE ERROS (PROFISSIONAL)
+window.onerror = function(msg, url, line, col, error){
+  console.error("🔥 Erro global:", {
+    mensagem: msg,
+    arquivo: url,
+    linha: line,
+    coluna: col,
+    erro: error
+  });
 };
+
+// ================= DB =================
+const DB = {
+  get: (k) => JSON.parse(localStorage.getItem(k)) || [],
+  set: (k, v) => localStorage.setItem(k, JSON.stringify(v))
+};
+
+// ================= CONFIG =================
+const CONFIG_KEY = "config";
+
+function getConfig(){
+  return JSON.parse(localStorage.getItem(CONFIG_KEY)) || {
+    hideBalance: false
+  };
+}
+
+function setConfig(cfg){
+  localStorage.setItem(CONFIG_KEY, JSON.stringify(cfg));
+}
 
 let transactions = DB.get("t");
 let accounts = DB.get("acc") || [];
@@ -358,12 +383,19 @@ function renderHome(){
 
   const real = getRealAvailable();
 
-    balance.innerHTML = `
-      ${money(total)}
-      <div style="font-size:12px; opacity:0.6;">
-        Real: ${money(real)}
-      </div>
-    `;
+  const config = getConfig();
+
+balance.innerHTML = config.hideBalance ? `
+  R$ •••••
+  <div style="font-size:12px; opacity:0.6;">
+    Real: •••••
+  </div>
+` : `
+  ${money(total)}
+  <div style="font-size:12px; opacity:0.6;">
+    Real: ${money(real)}
+  </div>
+`;`;
     
   inTotal.innerText = money(inS);
   outTotal.innerText = money(outS);
@@ -859,6 +891,14 @@ if(settingsModal){
       closeSettings();
     }
   });
+}
+
+function toggleBalance(){
+  const config = getConfig();
+  config.hideBalance = !config.hideBalance;
+  setConfig(config);
+
+  renderHome();
 }
 
 // INIT
