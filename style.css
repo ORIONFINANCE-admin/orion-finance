@@ -380,3 +380,12 @@ html{
 button:hover{
   opacity:0.9;
 }
+
+body{
+  overflow-x:hidden;
+}
+
+.screen{
+  left:0;
+  top:0;
+}
