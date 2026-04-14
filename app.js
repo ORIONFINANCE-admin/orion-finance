@@ -600,6 +600,18 @@ const isRealCredit = (
     }
   }
 
+transactions.push({
+  desc: desc.value,
+  value: Number(value.value),
+  type: type.value,
+  account: account.value,
+  category: category.value,
+  paymentType: useCard.checked ? "credito" : null,
+  isCredit: useCard.checked,
+  date: Date.now(),
+  customDate: null
+});
+
   DB.set("t", transactions);
   form.reset();
 
