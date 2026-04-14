@@ -87,30 +87,37 @@ li{
 }
 
 /* TABBAR PREMIUM */
-.tabbar{
-  position:fixed;
-  bottom:0;
-  left:0;
-  right:0;
-  display:flex;
-  justify-content:space-around;
-  padding:12px;
-  background:#0b1220;
-  border-top:1px solid #1f2937;
+.tabbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 10px 10px calc(10px + env(safe-area-inset-bottom));
+  background: #0f172a;
+  display: flex;
+  justify-content: space-around;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  z-index: 1000;
 }
 
-.tabbar button{
-  background:#111827;
-  padding:10px 14px;
-  border-radius:12px;
-  font-size:16px;
-  color:#9ca3af;
-  transition:0.2s;
+.tabbar button {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
 }
 
-.tabbar button.active{
-  background:#22c55e;
-  color:#000;
+.tabbar button.active {
+  color: #22c55e;
+}
+
+.tabbar button span {
+  font-size: 11px;
 }
 
 /* BOTÃO + */
