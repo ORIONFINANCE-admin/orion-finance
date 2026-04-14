@@ -176,7 +176,7 @@
 </section>
 
 <!-- CONTAS -->
-<section id="accountsScreen" class="screen">
+<section id="accountsScreen" class="screen" style="display:none;">
 
   <div class="card">
     <h3>Backup & Segurança</h3>
@@ -189,6 +189,37 @@
   </div>
 
 </section>
+
+<!-- CONFIGURAÇÕES -->
+<div id="settingsModal" class="modal">
+
+  <div class="modal-content">
+
+    <h3>Configurações</h3>
+
+    <div class="card">
+      <strong>Backup</strong>
+
+      <button onclick="exportData()">Salvar backup</button>
+
+      <input type="file" onchange="importData(event)">
+    </div>
+
+    <div class="card">
+      <strong>Segurança</strong>
+
+      <button onclick="resetAll()" class="btn danger">
+        Resetar tudo
+      </button>
+    </div>
+
+    <button onclick="closeSettings()" style="margin-top:10px;">
+      Fechar
+    </button>
+
+  </div>
+
+</div>
 
 </main>
 
