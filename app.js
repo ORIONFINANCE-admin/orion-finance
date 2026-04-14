@@ -824,14 +824,35 @@ function loadCategories(){
   });
 }
 
+const settingsModal = document.getElementById("settingsModal");
+
 function openSettings(){
-  const modal = document.getElementById("settingsModal");
-  if(modal) modal.classList.add("active");
+  settingsModal.classList.add("active");
 }
 
 function closeSettings(){
-  const modal = document.getElementById("settingsModal");
-  if(modal) modal.classList.remove("active");
+  settingsModal.classList.remove("active");
+}
+
+// 🔥 fechar clicando fora
+const settingsModal = document.getElementById("settingsModal");
+
+if(settingsModal){
+
+  function openSettings(){
+    settingsModal.classList.add("active");
+  }
+
+  function closeSettings(){
+    settingsModal.classList.remove("active");
+  }
+
+  settingsModal.addEventListener("click", (e)=>{
+    if(e.target === settingsModal){
+      closeSettings();
+    }
+  });
+
 }
 
 // INIT
