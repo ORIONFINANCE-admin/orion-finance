@@ -249,6 +249,22 @@ function setLimit(accountName){
   renderHome();
 }
 
+function removeCredit(accountName){
+
+  const acc = accounts.find(a => a.name === accountName);
+  if(!acc) return;
+
+  if(!confirm("Remover crédito desta conta?")) return;
+
+  acc.card = false;
+  acc.limit = 0;
+  acc.used = 0;
+  acc.type = null;
+
+  DB.set("acc", accounts);
+  renderHome();
+}
+
 // ================= HOME =================
 
 function renderHome(){
@@ -303,29 +319,33 @@ function renderHome(){
     if(a.name.includes("VR")) color="vr";
 
     accountsDiv.insertAdjacentHTML("beforeend", `
-  <div class="card-bank ${color}">
-    <strong>${a.name}</strong><br>
+ <div class="card-bank ${color}">
+  <strong>${a.name}</strong><br>
 
-    <div style="font-size:20px; font-weight:bold; margin:4px 0;">
-      ${money(saldo)}
-    </div>
-
-    ${a.name === "Banco Inter" && !a.card ? `
-      <button onclick="setLimit('Banco Inter')" style="margin-top:6px;">
-        Ativar crédito
-      </button>
-    ` : ""}
-
-    ${a.card && a.type === "real" ? `
-      <small onclick="setLimit('${a.name}')" style="cursor:pointer; opacity:0.7;">
-        Limite: ${money(a.limit)}
-      </small><br>
-
-      <small style="opacity:0.6;">
-        Disponível: ${money(a.limit - (a.used || 0))}
-      </small>
-    ` : ""}
+  <div style="font-size:20px; font-weight:bold; margin:4px 0;">
+    ${money(saldo)}
   </div>
+
+  ${a.name === "Banco Inter" && !a.card ? `
+    <button onclick="setLimit('Banco Inter')" style="margin-top:6px;">
+      Ativar crédito
+    </button>
+  ` : ""}
+
+  ${a.card && a.type === "real" ? `
+    <small onclick="setLimit('${a.name}')" style="cursor:pointer; opacity:0.7;">
+      Limite: ${money(a.limit)}
+    </small><br>
+
+    <small style="opacity:0.6;">
+      Disponível: ${money(a.limit - (a.used || 0))}
+    </small><br>
+
+    <button onclick="removeCredit('${a.name}')" style="margin-top:6px; background:#ef4444;">
+      Remover crédito
+    </button>
+  ` : ""}
+</div>
 `);
 
   });
