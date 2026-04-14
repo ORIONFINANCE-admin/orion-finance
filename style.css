@@ -160,3 +160,53 @@ label input[type="checkbox"]{
   padding:20px;
   border-radius:20px 20px 0 0;
 }
+
+.card-bank{
+  padding:12px;
+  border-radius:12px;
+  margin-bottom:10px;
+  background:#1f2937;
+  color:#fff;
+}
+
+.card-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:16px;
+}
+
+.card-body{
+  margin-top:8px;
+}
+
+.credit-info{
+  display:flex;
+  justify-content:space-between;
+  font-size:13px;
+  opacity:0.8;
+  margin-bottom:6px;
+}
+
+.card-actions{
+  display:flex;
+  gap:6px;
+}
+
+.btn{
+  background:#2563eb;
+  border:none;
+  padding:6px 10px;
+  border-radius:6px;
+  color:white;
+  cursor:pointer;
+}
+
+.btn.small{
+  font-size:12px;
+  padding:4px 8px;
+}
+
+.btn.danger{
+  background:#ef4444;
+}
