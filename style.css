@@ -11,12 +11,16 @@ header{
 
 /* TELAS */
 .screen{
+  display:none;
   opacity:0;
   transform: translateY(10px);
-  pointer-events:none;
   transition: 0.25s ease;
-  position:absolute;
-  width:100%;
+}
+
+.screen.active{
+  display:block;
+  opacity:1;
+  transform: translateY(0);
 }
 
 .screen.active{
@@ -24,10 +28,6 @@ header{
   transform: translateY(0);
   pointer-events:auto;
   position:relative;
-}
-
-.screen{
-  will-change: opacity, transform;
 }
 
 /* HOME */
@@ -163,10 +163,20 @@ li{
 .modal{
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,0.6);
-  display:none;
+  background:rgba(0,0,0,0.5);
+
+  display:flex;
   justify-content:center;
   align-items:flex-end;
+
+  opacity:0;
+  pointer-events:none;
+  transition:0.2s;
+}
+
+.modal.active{
+  opacity:1;
+  pointer-events:auto;
 }
 
 /* FIX CHECKBOX HORIZONTAL (USAR CARTÃO) */
@@ -303,15 +313,21 @@ label input[type="checkbox"]{
 }
 
 .topbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 20px;
-  background: #0f172a;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
   position: sticky;
   top: 0;
   z-index: 100;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  width: 100%;
+  height: 60px;
+
+  padding: 0 16px;
+
+  background: #0f172a;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
 .topbar header {
@@ -359,4 +375,8 @@ html{
     transform: translateY(0);
     opacity:1;
   }
+}
+
+button:hover{
+  opacity:0.9;
 }
