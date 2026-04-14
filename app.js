@@ -249,6 +249,36 @@ function setLimit(accountName){
   renderHome();
 }
 
+function getRealAvailable(){
+
+  let saldo = 0;
+
+  // saldo das contas
+  accounts.forEach(a=>{
+    saldo += (a.initialBalance ?? a.balance ?? 0);
+  });
+
+  // transações
+  transactions.forEach(t=>{
+    if(t.type === "entrada"){
+      saldo += t.value;
+    } else {
+      if(t.paymentType !== "credito" || !t.paymentType){
+        saldo -= t.value;
+      }
+    }
+  });
+
+  // 🔻 desconta faturas (dívidas de cartão)
+  debts.forEach(d=>{
+    if(d.isCard){
+      saldo -= (d.totalValor || 0);
+    }
+  });
+
+  return saldo;
+}
+
 function removeCredit(accountName){
 
   const acc = accounts.find(a => a.name === accountName);
@@ -289,7 +319,15 @@ function renderHome(){
     }
   });
 
-  balance.innerText = money(total);
+  const real = getRealAvailable();
+
+    balance.innerHTML = `
+      ${money(total)}
+      <div style="font-size:12px; opacity:0.6;">
+        Real: ${money(real)}
+      </div>
+    `;
+    
   inTotal.innerText = money(inS);
   outTotal.innerText = money(outS);
 
@@ -319,35 +357,41 @@ function renderHome(){
     if(a.name.includes("VR")) color="vr";
 
     accountsDiv.insertAdjacentHTML("beforeend", `
- <div class="card-bank ${color}">
-  <strong>${a.name}</strong><br>
+  <div class="card-bank ${color}">
+    
+    <div class="card-header">
+      <strong>${a.name}</strong>
+      <span>${money(saldo)}</span>
+    </div>
 
-  <div style="font-size:20px; font-weight:bold; margin:4px 0;">
-    ${money(saldo)}
+    <div class="card-body">
+
+      ${a.name === "Banco Inter" && !a.card ? `
+        <button onclick="setLimit('Banco Inter')" class="btn">
+          Ativar crédito
+        </button>
+      ` : ""}
+
+      ${a.card && a.type === "real" ? `
+        <div class="credit-info">
+          <span>Limite: ${money(a.limit)}</span>
+          <span>Disp: ${money(a.limit - (a.used || 0))}</span>
+        </div>
+
+        <div class="card-actions">
+          <button onclick="setLimit('${a.name}')" class="btn small">
+            Alterar
+          </button>
+          <button onclick="removeCredit('${a.name}')" class="btn danger small">
+            Remover
+          </button>
+        </div>
+      ` : ""}
+
+    </div>
+
   </div>
-
-  ${a.name === "Banco Inter" && !a.card ? `
-    <button onclick="setLimit('Banco Inter')" style="margin-top:6px;">
-      Ativar crédito
-    </button>
-  ` : ""}
-
-  ${a.card && a.type === "real" ? `
-    <small onclick="setLimit('${a.name}')" style="cursor:pointer; opacity:0.7;">
-      Limite: ${money(a.limit)}
-    </small><br>
-
-    <small style="opacity:0.6;">
-      Disponível: ${money(a.limit - (a.used || 0))}
-    </small><br>
-
-    <button onclick="removeCredit('${a.name}')" style="margin-top:6px; background:#ef4444;">
-      Remover crédito
-    </button>
-  ` : ""}
-</div>
 `);
-
   });
 }
 // ================= TRANSAÇÕES AGRUPADAS =================
