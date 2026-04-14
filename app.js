@@ -788,7 +788,7 @@ if(target==="debts"){
 title.innerText="Dívidas";
 renderDebts();
 }
-if(target==="accountsScreen") title.innerText="Contas";
+
 if(target==="dashboard"){
   title.innerText="Dashboard";
   renderDashboard();
@@ -825,7 +825,13 @@ function loadCategories(){
 }
 
 function openSettings(){
-  alert("Configurações em breve");
+  const modal = document.getElementById("settingsModal");
+  if(modal) modal.classList.add("active");
+}
+
+function closeSettings(){
+  const modal = document.getElementById("settingsModal");
+  if(modal) modal.classList.remove("active");
 }
 
 // INIT
