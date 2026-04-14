@@ -817,7 +817,7 @@ initTabs();
 }
 
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/service-worker.js')
+  navigator.serviceWorker.register('service-worker.js')
     .then(() => console.log('SW registrado'))
     .catch(err => console.log('SW erro', err));
 }
@@ -839,17 +839,6 @@ function loadCategories(){
 const settingsModal = document.getElementById("settingsModal");
 
 function openSettings(){
-  settingsModal.classList.add("active");
-}
-
-function closeSettings(){
-  settingsModal.classList.remove("active");
-}
-
-// 🔥 fechar clicando fora
-const settingsModal = document.getElementById("settingsModal");
-
-function openSettings(){
   if(settingsModal) settingsModal.classList.add("active");
 }
 
@@ -857,6 +846,13 @@ function closeSettings(){
   if(settingsModal) settingsModal.classList.remove("active");
 }
 
+if(settingsModal){
+  settingsModal.addEventListener("click", (e)=>{
+    if(e.target === settingsModal){
+      closeSettings();
+    }
+  });
+}
 if(settingsModal){
   settingsModal.addEventListener("click", (e)=>{
     if(e.target === settingsModal){
