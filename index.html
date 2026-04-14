@@ -18,7 +18,7 @@
 
 <div class="topbar">
   <header id="title">Home</header>
-  <button onclick="openSettings()">⚙️</button>
+  <button onclick="openSettings()" style="font-size:20px;">⚙️</button>
 </div>
 
 <main>
@@ -42,7 +42,7 @@
   </div>
 
   <div id="accounts" class="accounts"></div>
-  </div>
+
 </section>
 
 <!-- LANÇAMENTOS -->
@@ -172,21 +172,6 @@
   </div>
 
   <div id="debtList" class="list-box"></div>
-
-</section>
-
-<!-- CONTAS -->
-<section id="accountsScreen" class="screen" style="display:none;">
-
-  <div class="card">
-    <h3>Backup & Segurança</h3>
-
-    <button onclick="exportData()">Salvar backup</button>
-
-    <input type="file" onchange="importData(event)">
-
-    <button onclick="resetAll()">Resetar tudo</button>
-  </div>
 
 </section>
 
