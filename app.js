@@ -431,6 +431,30 @@ function renderHome(){
 `);
   });
 }
+
+function renderDashboard(){
+
+  const total = transactions.reduce((acc, t)=>{
+    if(t.type === "entrada") return acc + t.value;
+    return acc;
+  }, 0);
+
+  const out = transactions.reduce((acc, t)=>{
+    if(t.type === "saida") return acc + t.value;
+    return acc;
+  }, 0);
+
+  const real = getRealAvailable();
+
+  const elReal = document.getElementById("dashReal");
+  const elTotal = document.getElementById("dashTotal");
+  const elOut = document.getElementById("dashOut");
+
+  if(elReal) elReal.innerText = money(real);
+  if(elTotal) elTotal.innerText = money(total);
+  if(elOut) elOut.innerText = money(out);
+}
+
 // ================= TRANSAÇÕES AGRUPADAS =================
 
 function renderTransactions(){
@@ -765,6 +789,10 @@ title.innerText="Dívidas";
 renderDebts();
 }
 if(target==="accountsScreen") title.innerText="Contas";
+if(target==="dashboard"){
+  title.innerText="Dashboard";
+  renderDashboard();
+}
 
 });
 });
