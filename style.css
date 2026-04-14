@@ -23,13 +23,6 @@ header{
   transform: translateY(0);
 }
 
-.screen.active{
-  opacity:1;
-  transform: translateY(0);
-  pointer-events:auto;
-  position:relative;
-}
-
 /* HOME */
 .balance{padding:0 20px;}
 
@@ -325,6 +318,7 @@ label input[type="checkbox"]{
   height: 60px;
 
   padding: 0 16px;
+  box-sizing: border-box; /* 🔥 CORREÇÃO */
 
   background: #0f172a;
   border-bottom: 1px solid rgba(255,255,255,0.05);
@@ -354,7 +348,7 @@ label input[type="checkbox"]{
 
 main{
   position: relative;
-  min-height: 100vh;
+  min-height: calc(100vh - 60px);
   padding-bottom: 90px;
 }
 
