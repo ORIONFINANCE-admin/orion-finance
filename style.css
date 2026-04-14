@@ -6,14 +6,29 @@ body{
 }
 
 header{
-  padding:20px;
-  font-size:22px;
-  font-weight:600;
+  margin:0;
 }
 
 /* TELAS */
-.screen{display:none;}
-.screen.active{display:block;}
+.screen{
+  opacity:0;
+  transform: translateY(10px);
+  pointer-events:none;
+  transition: 0.25s ease;
+  position:absolute;
+  width:100%;
+}
+
+.screen.active{
+  opacity:1;
+  transform: translateY(0);
+  pointer-events:auto;
+  position:relative;
+}
+
+.screen{
+  will-change: opacity, transform;
+}
 
 /* HOME */
 .balance{padding:0 20px;}
@@ -65,12 +80,16 @@ input, select, button{
 button{
   background:#22c55e;
   font-weight:bold;
-  transition:0.2s;
+  transition: transform 0.1s ease, opacity 0.1s ease;
 }
 
 button:active{
-  transform:scale(0.97);
-  opacity:0.9;
+  transform: scale(0.95);
+  opacity:0.85;
+}
+
+#balance{
+  transition: 0.3s ease;
 }
 
 /* LISTA */
@@ -119,6 +138,10 @@ li{
 
 .tabbar button span {
   font-size: 11px;
+}
+
+.tabbar button:active{
+  transform: scale(0.9);
 }
 
 /* BOTÃO + */
@@ -177,11 +200,23 @@ label input[type="checkbox"]{
   color:#fff;
   box-shadow: 0 4px 12px rgba(0,0,0,0.4);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
+  animation: fadeUp 0.3s ease;
 }
 
 .card-bank:active{
   transform: scale(0.98);
   box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+@keyframes fadeUp{
+  from{
+    opacity:0;
+    transform: translateY(10px);
+  }
+  to{
+    opacity:1;
+    transform: translateY(0);
+  }
 }
 
 .card-header{
@@ -302,5 +337,11 @@ label input[type="checkbox"]{
 }
 
 main{
+  position: relative;
+  min-height: 100vh;
   padding-bottom: 90px;
+}
+
+html{
+  scroll-behavior: smooth;
 }
