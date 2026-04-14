@@ -849,22 +849,20 @@ function closeSettings(){
 // 🔥 fechar clicando fora
 const settingsModal = document.getElementById("settingsModal");
 
+function openSettings(){
+  if(settingsModal) settingsModal.classList.add("active");
+}
+
+function closeSettings(){
+  if(settingsModal) settingsModal.classList.remove("active");
+}
+
 if(settingsModal){
-
-  function openSettings(){
-    settingsModal.classList.add("active");
-  }
-
-  function closeSettings(){
-    settingsModal.classList.remove("active");
-  }
-
   settingsModal.addEventListener("click", (e)=>{
     if(e.target === settingsModal){
       closeSettings();
     }
   });
-
 }
 
 // INIT
