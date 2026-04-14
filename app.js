@@ -194,7 +194,44 @@ return d.toLocaleDateString("pt-BR");
 // });
 
 function updateCardUI(){
-paymentType.style.display = useCard.checked ? "block" : "none";
+
+  if(!useCard.checked){
+    paymentType.style.display = "none";
+    paymentType.innerHTML = "";
+    return;
+  }
+
+  const acc = accounts.find(a => a.name === account.value);
+
+  paymentType.style.display = "block";
+
+  // 🔴 Se não tem crédito ativo
+  if(!acc || !acc.card || acc.type !== "real"){
+    paymentType.innerHTML = `
+      <div class="card-alert">
+        <span>⚠️ Sem crédito ativo</span>
+        <button onclick="setLimit('${account.value}')">
+          Ativar crédito
+        </button>
+      </div>
+    `;
+    return;
+  }
+
+  // 🟢 Se tem crédito
+  paymentType.innerHTML = `
+    <div class="card-select">
+      <label>Forma de pagamento</label>
+      <select id="paymentTypeSelect">
+        <option value="credito">Cartão de crédito</option>
+      </select>
+
+      <small>
+        Limite: ${money(acc.limit)} |
+        Disponível: ${money(acc.limit - (acc.used || 0))}
+      </small>
+    </div>
+  `;
 }
 
 useCard.addEventListener("change", updateCardUI);
@@ -507,7 +544,7 @@ form.onsubmit = e => {
 
 const isRealCredit = (
   useCard.checked &&
-  paymentType.value === "credito" &&
+  document.getElementById("paymentTypeSelect")?.value === "credito" &&
   acc &&
   acc.card === true &&
   acc.type === "real"
