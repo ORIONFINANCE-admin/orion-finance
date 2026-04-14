@@ -796,6 +796,10 @@ function loadCategories(){
   });
 }
 
+function openSettings(){
+  alert("Configurações em breve");
+}
+
 // INIT
 renderHome();
 renderTransactions();
