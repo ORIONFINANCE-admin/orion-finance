@@ -1053,13 +1053,6 @@ loadCategories();
 initSettings();
 updateEyeIcon();
 
-// evita crashes silenciosos futuros
-function safeBind(el, event, fn){
-  if(el) el.addEventListener(event, fn);
-}
-
-// ================= UI BINDER (FINAL LIMPO) =================
-
 const UIBinder = {
 
   init(){
@@ -1069,42 +1062,35 @@ const UIBinder = {
     this.bindSafety();
   },
 
-  // ---------------- CORE ACTIONS ----------------
   bindCore(){
 
-    const settingsBtn = document.getElementById("settingsBtn");
-    settingsBtn?.addEventListener("click", openSettings);
+    document.getElementById("settingsBtn")
+      ?.addEventListener("click", openSettings);
 
-    const eyeBtn = document.getElementById("eyeBtn");
-    eyeBtn?.addEventListener("click", toggleBalance);
+    document.getElementById("eyeBtn")
+      ?.addEventListener("click", toggleBalance);
 
-    const btnExtract = document.getElementById("btnExtract");
-    btnExtract?.addEventListener("click", showExtract);
+    document.getElementById("btnExtract")
+      ?.addEventListener("click", showExtract);
 
-    const btnBackExtract = document.getElementById("btnBackExtract");
-    btnBackExtract?.addEventListener("click", hideExtract);
+    document.getElementById("btnBackExtract")
+      ?.addEventListener("click", hideExtract);
   },
 
-  // ---------------- TABS ----------------
   bindTabs(){
-
-    const tabs = document.querySelectorAll(".tabbar button");
-    if(!tabs.length) return;
-
-    tabs.forEach(btn => {
-      btn.addEventListener("click", () => {
-        UI.go(btn.dataset.tab);
+    document.querySelectorAll(".tabbar button")
+      .forEach(btn => {
+        btn.addEventListener("click", () => {
+          UI.go(btn.dataset.tab);
+        });
       });
-    });
   },
 
-  // ---------------- FORM ----------------
   bindForm(){
-
     const formEl = document.getElementById("form");
     if(!formEl) return;
 
-    // evita duplicação de submit
+    // fluxo único de submit (SEM duplicação)
     formEl.addEventListener("submit", (e) => {
       e.preventDefault();
 
@@ -1114,20 +1100,18 @@ const UIBinder = {
     });
   },
 
-  // ---------------- SAFETY ----------------
   bindSafety(){
 
-    // captura erros da UI
     window.addEventListener("error", (e) => {
       console.warn("UIBinder error:", e.message);
     });
 
-    // ESC fecha modal
-    document.addEventListener("keydown", (e) => {
-      if(e.key === "Escape"){
-        closeSettings();
-      }
-    });
   }
-
 };
+
+// ================= ESC GLOBAL =================
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    closeSettings();
+  }
+});
