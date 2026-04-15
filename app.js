@@ -1051,3 +1051,29 @@ renderDebts();
 loadCategories();
 initSettings();
 updateEyeIcon();
+
+// ================= CONFIG BUTTON (SETTINGS) =================
+
+const settingsBtn = document.getElementById("settingsBtn");
+
+settingsBtn?.addEventListener("click", () => {
+  openSettings();
+});
+
+// ================= EXTRATO =================
+
+const btnExtract = document.getElementById("btnExtract");
+const btnBackExtract = document.getElementById("btnBackExtract");
+
+btnExtract?.addEventListener("click", () => {
+  showExtract();
+});
+
+btnBackExtract?.addEventListener("click", () => {
+  hideExtract();
+});
+
+// evita crashes silenciosos futuros
+function safeBind(el, event, fn){
+  if(el) el.addEventListener(event, fn);
+}
