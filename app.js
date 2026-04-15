@@ -914,6 +914,7 @@ const UI = {
 
 document.addEventListener("DOMContentLoaded", () => {
   UI.init();
+  UIBinder.init();
 });
 
 if ('serviceWorker' in navigator) {
@@ -1052,63 +1053,81 @@ loadCategories();
 initSettings();
 updateEyeIcon();
 
-btnBackExtract?.addEventListener("click", () => {
-  hideExtract();
-});
-
 // evita crashes silenciosos futuros
 function safeBind(el, event, fn){
   if(el) el.addEventListener(event, fn);
 }
 
-// ================= UI BINDER (LEVE) =================
+// ================= UI BINDER (FINAL LIMPO) =================
 
-const UI_BINDER = {
+const UIBinder = {
+
   init(){
-
-    this.settings();
-    this.extract();
-    this.eye();
-    this.switches();
-
+    this.bindCore();
+    this.bindTabs();
+    this.bindForm();
+    this.bindSafety();
   },
 
-  settings(){
-    const btn = document.getElementById("settingsBtn");
-    btn?.addEventListener("click", openSettings);
+  // ---------------- CORE ACTIONS ----------------
+  bindCore(){
+
+    const settingsBtn = document.getElementById("settingsBtn");
+    settingsBtn?.addEventListener("click", openSettings);
+
+    const eyeBtn = document.getElementById("eyeBtn");
+    eyeBtn?.addEventListener("click", toggleBalance);
+
+    const btnExtract = document.getElementById("btnExtract");
+    btnExtract?.addEventListener("click", showExtract);
+
+    const btnBackExtract = document.getElementById("btnBackExtract");
+    btnBackExtract?.addEventListener("click", hideExtract);
   },
 
-  extract(){
-    const openBtn = document.getElementById("btnExtract");
-    const backBtn = document.getElementById("btnBackExtract");
+  // ---------------- TABS ----------------
+  bindTabs(){
 
-    openBtn?.addEventListener("click", showExtract);
-    backBtn?.addEventListener("click", hideExtract);
-  },
+    const tabs = document.querySelectorAll(".tabbar button");
+    if(!tabs.length) return;
 
-  eye(){
-    const btn = document.getElementById("eyeBtn");
-    if(!btn) return;
-
-    btn.addEventListener("click", () => {
-      toggleBalance();
+    tabs.forEach(btn => {
+      btn.addEventListener("click", () => {
+        UI.go(btn.dataset.tab);
+      });
     });
   },
 
-  switches(){
-    const switchBalance = document.getElementById("toggleBalanceSwitch");
+  // ---------------- FORM ----------------
+  bindForm(){
 
-    if(switchBalance){
-      switchBalance.checked = hideBalance;
+    const formEl = document.getElementById("form");
+    if(!formEl) return;
 
-      switchBalance.addEventListener("change", () => {
-        toggleBalance();
-      });
-    }
+    // evita duplicação de submit
+    formEl.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      if(typeof form.onsubmit === "function"){
+        form.onsubmit(e);
+      }
+    });
+  },
+
+  // ---------------- SAFETY ----------------
+  bindSafety(){
+
+    // captura erros da UI
+    window.addEventListener("error", (e) => {
+      console.warn("UIBinder error:", e.message);
+    });
+
+    // ESC fecha modal
+    document.addEventListener("keydown", (e) => {
+      if(e.key === "Escape"){
+        closeSettings();
+      }
+    });
   }
-};
 
-// INIT UI BINDER
-document.addEventListener("DOMContentLoaded", () => {
-  UI_BINDER.init();
-});
+};
