@@ -17,6 +17,8 @@ const DB = {
   set: (k, v) => localStorage.setItem(k, JSON.stringify(v))
 };
 
+let hideBalance = localStorage.getItem("hideBalance") === "true";
+
 // ================= CONFIG =================
 
 let transactions = DB.get("t");
@@ -392,6 +394,11 @@ if(hideBalance){
       Real: ${money(real)}
     </div>
   `;
+if(hideBalance){
+  balance.classList.add("blur");
+} else {
+  balance.classList.remove("blur");
+}
 }
     
   inTotal.innerText = money(inS);
@@ -423,7 +430,7 @@ if(hideBalance){
     if(a.name.includes("VR")) color="vr";
 
     accountsDiv.insertAdjacentHTML("beforeend", `
-  <div class="card-bank ${color}">
+    <div class="card-bank ${color} ${hideBalance ? 'blur' : ''}">
     
     <div class="card-header">
       <strong>${a.name}</strong>
@@ -883,8 +890,19 @@ if(settingsModal){
   });
 }
 
+function updateEyeIcon(){
+  const btn = document.getElementById("eyeBtn");
+  if(!btn) return;
+
+  btn.textContent = hideBalance ? "🙈" : "👁️";
+}
+
 function toggleBalance(){
   hideBalance = !hideBalance;
+
+  localStorage.setItem("hideBalance", hideBalance);
+
+  updateEyeIcon();
 
   renderHome();
   renderDashboard();
@@ -896,3 +914,4 @@ renderTransactions();
 renderDebts();
 loadCategories();
 initSettings();
+updateEyeIcon();
