@@ -431,3 +431,33 @@ body{
 .switch input:checked + .slider:before {
   transform: translateX(20px);
 }
+
+.top-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.top-actions button {
+  font-size: 20px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.2s;
+}
+
+.top-actions button:active {
+  transform: scale(0.9);
+  opacity: 0.6;
+}
+
+/* BLUR estilo banco */
+.blur {
+  filter: blur(8px);
+  transition: filter 0.3s ease;
+}
+
+/* fade suave */
+.fade {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
