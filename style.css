@@ -15,22 +15,15 @@ header{
 
 /* TELAS */
 .screen {
+  display: none;
   position: absolute;
   inset: 60px 0 90px 0;
-
-  opacity: 0;
-  transform: translateY(10px);
-
-  pointer-events: none;
-  visibility: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .screen.active {
-  opacity: 1;
-  transform: translateY(0);
-
-  pointer-events: auto;
-  visibility: visible;
+  display: block;
 }
 
 /* HOME */
@@ -371,11 +364,10 @@ label input[type="checkbox"]{
   opacity:0.6;
 }
 
-main{
+main {
   position: relative;
-  height: calc(100dvh - 60px);
+  height: 100dvh;
   overflow: hidden;
-  padding-bottom: 0;
 }
 
 html, body {
