@@ -318,6 +318,8 @@ function getRealAvailable(){
   let saldo = 0;
 
   // saldo das contas
+  const config = getConfig();
+  
   accounts.forEach(a=>{
     saldo += (a.initialBalance ?? a.balance ?? 0);
   });
@@ -436,7 +438,7 @@ if(config.hideBalance){
     
     <div class="card-header">
       <strong>${a.name}</strong>
-      <span>${money(saldo)}</span>
+      <span>${config.hideBalance ? "R$ ••••••" : money(saldo)}</span>
     </div>
 
     <div class="card-body">
