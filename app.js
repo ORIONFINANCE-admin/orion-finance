@@ -342,64 +342,44 @@ function setLimit(accountName){
   const acc = accounts.find(a => a.name === accountName);
   if(!acc) return;
 
-  const novoLimite = Number(prompt("Valor do CDB (limite):"));
+  const modal = document.createElement("div");
+  modal.className = "cdb-modal";
 
-  if(isNaN(novoLimite) || novoLimite <= 0) return;
+  modal.innerHTML = `
+    <div class="cdb-box">
+      <h3>Ativar CDB + Limite</h3>
 
-  acc.limit = novoLimite;
-  acc.used = 0;
-  acc.card = true;
-  acc.type = "real";
+      <input id="cdbValue" type="number" placeholder="Valor do limite" />
 
-  DB.set("acc", accounts);
-  renderHome();
-}
+      <div style="display:flex; gap:8px; margin-top:10px;">
+        <button id="confirmCdb">Confirmar</button>
+        <button id="cancelCdb" style="background:#444;">Cancelar</button>
+      </div>
+    </div>
+  `;
 
-function getRealAvailable(){
+  document.body.appendChild(modal);
 
-  let saldo = 0;
+  modal.querySelector("#cancelCdb").onclick = () => modal.remove();
 
-  // saldo das contas
-  
-  accounts.forEach(a=>{
-    saldo += (a.initialBalance ?? a.balance ?? 0);
-  });
+  modal.querySelector("#confirmCdb").onclick = () => {
 
-  // transações
-  transactions.forEach(t=>{
-    if(t.type === "entrada"){
-      saldo += t.value;
-    } else {
-      if(t.paymentType !== "credito" || !t.paymentType){
-        saldo -= t.value;
-      }
-    }
-  });
+    const value = Number(document.getElementById("cdbValue").value);
 
-  // 🔻 desconta faturas (dívidas de cartão)
-  debts.forEach(d=>{
-    if(d.isCard){
-      saldo -= (d.totalValor || 0);
-    }
-  });
+    if(isNaN(value) || value <= 0) return;
 
-  return saldo;
-}
+    acc.limit = value;
+    acc.used = 0;
+    acc.card = true;
+    acc.type = "real";
 
-function removeCredit(accountName){
+    DB.set("acc", accounts);
 
-  const acc = accounts.find(a => a.name === accountName);
-  if(!acc) return;
+    modal.remove();
 
-  if(!confirm("Remover crédito desta conta?")) return;
-
-  acc.card = false;
-  acc.limit = 0;
-  acc.used = 0;
-  acc.type = null;
-
-  DB.set("acc", accounts);
-  renderHome();
+    renderHome();
+    renderTransactions();
+  };
 }
 
 // ================= HOME =================
