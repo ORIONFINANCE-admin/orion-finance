@@ -1,3 +1,7 @@
+* {
+  box-sizing: border-box;
+}
+
 body{
   margin:0;
   background:#0b1220;
@@ -13,8 +17,11 @@ header{
 .screen{
   display:none;
   opacity:0;
-  transform: translateY(10px);
-  transition: 0.25s ease;
+  transform: translateY(8px);
+  transition: 0.2s ease;
+  position: absolute;
+  inset: 60px 0 90px 0;
+  overflow: hidden;
 }
 
 .screen.active{
@@ -363,8 +370,8 @@ label input[type="checkbox"]{
 
 main{
   position: relative;
-  min-height: calc(100vh - 60px);
-  padding-bottom: 90px;
+  height: calc(100vh - 60px);
+  overflow: hidden;
 }
 
 html{
@@ -377,6 +384,11 @@ button:hover{
 
 body{
   overflow-x:hidden;
+}
+
+html, body {
+  overflow-x: hidden;
+  overscroll-behavior: none;
 }
 
 .screen{
@@ -485,4 +497,9 @@ body{
 .modal-content{
   touch-action: none;
   will-change: transform;
+}
+
+html, body{
+  height: 100%;
+  overflow: hidden;
 }
