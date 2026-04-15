@@ -19,7 +19,9 @@ const DB = {
 const CONFIG_KEY = "config";
 
 function getConfig(){
-  return JSON.parse(localStorage.getItem(CONFIG_KEY)) || {
+  const cfg = JSON.parse(localStorage.getItem(CONFIG_KEY));
+
+  return cfg || {
     hideBalance: false
   };
 }
@@ -385,17 +387,21 @@ function renderHome(){
 
   const config = getConfig();
 
-balance.innerHTML = config.hideBalance ? `
-  R$ •••••
-  <div style="font-size:12px; opacity:0.6;">
-    Real: •••••
-  </div>
-` : `
-  ${money(total)}
-  <div style="font-size:12px; opacity:0.6;">
-    Real: ${money(real)}
-  </div>
-`;`;
+if(config.hideBalance){
+  balance.innerHTML = `
+    R$ •••••
+    <div style="font-size:12px; opacity:0.6;">
+      Real: •••••
+    </div>
+  `;
+} else {
+  balance.innerHTML = `
+    ${money(total)}
+    <div style="font-size:12px; opacity:0.6;">
+      Real: ${money(real)}
+    </div>
+  `;
+}
     
   inTotal.innerText = money(inS);
   outTotal.innerText = money(outS);
@@ -898,7 +904,9 @@ function toggleBalance(){
   config.hideBalance = !config.hideBalance;
   setConfig(config);
 
+  // 🔥 força atualização completa
   renderHome();
+  renderDashboard();
 }
 
 // INIT
@@ -906,3 +914,7 @@ renderHome();
 renderTransactions();
 renderDebts();
 loadCategories();
+
+// DEBUG CONFIG
+const config = getConfig();
+console.log("CONFIG:", config);
