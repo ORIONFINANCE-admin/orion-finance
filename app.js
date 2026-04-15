@@ -954,6 +954,19 @@ function toggleBalance(){
   renderDashboard();
 }
 
+function initSettings(){
+
+  const switchBalance = document.getElementById("toggleBalanceSwitch");
+
+  if(switchBalance){
+    switchBalance.checked = hideBalance;
+
+    switchBalance.addEventListener("change", () => {
+      toggleBalance();
+    });
+  }
+}
+
 // INIT
 renderHome();
 renderTransactions();
