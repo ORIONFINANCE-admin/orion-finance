@@ -1052,23 +1052,6 @@ loadCategories();
 initSettings();
 updateEyeIcon();
 
-// ================= CONFIG BUTTON (SETTINGS) =================
-
-const settingsBtn = document.getElementById("settingsBtn");
-
-settingsBtn?.addEventListener("click", () => {
-  openSettings();
-});
-
-// ================= EXTRATO =================
-
-const btnExtract = document.getElementById("btnExtract");
-const btnBackExtract = document.getElementById("btnBackExtract");
-
-btnExtract?.addEventListener("click", () => {
-  showExtract();
-});
-
 btnBackExtract?.addEventListener("click", () => {
   hideExtract();
 });
@@ -1077,3 +1060,55 @@ btnBackExtract?.addEventListener("click", () => {
 function safeBind(el, event, fn){
   if(el) el.addEventListener(event, fn);
 }
+
+// ================= UI BINDER (LEVE) =================
+
+const UI_BINDER = {
+  init(){
+
+    this.settings();
+    this.extract();
+    this.eye();
+    this.switches();
+
+  },
+
+  settings(){
+    const btn = document.getElementById("settingsBtn");
+    btn?.addEventListener("click", openSettings);
+  },
+
+  extract(){
+    const openBtn = document.getElementById("btnExtract");
+    const backBtn = document.getElementById("btnBackExtract");
+
+    openBtn?.addEventListener("click", showExtract);
+    backBtn?.addEventListener("click", hideExtract);
+  },
+
+  eye(){
+    const btn = document.getElementById("eyeBtn");
+    if(!btn) return;
+
+    btn.addEventListener("click", () => {
+      toggleBalance();
+    });
+  },
+
+  switches(){
+    const switchBalance = document.getElementById("toggleBalanceSwitch");
+
+    if(switchBalance){
+      switchBalance.checked = hideBalance;
+
+      switchBalance.addEventListener("change", () => {
+        toggleBalance();
+      });
+    }
+  }
+};
+
+// INIT UI BINDER
+document.addEventListener("DOMContentLoaded", () => {
+  UI_BINDER.init();
+});
