@@ -560,3 +560,30 @@ body{
   touch-action: none;
   will-change: transform;
 }
+
+.cdb-modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+}
+
+.cdb-box{
+  background:#111;
+  color:#fff;
+  padding:20px;
+  border-radius:14px;
+  width:280px;
+  box-shadow:0 10px 30px rgba(0,0,0,.4);
+}
+
+.cdb-box input{
+  width:100%;
+  padding:10px;
+  margin-top:10px;
+  border-radius:8px;
+  border:none;
+}
