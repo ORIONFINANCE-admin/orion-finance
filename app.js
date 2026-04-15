@@ -849,41 +849,46 @@ location.reload();
 
 function initTabs(){
 
-const tabs = document.querySelectorAll(".tabbar button");
-const screens = document.querySelectorAll(".screen");
-const title = document.getElementById("title");
+  const tabs = document.querySelectorAll(".tabbar button");
+  const screens = document.querySelectorAll(".screen");
+  const title = document.getElementById("title");
 
-if(!tabs || tabs.length === 0){
-return;
-}
+  if(!tabs.length || !screens.length) return;
 
-tabs.forEach(btn=>{
-btn.addEventListener("click", function(){
+  function setScreen(target){
 
-tabs.forEach(b=>b.classList.remove("active"));
-this.classList.add("active");
+    screens.forEach(s => s.classList.remove("active"));
 
-screens.forEach(s=>s.classList.remove("active"));
+    const el = document.getElementById(target);
+    if(!el) return;
 
-const target = this.dataset.tab;
-const el = document.getElementById(target);
+    el.classList.add("active");
 
-if(el) el.classList.add("active");
+    if(title){
+      title.innerText =
+        target === "home" ? "Home" :
+        target === "transactions" ? "Lançamentos" :
+        target === "dashboard" ? "Dashboard" :
+        target === "debts" ? "Dívidas" : "Orion";
+    }
+  }
 
-if(target==="home") title.innerText="Home";
-if(target==="transactions") title.innerText="Lançamentos";
-if(target==="debts"){
-title.innerText="Dívidas";
-renderDebts();
-}
+  tabs.forEach(btn=>{
+    btn.addEventListener("click", function(){
 
-if(target==="dashboard"){
-  title.innerText="Dashboard";
-  renderDashboard();
-}
+      tabs.forEach(b => b.classList.remove("active"));
+      this.classList.add("active");
 
-});
-});
+      const target = this.dataset.tab;
+      if(!target) return;
+
+      setScreen(target);
+
+      if(target === "debts") renderDebts();
+      if(target === "dashboard") renderDashboard();
+
+    });
+  });
 }
 
 if(document.readyState === "loading"){
