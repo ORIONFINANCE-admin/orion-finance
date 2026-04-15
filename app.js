@@ -1,16 +1,13 @@
-// 🔒 CAPTURA GLOBAL DE ERROS (PROFISSIONAL)
+// ======================================================
+// 🔒 GLOBAL ERROR CATCH
+// ======================================================
 window.onerror = function(msg, url, line, col, error){
-  console.error("🔥 Erro global:", {
-    mensagem: msg,
-    arquivo: url,
-    linha: line,
-    coluna: col,
-    erro: error
-  });
+  console.error("🔥 Erro global:", { msg, url, line, col, error });
 };
 
-// ================= DB =================
-
+// ======================================================
+// 🧠 DB LAYER
+// ======================================================
 const DB = {
   get: (k) => JSON.parse(localStorage.getItem(k)) || [],
   set: (k, v) => localStorage.setItem(k, JSON.stringify(v))
@@ -18,27 +15,12 @@ const DB = {
 
 let hideBalance = localStorage.getItem("hideBalance") === "true";
 
-// ================= CONFIG =================
-
+// ======================================================
+// 📦 STATE
+// ======================================================
 let transactions = DB.get("t");
 let accounts = DB.get("acc") || [];
 let debts = DB.get("debts") || [];
-const categories = [
-  "Salário",
-  "Mercado",
-  "Investimentos",
-  "Rendimentos",
-  "Moradia",
-  "Aluguel",
-  "Internet",
-  "Saúde",
-  "Transporte",
-  "Lazer",
-  "Educação",
-  "Outros"
-];
-
-// ================= STATE CENTRAL =================
 
 const STATE = {
   balance: 0,
@@ -49,282 +31,124 @@ const STATE = {
 
 const ACCOUNT_CACHE = {};
 
-function computeState(){
+// ======================================================
+// 📚 CATEGORIES
+// ======================================================
+const categories = [
+  "Salário","Mercado","Investimentos","Rendimentos","Moradia",
+  "Aluguel","Internet","Saúde","Transporte","Lazer","Educação","Outros"
+];
 
-  let total = 0;
-  let inS = 0;
-  let outS = 0;
+// ======================================================
+// 🧾 MIGRATION
+// ======================================================
+function migrateData(){
+  let changed = false;
+
+  accounts = accounts.map(a => {
+    if(a.initialBalance === undefined){ a.initialBalance = a.balance ?? 0; changed = true; }
+    if(a.limit === undefined){ a.limit = 0; changed = true; }
+    if(a.used === undefined){ a.used = 0; changed = true; }
+    return a;
+  });
+
+  transactions = transactions.map(t => {
+    if(t.account === undefined){ t.account = "Sem conta"; changed = true; }
+    if(t.category === undefined){ t.category = "Outros"; changed = true; }
+    if(t.paymentType === undefined){ t.paymentType = null; changed = true; }
+    if(t.date === undefined){ t.date = Date.now(); changed = true; }
+    if(t.customDate === undefined){ t.customDate = null; changed = true; }
+    return t;
+  });
+
+  if(changed){
+    DB.set("acc", accounts);
+    DB.set("t", transactions);
+  }
+}
+migrateData();
+
+// ======================================================
+// 🏦 CONTAS FIXAS
+// ======================================================
+if(accounts.length === 0){
+  accounts = [
+    { name:"Bradesco", initialBalance:0, balance:0, card:false },
+    { name:"Banco Inter", initialBalance:0, balance:0, card:false },
+    { name:"Mercado Pago", initialBalance:0, balance:0, card:true, type:"fake" },
+    { name:"VR", initialBalance:0, balance:0, card:false }
+  ];
+  DB.set("acc", accounts);
+}
+
+// ======================================================
+// 🔢 HELPERS
+// ======================================================
+function money(v){
+  return Number(v || 0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+}
+
+function formatDateLabel(ts){
+  const d = new Date(ts);
+  const t = new Date();
+  const y = new Date();
+  y.setDate(t.getDate()-1);
+
+  if(d.toDateString() === t.toDateString()) return "Hoje";
+  if(d.toDateString() === y.toDateString()) return "Ontem";
+  return d.toLocaleDateString("pt-BR");
+}
+
+// ======================================================
+// 📊 STATE CALC
+// ======================================================
+function computeState(){
+  let total=0, inc=0, out=0;
 
   accounts.forEach(a=>{
-    total += (a.initialBalance ?? a.balance ?? 0);
+    total += (a.initialBalance ?? 0);
   });
 
   transactions.forEach(t=>{
     if(t.type === "entrada"){
       total += t.value;
-      inS += t.value;
+      inc += t.value;
     } else {
-      if(t.paymentType !== "credito"){
-        total -= t.value;
-      }
-      outS += t.value;
+      if(t.paymentType !== "credito") total -= t.value;
+      out += t.value;
     }
   });
 
   STATE.balance = total;
-  STATE.income = inS;
-  STATE.outcome = outS;
+  STATE.income = inc;
+  STATE.outcome = out;
   STATE.realBalance = getRealAvailable();
 }
 
-// ================= MIGRAÇÃO =================
+function getRealAvailable(){
+  let s = 0;
 
-function migrateData(){
-
-let changed = false;
-
-// ACCOUNTS
-accounts = accounts.map(acc => {
-
-  if(acc.initialBalance === undefined){
-    acc.initialBalance = acc.balance ?? 0;
-    changed = true;
-  }
-
-  if(acc.limit === undefined){
-    acc.limit = 0;
-    changed = true;
-  }
-
-  if(acc.used === undefined){
-    acc.used = 0;
-    changed = true;
-  }
-
-  return acc;
-});
-
-// TRANSACTIONS
-transactions = transactions.map(t => {
-
-  if(t.account === undefined){
-    t.account = "Sem conta";
-    changed = true;
-  }
-
-  if(t.category === undefined){
-    t.category = "Outros";
-    changed = true;
-  }
-
-  if(t.paymentType === undefined){
-    t.paymentType = null;
-    changed = true;
-  }
-
-  if(t.isCredit === undefined){
-    t.isCredit = false;
-    changed = true;
-  }
-
-  // 🔥 NOVO: DATA
-  if(t.date === undefined){
-    t.date = Date.now();
-    changed = true;
-  }
-
-  if(t.customDate === undefined){
-    t.customDate = null;
-    changed = true;
-  }
-
-  return t;
-});
-
-if(changed){
-  DB.set("acc", accounts);
-  DB.set("t", transactions);
-}
-
-}
-
-migrateData();
-
-// ================= CONTAS FIXAS =================
-
-if(accounts.length === 0){
-  accounts = [
-  {
-    name: "Bradesco",
-    initialBalance: 0,
-    balance: 0,
-    card: false
-  },
-  {
-    name: "Banco Inter",
-    initialBalance: 0,
-    balance: 0,
-    card: false // 👈 começa SEM crédito
-  },
-  {
-    name: "Mercado Pago",
-    initialBalance: 0,
-    balance: 0,
-    card: true,
-    type: "fake" // 👈 AQUI
-  },
-  {
-    name: "VR",
-    initialBalance: 0,
-    balance: 0,
-    card: false
-  }
-];
-
-  DB.set("acc", accounts);
-}
-
-// ================= ELEMENTOS =================
-
-const balance = document.getElementById("balance");
-const inTotal = document.getElementById("inTotal");
-const outTotal = document.getElementById("outTotal");
-const accountsDiv = document.getElementById("accounts");
-
-const form = document.getElementById("form");
-const desc = document.getElementById("desc");
-const value = document.getElementById("value");
-const type = document.getElementById("type");
-const account = document.getElementById("account");
-const category = document.getElementById("category");
-const list = document.getElementById("list");
-
-const searchInput = document.getElementById("searchInput");
-
-const debtList = document.getElementById("debtList");
-
-const useCard = document.getElementById("useCard");
-const paymentType = document.getElementById("paymentType");
-
-const hasCard = document.getElementById("hasCard");
-const cardFields = document.getElementById("cardFields");
-
-function safe(el){
-  return el !== null && el !== undefined;
-}
-
-const transactionView = document.getElementById("transactionView");
-const extractView = document.getElementById("extractView");
-
-// ================= FORMAT =================
-
-function money(v){
-  return Number(v || 0).toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL"
-  });
-}
-
-// ================= DATA FORMAT =================
-
-function formatDateLabel(timestamp){
-
-const d = new Date(timestamp);
-const today = new Date();
-const yesterday = new Date();
-
-yesterday.setDate(today.getDate() - 1);
-
-if(d.toDateString() === today.toDateString()){
-return "Hoje";
-}
-
-if(d.toDateString() === yesterday.toDateString()){
-return "Ontem";
-}
-
-return d.toLocaleDateString("pt-BR");
-}
-
-// ================= MODAL =================
-
-// hasCard.addEventListener("change",()=>{
-// cardFields.style.display = hasCard.checked ? "block":"none";
-// });
-
-function updateCardUI(){
-
-  const acc = accounts.find(a => a.name === account.value);
-
-  if(!acc || acc.name !== "Banco Inter" || acc.type !== "real"){
-    paymentType.style.display = "none";
-    paymentType.innerHTML = "";
-    return;
-  }
-
-  if(!useCard.checked){
-    paymentType.style.display = "none";
-    paymentType.innerHTML = "";
-    return;
-  }
-
-  paymentType.style.display = "block";
-
-  paymentType.innerHTML = `
-    <div class="card-select">
-      <strong>Crédito ativo (Inter)</strong>
-
-      <small>
-        Limite: ${money(acc.limit)} |
-        Disponível: ${money(acc.limit - (acc.used || 0))}
-      </small>
-
-      <div style="margin-top:8px;">
-        <select id="paymentTypeSelect">
-          <option value="credito">Usar crédito</option>
-        </select>
-      </div>
-    </div>
-  `;
-}
-
-useCard.addEventListener("change", updateCardUI);
-
-// ================= CONTAS =================
-
-function payInvoice(accountName, amount){
-
-  const acc = accounts.find(a => a.name === accountName);
-  if(!acc) return;
-
-  const value = Number(amount);
-
-  if(value <= 0) return;
-
-  acc.used = Math.max(0, (acc.used || 0) - value);
-
-  transactions.push({
-    desc: "Pagamento de fatura",
-    value: value,
-    type: "saida",
-    account: accountName,
-    category: "Cartão de crédito",
-    paymentType: null,
-    isCredit: false,
-    date: Date.now(),
-    customDate: null
+  accounts.forEach(a=>{
+    s += (a.initialBalance ?? 0);
   });
 
-  DB.set("acc", accounts);
-  DB.set("t", transactions);
+  transactions.forEach(t=>{
+    if(t.type === "entrada") s += t.value;
+    else if(t.paymentType !== "credito") s -= t.value;
+  });
 
-  renderHome();
-  renderTransactions();
+  debts.forEach(d=>{
+    if(d.isCard) s -= (d.totalValor || 0);
+  });
+
+  return s;
 }
 
-function setLimit(accountName){
-
-  const acc = accounts.find(a => a.name === accountName);
+// ======================================================
+// 🧠 CREDIT LOGIC
+// ======================================================
+function setLimit(name){
+  const acc = accounts.find(a=>a.name===name);
   if(!acc) return;
 
   const modal = document.createElement("div");
@@ -333,33 +157,26 @@ function setLimit(accountName){
   modal.innerHTML = `
     <div class="cdb-box">
       <h3>Ativar CDB + Limite</h3>
-
-      <input id="cdbValue" type="number" placeholder="Valor do limite" />
-
-      <div style="display:flex; gap:8px; margin-top:10px;">
-        <button id="confirmCdb">Confirmar</button>
-        <button id="cancelCdb" style="background:#444;">Cancelar</button>
-      </div>
+      <input id="cdbValue" type="number" placeholder="Limite" />
+      <button id="ok">OK</button>
+      <button id="cancel">Cancelar</button>
     </div>
   `;
 
   document.body.appendChild(modal);
 
-  modal.querySelector("#cancelCdb").onclick = () => modal.remove();
+  modal.querySelector("#cancel").onclick = () => modal.remove();
 
-  modal.querySelector("#confirmCdb").onclick = () => {
+  modal.querySelector("#ok").onclick = () => {
+    const v = Number(document.getElementById("cdbValue").value);
+    if(!v || v<=0) return;
 
-    const value = Number(document.getElementById("cdbValue").value);
-
-    if(isNaN(value) || value <= 0) return;
-
-    acc.limit = value;
+    acc.limit = v;
     acc.used = 0;
     acc.card = true;
     acc.type = "real";
 
     DB.set("acc", accounts);
-
     modal.remove();
 
     renderHome();
@@ -367,735 +184,152 @@ function setLimit(accountName){
   };
 }
 
-// ================= HOME =================
-
-function buildAccountMap(){
-
-  const map = {};
-
-  accounts.forEach(a=>{
-    map[a.name] = a.initialBalance ?? a.balance ?? 0;
-  });
-
-  transactions.forEach(t=>{
-    if(!map[t.account]) return;
-
-    if(t.type === "entrada"){
-      map[t.account] += t.value;
-    } else {
-      if(t.paymentType !== "credito"){
-        map[t.account] -= t.value;
-      }
-    }
-  });
-
-  return map;
-}
-
+// ======================================================
+// 🏠 HOME
+// ======================================================
 function updateAccountCache(){
-
-  for (const k in ACCOUNT_CACHE) delete ACCOUNT_CACHE[k];
+  for(const k in ACCOUNT_CACHE) delete ACCOUNT_CACHE[k];
 
   accounts.forEach(a=>{
-    ACCOUNT_CACHE[a.name] = a.initialBalance ?? a.balance ?? 0;
+    ACCOUNT_CACHE[a.name] = a.initialBalance ?? 0;
   });
 
   transactions.forEach(t=>{
-    if(!ACCOUNT_CACHE.hasOwnProperty(t.account)) return;
-
-    if(t.type === "entrada"){
-      ACCOUNT_CACHE[t.account] += t.value;
-    } else {
-      if(t.paymentType !== "credito"){
-        ACCOUNT_CACHE[t.account] -= t.value;
-      }
-    }
+    if(!ACCOUNT_CACHE[t.account]) return;
+    if(t.type==="entrada") ACCOUNT_CACHE[t.account]+=t.value;
+    else if(t.paymentType!=="credito") ACCOUNT_CACHE[t.account]-=t.value;
   });
 }
 
 function renderHome(){
-
   computeState();
   updateAccountCache();
 
+  const balance = document.getElementById("balance");
+  const inT = document.getElementById("inTotal");
+  const outT = document.getElementById("outTotal");
+  const accountsDiv = document.getElementById("accounts");
+
+  if(!accountsDiv) return;
+
   accountsDiv.innerHTML = "";
 
-if(hideBalance){
-  balance.innerHTML = `
-    R$ •••••
-    <div style="font-size:12px; opacity:0.6;">
-      Real: •••••
-    </div>
-  `;
-  balance.classList.add("blur");
-} else {
-  balance.innerHTML = `
-    ${money(STATE.balance)}
-    <div style="font-size:12px; opacity:0.6;">
-      Real: ${money(STATE.realBalance)}
-    </div>
-  `;
-  balance.classList.remove("blur");
-}
-    
-    inTotal.innerText = money(STATE.income);
-    outTotal.innerText = money(STATE.outcome);
+  inT.innerText = money(STATE.income);
+  outT.innerText = money(STATE.outcome);
 
-  if(accounts.length===0){
-    accountsDiv.innerHTML="<p style='opacity:.5'>Nenhuma conta</p>";
-    return;
+  if(hideBalance){
+    balance.innerHTML = "R$ •••••";
+  } else {
+    balance.innerHTML = `${money(STATE.balance)}<br><small>${money(STATE.realBalance)}</small>`;
   }
 
   accounts.forEach(a=>{
-
-    let saldo = ACCOUNT_CACHE[a.name] || 0;
-    let color="mp";
-    if(a.name.includes("Bradesco")) color="bradesco";
-    if(a.name.includes("Inter")) color="inter";
-    if(a.name.includes("VR")) color="vr";
+    const saldo = ACCOUNT_CACHE[a.name] || 0;
 
     accountsDiv.insertAdjacentHTML("beforeend", `
-    <div class="card-bank ${color} ${hideBalance ? 'blur' : ''}">
-    
-    <div class="card-header">
-      <strong>${a.name}</strong>
-      <span>${hideBalance ? "R$ ••••••" : money(saldo)}</span>
-    </div>
+      <div class="card-bank">
+        <strong>${a.name}</strong>
+        <div>${money(saldo)}</div>
 
-    <div class="card-body">
+        ${a.name==="Banco Inter" && !a.card ? `
+          <button onclick="setLimit('Banco Inter')">Ativar crédito</button>
+        ` : ""}
 
-      ${a.name === "Banco Inter" && !a.card ? `
-        <button onclick="setLimit('Banco Inter')" class="btn">
-          Ativar crédito
-        </button>
-      ` : ""}
-
-      ${a.card && a.type === "real" ? `
-        <div class="credit-info">
-          <span>Limite: ${money(a.limit)}</span>
-          <span>Disp: ${money(a.limit - (a.used || 0))}</span>
-        </div>
-
-        <div class="card-actions">
-          <button onclick="setLimit('${a.name}')" class="btn small">
-            Alterar
-          </button>
-          <button onclick="removeCredit('${a.name}')" class="btn danger small">
-            Remover
-          </button>
-        </div>
-      ` : ""}
-
-    </div>
-
-  </div>
-`);
+        ${a.card && a.type==="real" ? `
+          <small>Limite ${money(a.limit)}</small>
+        ` : ""}
+      </div>
+    `);
   });
 }
 
+// ======================================================
+// 📊 DASHBOARD
+// ======================================================
 function renderDashboard(){
-
   computeState();
 
-  const elReal = document.getElementById("dashReal");
-  const elTotal = document.getElementById("dashTotal");
-  const elOut = document.getElementById("dashOut");
+  const r = document.getElementById("dashReal");
+  const i = document.getElementById("dashTotal");
+  const o = document.getElementById("dashOut");
 
-  if(elReal) elReal.innerText = money(STATE.realBalance);
-  if(elTotal) elTotal.innerText = money(STATE.income);
-  if(elOut) elOut.innerText = money(STATE.outcome);
-
-  // 📊 gráfico simples
-  const canvas = document.getElementById("dashChart");
-  if(!canvas) return;
-
-  const ctx = canvas.getContext("2d");
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-
-  const total = STATE.income + STATE.outcome;
-
-  const incomeBar = (STATE.income / total) * canvas.height;
-  const outcomeBar = (STATE.outcome / total) * canvas.height;
-
-  ctx.fillStyle = "#22c55e";
-  ctx.fillRect(20, canvas.height - incomeBar, 40, incomeBar);
-
-  ctx.fillStyle = "#ef4444";
-  ctx.fillRect(80, canvas.height - outcomeBar, 40, outcomeBar);
+  if(r) r.innerText = money(STATE.realBalance);
+  if(i) i.innerText = money(STATE.income);
+  if(o) o.innerText = money(STATE.outcome);
 }
 
-// ================= TRANSAÇÕES AGRUPADAS =================
-
+// ======================================================
+// 📜 TRANSACTIONS
+// ======================================================
 function renderTransactions(){
+  const list = document.getElementById("list");
+  if(!list) return;
 
-list.innerHTML = "";
+  list.innerHTML = "";
 
-if(transactions.length === 0){
-list.innerHTML = "<li style='opacity:.5'>Nenhuma transação</li>";
-return;
-}
+  const sorted = [...transactions].sort((a,b)=>
+    (b.customDate||b.date)-(a.customDate||a.date)
+  );
 
-// 🔥 ordenar por data (mais recente)
-const sorted = [...transactions].sort((a,b)=>{
-const da = a.customDate || a.date;
-const db = b.customDate || b.date;
-return db - da;
-});
+  let last="";
 
-let currentLabel = "";
+  sorted.forEach(t=>{
+    const label = formatDateLabel(t.date);
 
-sorted.forEach(t => {
-
-const date = t.customDate || t.date;
-const label = formatDateLabel(date);
-
-// 🔹 grupo
-if(label !== currentLabel){
-currentLabel = label;
-
-const header = document.createElement("li");
-header.innerHTML = `<strong style="opacity:.6;">${label}</strong>`;
-list.appendChild(header);
-}
-
-// 🔹 item
-const li = document.createElement("li");
-
-const color = t.type === "entrada" ? "#22c55e" : "#ef4444";
-
-li.innerHTML = `
-  <div style="display:flex; justify-content:space-between;">
-    <span>
-      ${t.desc}
-      <br>
-      <small style="opacity:.6;">
-        ${t.category} • ${t.account || "Sem conta"}
-      </small>
-    </span>
-
-    <strong style="color:${color}">
-      ${t.type === "saida" ? "-" : "+"} ${money(t.value)}
-    </strong>
-  </div>
-`;
-
-list.appendChild(li);
-
-});
-
-}
-
-// ================= BUSCA =================
-
-function filterTransactions(query){
-
-const q = query.toLowerCase();
-
-const filtered = transactions.filter(t=>{
-return (
-(t.desc && t.desc.toLowerCase().includes(q)) ||
-(t.account && t.account.toLowerCase().includes(q)) ||
-(t.category && t.category.toLowerCase().includes(q))
-);
-});
-
-renderFilteredTransactions(filtered);
-}
-
-function renderFilteredTransactions(data){
-
-list.innerHTML = "";
-
-data.forEach(t => {
-
-const li = document.createElement("li");
-
-li.innerHTML = `
-  ${t.desc} - ${money(t.value)}
-`;
-
-list.appendChild(li);
-
-});
-}
-
-if(searchInput){
-searchInput.addEventListener("input", function(){
-if(this.value.trim() === ""){
-renderTransactions();
-}else{
-filterTransactions(this.value);
-}
-});
-}
-
-// ================= SUBMIT =================
-
-form.onsubmit = e => {
-  e.preventDefault();
-
-  const acc = accounts.find(a => a.name === account.value);
-
-const isRealCredit = (
-  useCard.checked &&
-  document.getElementById("paymentTypeSelect")?.value === "credito" &&
-  acc &&
-  acc.card === true &&
-  acc.type === "real"
-);
-
-  if(isRealCredit){
-    const acc = accounts.find(a => a.name === account.value);
-
-    if(acc && acc.limit){
-      acc.used = (acc.used || 0) + Number(value.value);
-
-      let fatura = debts.find(d => d.isCard && d.account === acc.name);
-
-      if(fatura){
-        fatura.totalValor += Number(value.value);
-      } else {
-        debts.push({
-          name: "Fatura " + acc.name,
-          valor: 0,
-          totalValor: Number(value.value),
-          pago: 0,
-          isCard: true,
-          account: acc.name
-        });
-      }
-
-      DB.set("debts", debts);
-      DB.set("acc", accounts);
-    }
-  }
-
-transactions.push({
-  desc: desc.value,
-  value: Number(value.value),
-  type: type.value,
-  account: account.value,
-  category: category.value,
-  paymentType: useCard.checked ? "credito" : null,
-  isCredit: useCard.checked,
-  date: Date.now(),
-  customDate: null
-});
-
-  DB.set("t", transactions);
-  form.reset();
-
-  useCard.checked = false;
-  paymentType.style.display = "none";
-
-  requestAnimationFrame(() => {
-    renderHome();
-    renderTransactions();
-  });
-};
-
-// ================= EXTRATO =================
-
-function showExtract(){
-if(transactionView && extractView){
-transactionView.style.display = "none";
-extractView.style.display = "block";
-renderTransactions();
-}
-}
-
-function hideExtract(){
-if(transactionView && extractView){
-extractView.style.display = "none";
-transactionView.style.display = "block";
-}
-}
-
-// ================= DÍVIDAS =================
-
-function addDebt(){
-
-const name = d_name.value;
-const valor = Number(d_valor.value);
-const totalValor = Number(d_total.value);
-const pago = Number(d_pago.value);
-
-if(!name || !valor || !totalValor){
-alert("Preencha os campos corretamente");
-return;
-}
-
-debts.push({ name, valor, totalValor, pago });
-
-DB.set("debts", debts);
-renderDebts();
-}
-
-function renderDebts(){
-
-debtList.innerHTML = "";
-
-if(debts.length === 0){
-debtList.innerHTML = "<p style='opacity:.5'>Nenhuma dívida</p>";
-return;
-}
-
-debts.forEach((d, i)=>{
-
-const totalParcelas = d.valor > 0
-  ? Math.ceil(d.totalValor / d.valor)
-  : 1;
-const restante = totalParcelas - d.pago;
-
-debtList.innerHTML += `
-  <div class="card">
-    <strong>${d.name}</strong><br>
-    Parcela: ${money(d.valor)}<br>
-    Progresso: ${d.pago}/${totalParcelas}<br>
-    Restam: ${restante} parcelas
-
-    <div style="display:flex; gap:6px; margin-top:8px;">
-  <button onclick="payDebt(${i})">Pagar fatura</button>
-  <button onclick="payInstallment(${i})">+1</button>
-  <button onclick="undoInstallment(${i})" style="background:#374151;color:#fff;">Desfazer</button>
-</div>
-
-  </div>
-`;
-});
-
-}
-
-function payInstallment(i){
-const totalParcelas = Math.ceil(debts[i].totalValor / debts[i].valor);
-
-if(debts[i].pago < totalParcelas){
-debts[i].pago++;
-DB.set("debts", debts);
-renderDebts();
-}
-}
-
-function undoInstallment(i){
-if(debts[i].pago > 0){
-debts[i].pago--;
-DB.set("debts", debts);
-renderDebts();
-}
-}
-
-function payDebt(i){
-
-  const d = debts[i];
-  if(!d) return;
-
-  const acc = accounts.find(a => a.name === d.account);
-
-  if(acc){
-    acc.used = Math.max(0, (acc.used || 0) - d.totalValor);
-  }
-
-  debts.splice(i, 1);
-
-  DB.set("debts", debts);
-  DB.set("acc", accounts);
-
-  renderDebts();
-  renderHome();
-}
-
-// ================= BACKUP =================
-
-function exportData(){
-const data = JSON.stringify(localStorage);
-const blob = new Blob([data],{type:"application/json"});
-const a = document.createElement("a");
-a.href = URL.createObjectURL(blob);
-a.download = "orion-backup.json";
-a.click();
-}
-
-function importData(e){
-const file = e.target.files[0];
-const reader = new FileReader();
-
-reader.onload = ()=>{
-const data = JSON.parse(reader.result);
-Object.keys(data).forEach(k=>{
-localStorage.setItem(k,data[k]);
-});
-location.reload();
-};
-
-reader.readAsText(file);
-}
-
-// ================= RESET =================
-
-function resetAll(){
-if(confirm("Apagar tudo?")){
-localStorage.clear();
-location.reload();
-}
-}
-
-// ================= TABS =================
-
-const UI = {
-  current: "home",
-
-  init(){
-    this.tabs = document.querySelectorAll(".tabbar button");
-    this.screens = document.querySelectorAll(".screen");
-    this.title = document.getElementById("title");
-
-    if(!this.tabs.length || !this.screens.length) return;
-
-    this.tabs.forEach(btn=>{
-      btn.addEventListener("click", () => {
-        this.go(btn.dataset.tab);
-      });
-    });
-
-    // garante estado inicial correto
-    this.go("home", true);
-  },
-
-  go(target, force=false){
-
-    if(!target) return;
-
-    const screen = document.getElementById(target);
-    if(!screen) return;
-
-    // remove ativos
-    this.tabs.forEach(t => t.classList.remove("active"));
-    this.screens.forEach(s => s.classList.remove("active"));
-
-    // ativa botão correto
-    const btn = [...this.tabs].find(b => b.dataset.tab === target);
-    if(btn) btn.classList.add("active");
-
-    // ativa tela
-    screen.classList.add("active");
-
-    // título seguro
-    if(this.title){
-      this.title.innerText =
-        target === "home" ? "Home" :
-        target === "transactions" ? "Lançamentos" :
-        target === "dashboard" ? "Dashboard" :
-        target === "debts" ? "Dívidas" : "Orion Finance";
+    if(label!==last){
+      last=label;
+      list.innerHTML += `<li><strong>${label}</strong></li>`;
     }
 
-    this.current = target;
-
-    // hooks por tela
-    if(target === "debts") renderDebts();
-    if(target === "dashboard") renderDashboard();
-  }
-};
-
-document.addEventListener("DOMContentLoaded", () => {
-  UI.init();
-  UIBinder.init();
-});
-
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('service-worker.js')
-    .then(() => console.log('SW registrado'))
-    .catch(err => console.log('SW erro', err));
-}
-
-function loadCategories(){
-  const select = document.getElementById("category");
-  if(!select) return;
-
-  select.innerHTML = "";
-
-  categories.forEach(cat => {
-    const opt = document.createElement("option");
-    opt.value = cat;
-    opt.textContent = cat;
-    select.appendChild(opt);
+    list.innerHTML += `
+      <li>
+        ${t.desc} - ${money(t.value)}
+      </li>
+    `;
   });
 }
 
-const settingsModal = document.getElementById("settingsModal");
-
-const modalContent = settingsModal?.querySelector(".modal-content");
-
-let startY = 0;
-let currentY = 0;
-let dragging = false;
-let lastTranslate = 0;
-
-function setTranslate(y){
-  if(!modalContent) return;
-
-  // limita arrasto pra não subir infinito
-  if(y < 0) y = y / 3;
-
-  modalContent.style.transform = `translateY(${y}px)`;
-}
-
-function openSettings(){
-  if(settingsModal) settingsModal.classList.add("active");
-  document.body.style.overflow = "hidden";
-}
-
-function closeSettings(){
-  if(settingsModal) settingsModal.classList.remove("active");
-  document.body.style.overflow = "";
-
-  setTranslate(0);
-}
-
-settingsModal?.addEventListener("click", (e) => {
-  if (e.target === settingsModal) {
-    closeSettings();
-  }
-});
-
-modalContent?.addEventListener("touchstart", (e) => {
-  startY = e.touches[0].clientY;
-  dragging = true;
-
-  modalContent.style.transition = "none";
-});
-
-modalContent?.addEventListener("touchmove", (e) => {
-  if(!dragging) return;
-
-  currentY = e.touches[0].clientY;
-  let diff = currentY - startY;
-
-  // efeito iOS (resistência pra cima)
-  if(diff < 0) diff = diff / 3;
-
-  lastTranslate = diff;
-  setTranslate(diff);
-});
-
-modalContent?.addEventListener("touchend", () => {
-      dragging = false;
-
-    modalContent.style.transition =
-      "transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)";
-
-    if(lastTranslate > 120){
-      settingsModal.classList.remove("active");
-      setTranslate(0);
-      document.body.style.overflow = "";
-    } else {
-      setTranslate(0);
-    }
-});
-
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") {
-    closeSettings();
-  }
-});
-
-function updateEyeIcon(){
-  const btn = document.getElementById("eyeBtn");
-  if(!btn) return;
-
-  btn.textContent = hideBalance ? "🙈" : "👁️";
-}
-
-function toggleBalance(){
-  hideBalance = !hideBalance;
-
-  localStorage.setItem("hideBalance", hideBalance);
-
-  updateEyeIcon();
-
+// ======================================================
+// 🧾 INIT
+// ======================================================
+function init(){
   renderHome();
+  renderTransactions();
   renderDashboard();
-}
 
-function initSettings(){
+  const form = document.getElementById("form");
 
-  const switchBalance = document.getElementById("toggleBalanceSwitch");
-
-  if(switchBalance){
-    switchBalance.checked = hideBalance;
-
-    switchBalance.addEventListener("change", () => {
-      toggleBalance();
-    });
-  }
-}
-
-// INIT
-renderHome();
-renderTransactions();
-renderDebts();
-loadCategories();
-initSettings();
-updateEyeIcon();
-
-const UIBinder = {
-
-  init(){
-    this.bindCore();
-    this.bindTabs();
-    this.bindForm();
-    this.bindSafety();
-  },
-
-  bindCore(){
-
-    document.getElementById("settingsBtn")
-      ?.addEventListener("click", openSettings);
-
-    document.getElementById("eyeBtn")
-      ?.addEventListener("click", toggleBalance);
-
-    document.getElementById("btnExtract")
-      ?.addEventListener("click", showExtract);
-
-    document.getElementById("btnBackExtract")
-      ?.addEventListener("click", hideExtract);
-  },
-
-  bindTabs(){
-    document.querySelectorAll(".tabbar button")
-      .forEach(btn => {
-        btn.addEventListener("click", () => {
-          UI.go(btn.dataset.tab);
-        });
-      });
-  },
-
-  bindForm(){
-    const formEl = document.getElementById("form");
-    if(!formEl) return;
-
-    // fluxo único de submit (SEM duplicação)
-    formEl.addEventListener("submit", (e) => {
+  if(form){
+    form.onsubmit = (e)=>{
       e.preventDefault();
 
-      if(typeof form.onsubmit === "function"){
-        form.onsubmit(e);
-      }
-    });
-  },
+      transactions.push({
+        desc: form.desc.value,
+        value: Number(form.value.value),
+        type: form.type.value,
+        account: form.account.value,
+        category: form.category.value,
+        paymentType: null,
+        date: Date.now()
+      });
 
-  bindSafety(){
+      DB.set("t", transactions);
 
-    window.addEventListener("error", (e) => {
-      console.warn("UIBinder error:", e.message);
-    });
+      form.reset();
 
+      renderHome();
+      renderTransactions();
+    };
   }
-};
+}
 
-// ================= ESC GLOBAL =================
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") {
-    closeSettings();
+document.addEventListener("DOMContentLoaded", init);
+
+// ======================================================
+// ⌨️ ESC GLOBAL (ÚNICO)
+// ======================================================
+document.addEventListener("keydown",(e)=>{
+  if(e.key==="Escape"){
+    document.querySelector(".cdb-modal")?.remove();
   }
 });
