@@ -928,7 +928,7 @@ function loadCategories(){
 
 const settingsModal = document.getElementById("settingsModal");
 
-const modalContent = document.querySelector(".modal-content");
+const modalContent = settingsModal?.querySelector(".modal-content");
 
 let startY = 0;
 let currentY = 0;
@@ -942,7 +942,7 @@ function setTranslate(y){
   if(y < 0) y = y / 3;
 
   modalContent.style.transform = `translateY(${y}px)`;
-}}
+}
 
 function openSettings(){
   if(settingsModal) settingsModal.classList.add("active");
