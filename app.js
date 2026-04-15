@@ -922,13 +922,20 @@ function closeSettings(){
   if(settingsModal) settingsModal.classList.remove("active");
 }
 
-if(settingsModal){
-  settingsModal.addEventListener("click", (e)=>{
-    if(e.target === settingsModal){
-      closeSettings();
-    }
-  });
-}
+document.addEventListener("click", (e) => {
+  if (!settingsModal) return;
+
+  const isClickInside = settingsModal.contains(e.target);
+
+  const isOpen = settingsModal.classList.contains("active");
+
+  if (!isOpen) return;
+
+  // se clicou fora do conteúdo do modal
+  if (!isClickInside) {
+    closeSettings();
+  }
+});
 
 function updateEyeIcon(){
   const btn = document.getElementById("eyeBtn");
