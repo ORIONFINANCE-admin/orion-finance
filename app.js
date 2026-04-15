@@ -10,6 +10,8 @@ window.onerror = function(msg, url, line, col, error){
 };
 
 // ================= DB =================
+let hideBalance = false; // ✅ fora do DB
+
 const DB = {
   get: (k) => JSON.parse(localStorage.getItem(k)) || [],
   set: (k, v) => localStorage.setItem(k, JSON.stringify(v))
@@ -177,13 +179,9 @@ const extractView = document.getElementById("extractView");
 // ================= FORMAT =================
 
 function money(v){
-  const cfg = getConfig();
-
-  return Number(v||0).toLocaleString("pt-BR",{
-    style:"currency",
-    currency:"BRL",
-    minimumFractionDigits: cfg.showCents ? 2 : 0,
-    maximumFractionDigits: cfg.showCents ? 2 : 0
+  return Number(v || 0).toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL"
   });
 }
 
@@ -312,7 +310,6 @@ function getRealAvailable(){
   let saldo = 0;
 
   // saldo das contas
-  const config = getConfig();
   
   accounts.forEach(a=>{
     saldo += (a.initialBalance ?? a.balance ?? 0);
@@ -381,9 +378,7 @@ function renderHome(){
 
   const real = getRealAvailable();
 
-  const config = getConfig();
-
-if(config.hideBalance){
+if(hideBalance){
   balance.innerHTML = `
     R$ •••••
     <div style="font-size:12px; opacity:0.6;">
@@ -432,7 +427,7 @@ if(config.hideBalance){
     
     <div class="card-header">
       <strong>${a.name}</strong>
-      <span>${config.hideBalance ? "R$ ••••••" : money(saldo)}</span>
+      <span>${hideBalance ? "R$ ••••••" : money(saldo)}</span>
     </div>
 
     <div class="card-body">
@@ -889,9 +884,7 @@ if(settingsModal){
 }
 
 function toggleBalance(){
-  const config = getConfig();
-  config.hideBalance = !config.hideBalance;
-  saveConfig(config);
+  hideBalance = !hideBalance;
 
   renderHome();
   renderDashboard();
@@ -903,49 +896,3 @@ renderTransactions();
 renderDebts();
 loadCategories();
 initSettings();
-
-// DEBUG CONFIG
-const config = getConfig();
-console.log("CONFIG:", config);
-
-function getConfig(){
-  return JSON.parse(localStorage.getItem("config")) || {
-    hideBalance: false,
-    showCents: true
-  };
-}
-
-function saveConfig(cfg){
-  localStorage.setItem("config", JSON.stringify(cfg));
-}
-
-function initSettings(){
-
-  const cfg = getConfig();
-
-  const balanceSwitch = document.getElementById("toggleBalanceSwitch");
-  const centsSwitch = document.getElementById("toggleCentsSwitch");
-
-  if(balanceSwitch){
-    balanceSwitch.checked = cfg.hideBalance;
-
-    balanceSwitch.addEventListener("change", () => {
-      const config = getConfig();
-      config.hideBalance = balanceSwitch.checked;
-      saveConfig(config);
-      renderHome();
-    });
-  }
-
-  if(centsSwitch){
-    centsSwitch.checked = cfg.showCents;
-
-    centsSwitch.addEventListener("change", () => {
-      const config = getConfig();
-      config.showCents = centsSwitch.checked;
-      saveConfig(config);
-      renderHome();
-    });
-  }
-
-}
