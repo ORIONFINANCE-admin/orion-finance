@@ -254,41 +254,51 @@ return d.toLocaleDateString("pt-BR");
 
 function updateCardUI(){
 
+  const acc = accounts.find(a => a.name === account.value);
+
+  // só mostra se for Banco Inter
+  if(!acc || acc.name !== "Banco Inter"){
+    paymentType.style.display = "none";
+    paymentType.innerHTML = "";
+    return;
+  }
+
   if(!useCard.checked){
     paymentType.style.display = "none";
     paymentType.innerHTML = "";
     return;
   }
 
-  const acc = accounts.find(a => a.name === account.value);
-
   paymentType.style.display = "block";
 
-  // 🔴 Se não tem crédito ativo
-  if(!acc || !acc.card || acc.type !== "real"){
+  // sem crédito ativo
+  if(!acc.card || acc.type !== "real"){
     paymentType.innerHTML = `
       <div class="card-alert">
-        <span>⚠️ Sem crédito ativo</span>
-        <button onclick="setLimit('${account.value}')">
-          Ativar crédito
+        <span>Ative o crédito do Inter</span>
+        <button onclick="setLimit('Banco Inter')">
+          Ativar CDB + Limite
         </button>
       </div>
     `;
     return;
   }
 
-  // 🟢 Se tem crédito
+  // crédito ativo
   paymentType.innerHTML = `
     <div class="card-select">
-      <label>Forma de pagamento</label>
-      <select id="paymentTypeSelect">
-        <option value="credito">Cartão de crédito</option>
-      </select>
+      <strong>Cartão de crédito ativo</strong>
 
       <small>
         Limite: ${money(acc.limit)} |
         Disponível: ${money(acc.limit - (acc.used || 0))}
       </small>
+
+      <div style="margin-top:8px;">
+        <select id="paymentTypeSelect">
+          <option value="credito">Usar crédito</option>
+        </select>
+      </div>
     </div>
   `;
 }
