@@ -916,23 +916,22 @@ const settingsModal = document.getElementById("settingsModal");
 
 function openSettings(){
   if(settingsModal) settingsModal.classList.add("active");
+  document.body.style.overflow = "hidden";
 }
 
 function closeSettings(){
   if(settingsModal) settingsModal.classList.remove("active");
+  document.body.style.overflow = "";
 }
 
-document.addEventListener("click", (e) => {
-  if (!settingsModal) return;
+settingsModal?.addEventListener("click", (e) => {
+  if (e.target === settingsModal) {
+    closeSettings();
+  }
+});
 
-  const isClickInside = settingsModal.contains(e.target);
-
-  const isOpen = settingsModal.classList.contains("active");
-
-  if (!isOpen) return;
-
-  // se clicou fora do conteúdo do modal
-  if (!isClickInside) {
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
     closeSettings();
   }
 });
