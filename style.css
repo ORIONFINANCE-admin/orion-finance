@@ -2,15 +2,36 @@
   box-sizing: border-box;
 }
 
-body{
-  margin:0;
-  background:#0b1220;
-  color:#fff;
-  font-family:-apple-system;
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system;
 }
 
 header{
   margin:0;
+}
+
+:root {
+  /* APP THEME */
+  --bg: #0b1220;
+  --card: #111827;
+  --text: #ffffff;
+  --muted: #94a3b8;
+
+  /* ACTION COLORS */
+  --primary: #22c55e;
+  --danger: #ef4444;
+  --info: #2563eb;
+
+  /* BANK COLORS */
+  --bank-bradesco: #cc092f;
+  --bank-inter: #ff7a00;
+  --bank-mp: #00b1ea;
+
+  /* VR (Sólides Hub → roxo + azul moderno) */
+  --bank-vr: linear-gradient(135deg, #6d28d9, #2563eb);
 }
 
 /* TELAS */
@@ -51,10 +72,34 @@ header{
   padding:10px 20px;
 }
 
-.bradesco{background:#cc092f;}
-.inter{background:#ff7a00;}
-.mp{background:#00b1ea;}
-.vr{background:#6d28d9;}
+.bradesco{
+  background: var(--bank-bradesco);
+  box-shadow:
+    0 6px 18px rgba(0,0,0,0.35),
+    0 0 18px rgba(204, 9, 47, 0.25);
+}
+
+.inter{
+  background: var(--bank-inter);
+  box-shadow:
+    0 6px 18px rgba(0,0,0,0.35),
+    0 0 18px rgba(255, 122, 0, 0.25);
+}
+
+.mp{
+  background: var(--bank-mp);
+  box-shadow:
+    0 6px 18px rgba(0,0,0,0.35),
+    0 0 18px rgba(0, 177, 234, 0.22);
+}
+
+.vr{
+  background: var(--bank-vr);
+  box-shadow:
+    0 6px 18px rgba(0,0,0,0.35),
+    0 0 22px rgba(109, 40, 217, 0.25),
+    0 0 28px rgba(37, 99, 235, 0.18);
+}
 
 /* CARD */
 .card{
@@ -217,11 +262,17 @@ label input[type="checkbox"]{
   padding:14px;
   border-radius:16px;
   margin-bottom:10px;
-  background: linear-gradient(135deg, #1f2937, #0f172a);
+
   color:#fff;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+  box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+
   animation: fadeUp 0.3s ease;
+
+  position: relative;
+  overflow: hidden;
 }
 
 .card-bank:active{
