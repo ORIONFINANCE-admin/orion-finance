@@ -36,15 +36,20 @@ header{
 
 /* TELAS */
 .screen {
-  display: none;
   position: absolute;
   inset: 60px 0 90px 0;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+
+  transition: opacity 0.25s ease, transform 0.25s ease;
 }
 
 .screen.active {
-  display: block;
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
 }
 
 /* HOME */
@@ -105,7 +110,7 @@ header{
 .card{
   margin:10px;
   padding:12px;
-  background:#111827;
+  background: var(--card);;
   border-radius:12px;
 }
 
@@ -118,10 +123,15 @@ input, select, button{
   border-radius:10px;
 }
 
-button{
-  background:#22c55e;
-  font-weight:bold;
-  transition: transform 0.1s ease, opacity 0.1s ease;
+.btn-primary { background: var(--primary); }
+.btn-danger { background: var(--danger); }
+.btn-info { background: var(--info); }
+
+button {
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  transition: 0.2s;
 }
 
 button:active{
@@ -141,10 +151,15 @@ button:active{
 }
 
 li{
-  background:#1e293b;
-  padding:10px;
-  margin-bottom:8px;
-  border-radius:8px;
+  background: #1e293b;
+  padding: 10px;
+  margin-bottom: 8px;
+  border-radius: 10px;
+  transition: 0.2s;
+}
+
+li:hover{
+  transform: translateX(2px);
 }
 
 /* TABBAR PREMIUM */
@@ -244,7 +259,7 @@ label input[type="checkbox"]{
 .modal.active{display:flex;}
 
 .modal-content{
-  background:#111827;
+  background: var(--card);;
   width:100%;
   padding:20px;
   border-radius:20px 20px 0 0;
@@ -276,8 +291,11 @@ label input[type="checkbox"]{
 }
 
 .card-bank:active{
-  transform: scale(0.98);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  transform: scale(0.97);
+}
+
+.card-bank:hover{
+  transform: translateY(-2px);
 }
 
 @keyframes fadeUp{
