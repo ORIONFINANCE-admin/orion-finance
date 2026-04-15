@@ -156,7 +156,9 @@ li{
 .modal{
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,0.5);
+  background:rgba(0,0,0,0.35);
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
 
   display:flex;
   justify-content:center;
@@ -166,13 +168,15 @@ li{
   visibility:hidden;
   pointer-events:none;
 
-  transition:0.25s ease;
+  transition: opacity 0.25s ease, backdrop-filter 0.25s ease;
 }
 
 .modal.active{
   opacity:1;
   visibility:visible;
   pointer-events:auto;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 /* FIX CHECKBOX HORIZONTAL (USAR CARTÃO) */
@@ -197,8 +201,13 @@ label input[type="checkbox"]{
   padding:20px;
   border-radius:20px 20px 0 0;
 
-  transform: translateY(100%);
-  transition: transform 0.25s ease;
+  transform: translateY(40px) scale(0.98);
+  opacity:0;
+
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.2s ease;
+
+  will-change: transform;
 }
 
 .card-bank{
@@ -362,21 +371,6 @@ html{
   scroll-behavior: smooth;
 }
 
-.modal-content{
-  animation: slideUp 0.25s ease;
-}
-
-@keyframes slideUp{
-  from{
-    transform: translateY(100%);
-    opacity:0;
-  }
-  to{
-    transform: translateY(0);
-    opacity:1;
-  }
-}
-
 button:hover{
   opacity:0.9;
 }
@@ -469,5 +463,26 @@ body{
 }
 
 .modal.active .modal-content{
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
+  opacity:1;
+  animation: iosVibratePop 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes iosVibratePop{
+  0%{
+    transform: translateY(40px) scale(0.98);
+  }
+
+  60%{
+    transform: translateY(-6px) scale(1.01);
+  }
+
+  100%{
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal-content{
+  touch-action: none;
+  will-change: transform;
 }
