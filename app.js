@@ -10,7 +10,6 @@ window.onerror = function(msg, url, line, col, error){
 };
 
 // ================= DB =================
-let hideBalance = false; // ✅ fora do DB
 
 const DB = {
   get: (k) => JSON.parse(localStorage.getItem(k)) || [],
@@ -38,6 +37,45 @@ const categories = [
   "Educação",
   "Outros"
 ];
+
+// ================= STATE CENTRAL =================
+
+const STATE = {
+  balance: 0,
+  income: 0,
+  outcome: 0,
+  realBalance: 0
+};
+
+const ACCOUNT_CACHE = {};
+
+function computeState(){
+
+  let total = 0;
+  let inS = 0;
+  let outS = 0;
+
+  accounts.forEach(a=>{
+    total += (a.initialBalance ?? a.balance ?? 0);
+  });
+
+  transactions.forEach(t=>{
+    if(t.type === "entrada"){
+      total += t.value;
+      inS += t.value;
+    } else {
+      if(t.paymentType !== "credito"){
+        total -= t.value;
+      }
+      outS += t.value;
+    }
+  });
+
+  STATE.balance = total;
+  STATE.income = inS;
+  STATE.outcome = outS;
+  STATE.realBalance = getRealAvailable();
+}
 
 // ================= MIGRAÇÃO =================
 
@@ -356,29 +394,56 @@ function removeCredit(accountName){
 
 // ================= HOME =================
 
-function renderHome(){
+function buildAccountMap(){
 
-  accountsDiv.innerHTML = "";
-
-  let total=0, inS=0, outS=0;
+  const map = {};
 
   accounts.forEach(a=>{
-    total += (a.initialBalance ?? a.balance ?? 0);
+    map[a.name] = a.initialBalance ?? a.balance ?? 0;
   });
 
   transactions.forEach(t=>{
-    if(t.type==="entrada"){
-      total+=t.value;
-      inS+=t.value;
+    if(!map[t.account]) return;
+
+    if(t.type === "entrada"){
+      map[t.account] += t.value;
     } else {
-      if(t.paymentType !== "credito" || !t.paymentType){
-        total-=t.value;
+      if(t.paymentType !== "credito"){
+        map[t.account] -= t.value;
       }
-      outS+=t.value;
     }
   });
 
-  const real = getRealAvailable();
+  return map;
+}
+
+function updateAccountCache(){
+
+  for (const k in ACCOUNT_CACHE) delete ACCOUNT_CACHE[k];
+
+  accounts.forEach(a=>{
+    ACCOUNT_CACHE[a.name] = a.initialBalance ?? a.balance ?? 0;
+  });
+
+  transactions.forEach(t=>{
+    if(!ACCOUNT_CACHE.hasOwnProperty(t.account)) return;
+
+    if(t.type === "entrada"){
+      ACCOUNT_CACHE[t.account] += t.value;
+    } else {
+      if(t.paymentType !== "credito"){
+        ACCOUNT_CACHE[t.account] -= t.value;
+      }
+    }
+  });
+}
+
+function renderHome(){
+
+  computeState();
+  updateAccountCache();
+
+  accountsDiv.innerHTML = "";
 
 if(hideBalance){
   balance.innerHTML = `
@@ -387,22 +452,19 @@ if(hideBalance){
       Real: •••••
     </div>
   `;
-} else {
-  balance.innerHTML = `
-    ${money(total)}
-    <div style="font-size:12px; opacity:0.6;">
-      Real: ${money(real)}
-    </div>
-  `;
-if(hideBalance){
   balance.classList.add("blur");
 } else {
+  balance.innerHTML = `
+    ${money(STATE.balance)}
+    <div style="font-size:12px; opacity:0.6;">
+      Real: ${money(STATE.realBalance)}
+    </div>
+  `;
   balance.classList.remove("blur");
 }
-}
     
-  inTotal.innerText = money(inS);
-  outTotal.innerText = money(outS);
+    inTotal.innerText = money(STATE.income);
+    outTotal.innerText = money(STATE.outcome);
 
   if(accounts.length===0){
     accountsDiv.innerHTML="<p style='opacity:.5'>Nenhuma conta</p>";
@@ -411,19 +473,7 @@ if(hideBalance){
 
   accounts.forEach(a=>{
 
-    let saldo = a.initialBalance ?? a.balance ?? 0;
-
-    transactions.forEach(t=>{
-      if(t.account === a.name){
-        if(t.type === "entrada") saldo += t.value;
-        else {
-          if(t.paymentType !== "credito" || !t.paymentType){
-            saldo -= t.value;
-          }
-        }
-      }
-    });
-
+    let saldo = ACCOUNT_CACHE[a.name] || 0;
     let color="mp";
     if(a.name.includes("Bradesco")) color="bradesco";
     if(a.name.includes("Inter")) color="inter";
@@ -470,25 +520,15 @@ if(hideBalance){
 
 function renderDashboard(){
 
-  const total = transactions.reduce((acc, t)=>{
-    if(t.type === "entrada") return acc + t.value;
-    return acc;
-  }, 0);
-
-  const out = transactions.reduce((acc, t)=>{
-    if(t.type === "saida") return acc + t.value;
-    return acc;
-  }, 0);
-
-  const real = getRealAvailable();
+  computeState();
 
   const elReal = document.getElementById("dashReal");
   const elTotal = document.getElementById("dashTotal");
   const elOut = document.getElementById("dashOut");
 
-  if(elReal) elReal.innerText = money(real);
-  if(elTotal) elTotal.innerText = money(total);
-  if(elOut) elOut.innerText = money(out);
+  if(elReal) elReal.innerText = money(STATE.realBalance);
+  if(elTotal) elTotal.innerText = money(STATE.income);
+  if(elOut) elOut.innerText = money(STATE.outcome);
 }
 
 // ================= TRANSAÇÕES AGRUPADAS =================
