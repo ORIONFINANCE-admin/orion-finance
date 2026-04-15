@@ -15,19 +15,25 @@ header{
 
 /* TELAS */
 .screen {
-  display: none;
-
-  left: 0;
-  top: 0;
+  position: absolute;
+  inset: 60px 0 90px 0;
 
   opacity: 0;
-  transform: translateY(8px);
-  transition: 0.2s ease;
+  transform: translateY(10px);
+  pointer-events: none;
 
-  height: calc(100dvh - 60px - 90px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+
   overflow-y: auto;
-
   -webkit-overflow-scrolling: touch;
+
+  will-change: transform, opacity;
+}
+
+.screen.active {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
 }
 
 /* HOME */
