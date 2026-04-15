@@ -16,19 +16,6 @@ const DB = {
 };
 
 // ================= CONFIG =================
-const CONFIG_KEY = "config";
-
-function getConfig(){
-  const cfg = JSON.parse(localStorage.getItem(CONFIG_KEY));
-
-  return cfg || {
-    hideBalance: false
-  };
-}
-
-function setConfig(cfg){
-  localStorage.setItem(CONFIG_KEY, JSON.stringify(cfg));
-}
 
 let transactions = DB.get("t");
 let accounts = DB.get("acc") || [];
@@ -900,20 +887,12 @@ if(settingsModal){
     }
   });
 }
-if(settingsModal){
-  settingsModal.addEventListener("click", (e)=>{
-    if(e.target === settingsModal){
-      closeSettings();
-    }
-  });
-}
 
 function toggleBalance(){
   const config = getConfig();
   config.hideBalance = !config.hideBalance;
-  setConfig(config);
+  saveConfig(config);
 
-  // 🔥 força atualização completa
   renderHome();
   renderDashboard();
 }
