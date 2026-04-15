@@ -20,8 +20,8 @@
   <header id="title">Home</header>
 
   <div class="top-actions">
-    <button onclick="toggleBalance()" id="eyeBtn">👁️</button>
-    <button onclick="openSettings()">⚙️</button>
+    <button id="eyeBtn">👁️</button>
+    <button id="settingsBtn">⚙️</button>
   </div>
 </div>
 
@@ -67,7 +67,7 @@
           <option value="saida">Saída</option>
         </select>
 
-        <select id="account" onchange="updateCardUI()">
+        <select id="account">
           <option>Bradesco</option>
           <option>Banco Inter</option>
           <option>Mercado Pago</option>
@@ -100,7 +100,7 @@
 
     <!-- BOTÃO EXTRATO -->
     <div style="padding:10px;">
-      <button onclick="showExtract()" style="background:#374151;color:#fff;">
+      <button id="btnExtract" style="background:#374151;color:#fff;">
         Ver extrato
       </button>
     </div>
@@ -112,7 +112,7 @@
 <div id="extractView" style="display:none;">
 
   <div style="padding:10px;">
-    <button onclick="hideExtract()" style="background:#374151;color:#fff;">
+    <button id="btnBackExtract" style="background:#374151;color:#fff;">
       ← Voltar
     </button>
   </div>
@@ -172,7 +172,7 @@
     <input id="d_total" type="number" inputmode="numeric" placeholder="Total">
     <input id="d_pago" type="number" inputmode="numeric" placeholder="Parcelas pagas">
 
-    <button onclick="addDebt()">Salvar</button>
+    <button id="btnAddDebt">Salvar</button>
   </div>
 
   <div id="debtList" class="list-box"></div>
@@ -221,7 +221,7 @@
 
       <button onclick="exportData()">Salvar backup</button>
 
-      <input type="file" onchange="importData(event)">
+      <input type="file" id="importFile">
     </div>
 
     <div class="card">
