@@ -256,8 +256,7 @@ function updateCardUI(){
 
   const acc = accounts.find(a => a.name === account.value);
 
-  // só mostra se for Banco Inter
-  if(!acc || acc.name !== "Banco Inter"){
+  if(!acc || acc.name !== "Banco Inter" || acc.type !== "real"){
     paymentType.style.display = "none";
     paymentType.innerHTML = "";
     return;
@@ -271,23 +270,9 @@ function updateCardUI(){
 
   paymentType.style.display = "block";
 
-  // sem crédito ativo
-  if(!acc.card || acc.type !== "real"){
-    paymentType.innerHTML = `
-      <div class="card-alert">
-        <span>Ative o crédito do Inter</span>
-        <button onclick="setLimit('Banco Inter')">
-          Ativar CDB + Limite
-        </button>
-      </div>
-    `;
-    return;
-  }
-
-  // crédito ativo
   paymentType.innerHTML = `
     <div class="card-select">
-      <strong>Cartão de crédito ativo</strong>
+      <strong>Crédito ativo (Inter)</strong>
 
       <small>
         Limite: ${money(acc.limit)} |
@@ -519,6 +504,24 @@ function renderDashboard(){
   if(elReal) elReal.innerText = money(STATE.realBalance);
   if(elTotal) elTotal.innerText = money(STATE.income);
   if(elOut) elOut.innerText = money(STATE.outcome);
+
+  // 📊 gráfico simples
+  const canvas = document.getElementById("dashChart");
+  if(!canvas) return;
+
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  const total = STATE.income + STATE.outcome;
+
+  const incomeBar = (STATE.income / total) * canvas.height;
+  const outcomeBar = (STATE.outcome / total) * canvas.height;
+
+  ctx.fillStyle = "#22c55e";
+  ctx.fillRect(20, canvas.height - incomeBar, 40, incomeBar);
+
+  ctx.fillStyle = "#ef4444";
+  ctx.fillRect(80, canvas.height - outcomeBar, 40, outcomeBar);
 }
 
 // ================= TRANSAÇÕES AGRUPADAS =================
@@ -569,6 +572,7 @@ li.innerHTML = `
         ${t.category} • ${t.account || "Sem conta"}
       </small>
     </span>
+
     <strong style="color:${color}">
       ${t.type === "saida" ? "-" : "+"} ${money(t.value)}
     </strong>
@@ -788,7 +792,7 @@ function payDebt(i){
   const acc = accounts.find(a => a.name === d.account);
 
   if(acc){
-    acc.used = Math.max(0, (acc.used || 0) - d.valor);
+    acc.used = Math.max(0, (acc.used || 0) - d.totalValor);
   }
 
   debts.splice(i, 1);
