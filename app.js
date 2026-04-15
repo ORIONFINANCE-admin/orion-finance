@@ -847,55 +847,64 @@ location.reload();
 
 // ================= TABS =================
 
-function initTabs(){
+const UI = {
+  current: "home",
 
-  const tabs = document.querySelectorAll(".tabbar button");
-  const screens = document.querySelectorAll(".screen");
-  const title = document.getElementById("title");
+  init(){
+    this.tabs = document.querySelectorAll(".tabbar button");
+    this.screens = document.querySelectorAll(".screen");
+    this.title = document.getElementById("title");
 
-  if(!tabs.length || !screens.length) return;
+    if(!this.tabs.length || !this.screens.length) return;
 
-  function setScreen(target){
+    this.tabs.forEach(btn=>{
+      btn.addEventListener("click", () => {
+        this.go(btn.dataset.tab);
+      });
+    });
 
-    screens.forEach(s => s.classList.remove("active"));
+    // garante estado inicial correto
+    this.go("home", true);
+  },
 
-    const el = document.getElementById(target);
-    if(!el) return;
+  go(target, force=false){
 
-    el.classList.add("active");
+    if(!target) return;
 
-    if(title){
-      title.innerText =
+    const screen = document.getElementById(target);
+    if(!screen) return;
+
+    // remove ativos
+    this.tabs.forEach(t => t.classList.remove("active"));
+    this.screens.forEach(s => s.classList.remove("active"));
+
+    // ativa botão correto
+    const btn = [...this.tabs].find(b => b.dataset.tab === target);
+    if(btn) btn.classList.add("active");
+
+    // ativa tela
+    screen.classList.add("active");
+
+    // título seguro
+    if(this.title){
+      this.title.innerText =
         target === "home" ? "Home" :
         target === "transactions" ? "Lançamentos" :
         target === "dashboard" ? "Dashboard" :
-        target === "debts" ? "Dívidas" : "Orion";
+        target === "debts" ? "Dívidas" : "Orion Finance";
     }
+
+    this.current = target;
+
+    // hooks por tela
+    if(target === "debts") renderDebts();
+    if(target === "dashboard") renderDashboard();
   }
+};
 
-  tabs.forEach(btn=>{
-    btn.addEventListener("click", function(){
-
-      tabs.forEach(b => b.classList.remove("active"));
-      this.classList.add("active");
-
-      const target = this.dataset.tab;
-      if(!target) return;
-
-      setScreen(target);
-
-      if(target === "debts") renderDebts();
-      if(target === "dashboard") renderDashboard();
-
-    });
-  });
-}
-
-if(document.readyState === "loading"){
-document.addEventListener("DOMContentLoaded", initTabs);
-}else{
-initTabs();
-}
+document.addEventListener("DOMContentLoaded", () => {
+  UI.init();
+});
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('service-worker.js')
