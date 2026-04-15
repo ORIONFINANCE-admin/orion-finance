@@ -914,6 +914,22 @@ function loadCategories(){
 
 const settingsModal = document.getElementById("settingsModal");
 
+const modalContent = document.querySelector(".modal-content");
+
+let startY = 0;
+let currentY = 0;
+let dragging = false;
+let lastTranslate = 0;
+
+function setTranslate(y){
+  if(!modalContent) return;
+
+  // limita arrasto pra não subir infinito
+  if(y < 0) y = y / 3;
+
+  modalContent.style.transform = `translateY(${y}px)`;
+}}
+
 function openSettings(){
   if(settingsModal) settingsModal.classList.add("active");
   document.body.style.overflow = "hidden";
@@ -922,12 +938,49 @@ function openSettings(){
 function closeSettings(){
   if(settingsModal) settingsModal.classList.remove("active");
   document.body.style.overflow = "";
+
+  setTranslate(0);
 }
 
 settingsModal?.addEventListener("click", (e) => {
   if (e.target === settingsModal) {
     closeSettings();
   }
+});
+
+modalContent?.addEventListener("touchstart", (e) => {
+  startY = e.touches[0].clientY;
+  dragging = true;
+
+  modalContent.style.transition = "none";
+});
+
+modalContent?.addEventListener("touchmove", (e) => {
+  if(!dragging) return;
+
+  currentY = e.touches[0].clientY;
+  let diff = currentY - startY;
+
+  // efeito iOS (resistência pra cima)
+  if(diff < 0) diff = diff / 3;
+
+  lastTranslate = diff;
+  setTranslate(diff);
+});
+
+modalContent?.addEventListener("touchend", () => {
+      dragging = false;
+
+    modalContent.style.transition =
+      "transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)";
+
+    if(lastTranslate > 120){
+      settingsModal.classList.remove("active");
+      setTranslate(0);
+      document.body.style.overflow = "";
+    } else {
+      setTranslate(0);
+    }
 });
 
 document.addEventListener("keydown", (e) => {
