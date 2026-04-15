@@ -190,7 +190,14 @@ const extractView = document.getElementById("extractView");
 // ================= FORMAT =================
 
 function money(v){
-return Number(v||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+  const cfg = getConfig();
+
+  return Number(v||0).toLocaleString("pt-BR",{
+    style:"currency",
+    currency:"BRL",
+    minimumFractionDigits: cfg.showCents ? 2 : 0,
+    maximumFractionDigits: cfg.showCents ? 2 : 0
+  });
 }
 
 // ================= DATA FORMAT =================
@@ -916,7 +923,50 @@ renderHome();
 renderTransactions();
 renderDebts();
 loadCategories();
+initSettings();
 
 // DEBUG CONFIG
 const config = getConfig();
 console.log("CONFIG:", config);
+
+function getConfig(){
+  return JSON.parse(localStorage.getItem("config")) || {
+    hideBalance: false,
+    showCents: true
+  };
+}
+
+function saveConfig(cfg){
+  localStorage.setItem("config", JSON.stringify(cfg));
+}
+
+function initSettings(){
+
+  const cfg = getConfig();
+
+  const balanceSwitch = document.getElementById("toggleBalanceSwitch");
+  const centsSwitch = document.getElementById("toggleCentsSwitch");
+
+  if(balanceSwitch){
+    balanceSwitch.checked = cfg.hideBalance;
+
+    balanceSwitch.addEventListener("change", () => {
+      const config = getConfig();
+      config.hideBalance = balanceSwitch.checked;
+      saveConfig(config);
+      renderHome();
+    });
+  }
+
+  if(centsSwitch){
+    centsSwitch.checked = cfg.showCents;
+
+    centsSwitch.addEventListener("change", () => {
+      const config = getConfig();
+      config.showCents = centsSwitch.checked;
+      saveConfig(config);
+      renderHome();
+    });
+  }
+
+}
