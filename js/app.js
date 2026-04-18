@@ -15,8 +15,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // RENDER INICIAL
   UIModule.renderHome();
-  renderTransactions();
-  renderDebts();
+  TransactionsModule.render();
+  DebtsModule.render();
   loadCategories();
   initSettings();
   updateEyeIcon();
