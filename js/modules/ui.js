@@ -80,7 +80,7 @@ window.UIModule = (function(){
       }
     });
 
-    balanceEl.innerText = money(total);
+    balanceEl.innerText = hideBalance ? "R$ •••••" : money(total);
     inEl.innerText = money(income);
     outEl.innerText = money(outcome);
 
@@ -92,7 +92,7 @@ window.UIModule = (function(){
       accountsDiv.innerHTML += `
         <div class="card-bank">
           <strong>${a.name}</strong>
-          <span>${money(saldo)}</span>
+          <span>${hideBalance ? "•••••" : money(saldo)}</span>
         </div>
       `;
     });
@@ -103,9 +103,7 @@ window.UIModule = (function(){
     bindTabs();
 
     document.getElementById("eyeBtn")
-      ?.addEventListener("click", () => {
-        alert("toggle virá na fase 4");
-      });
+      ?.addEventListener("click", toggleBalance);
   }
 
   return {
@@ -113,5 +111,16 @@ window.UIModule = (function(){
     go,
     renderHome
   };
+
+let hideBalance = localStorage.getItem("hideBalance") === "true";
+
+function toggleBalance(){
+
+  hideBalance = !hideBalance;
+
+  localStorage.setItem("hideBalance", hideBalance);
+
+  renderHome();
+}
 
 })();
