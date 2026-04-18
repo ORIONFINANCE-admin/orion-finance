@@ -1,62 +1,26 @@
-// ================= APP ORCHESTRATOR =================
-
 document.addEventListener("DOMContentLoaded", () => {
 
-  console.log("🚀 Orion Finance iniciando...");
+  console.log("🚀 Orion modular iniciado");
 
-  // ---------------- CORE READY ----------------
-  if(!window.DB || !window.STATE){
-    console.error("❌ Core não carregado corretamente");
-    return;
-  }
+  // INIT CORE DATA
+  window.transactions = DB.get("t");
+  window.accounts = DB.get("acc");
+  window.debts = DB.get("debts");
 
-  // ---------------- MODULES INIT ----------------
+  // INIT MODULES
+  AccountsModule.init();
+  AccountsModule.updateCache();
 
-  try{
+  UIModule.bind();
 
-    // CONTAS (base do sistema)
-    if(window.AccountsModule){
-      AccountsModule.init();
-      AccountsModule.updateCache();
-    }
+  // RENDER INICIAL
+  renderHome();
+  renderTransactions();
+  renderDebts();
+  loadCategories();
+  initSettings();
+  updateEyeIcon();
 
-    // UI
-    if(window.UIModule){
-      UIModule.bind();
-    }
-
-    console.log("✅ Módulos inicializados");
-
-  }catch(err){
-    console.error("🔥 Erro ao iniciar módulos:", err);
-  }
-
-  // ---------------- APP ANTIGO (COMPAT) ----------------
-  // 🔥 mantém seu sistema atual funcionando
-
-  try{
-
-    if(typeof renderHome === "function") renderHome();
-    if(typeof renderTransactions === "function") renderTransactions();
-    if(typeof renderDebts === "function") renderDebts();
-    if(typeof loadCategories === "function") loadCategories();
-    if(typeof initSettings === "function") initSettings();
-    if(typeof updateEyeIcon === "function") updateEyeIcon();
-
-    console.log("✅ Sistema legado ativo");
-
-  }catch(err){
-    console.error("🔥 Erro no sistema antigo:", err);
-  }
-
-  // ---------------- DASHBOARD ----------------
-
-  try{
-    if(window.DashboardModule){
-      DashboardModule.render();
-    }
-  }catch(err){
-    console.warn("⚠️ Dashboard não carregado ainda");
-  }
+  DashboardModule.render();
 
 });
