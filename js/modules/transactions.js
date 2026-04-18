@@ -12,7 +12,10 @@ window.TransactionsModule = (function(){
       const li = document.createElement("li");
 
       li.innerHTML = `
-        ${t.desc} - ${money(t.value)}
+        <span>${t.desc}</span>
+        <strong style="color:${t.type === "entrada" ? "#22c55e" : "#ef4444"}">
+            ${t.type === "saida" ? "-" : "+"} ${money(t.value)}
+        </strong>
       `;
 
       list.appendChild(li);
