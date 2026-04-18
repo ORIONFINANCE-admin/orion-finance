@@ -1,5 +1,56 @@
 window.UIModule = (function(){
 
+  let current = "home";
+
+  function go(target){
+
+    if(!target) return;
+
+    const screens = document.querySelectorAll(".screen");
+    const tabs = document.querySelectorAll(".tabbar button");
+
+    // remove ativos
+    screens.forEach(s => s.classList.remove("active"));
+    tabs.forEach(t => t.classList.remove("active"));
+
+    // ativa tela
+    const screen = document.getElementById(target);
+    if(screen) screen.classList.add("active");
+
+    // ativa botão
+    const btn = [...tabs].find(b => b.dataset.tab === target);
+    if(btn) btn.classList.add("active");
+
+    // título
+    const title = document.getElementById("title");
+    if(title){
+      title.innerText =
+        target === "home" ? "Home" :
+        target === "transactions" ? "Lançamentos" :
+        target === "dashboard" ? "Dashboard" :
+        target === "debts" ? "Dívidas" :
+        "Orion Finance";
+    }
+
+    current = target;
+
+    // render por tela
+    if(target === "home") renderHome();
+    if(target === "transactions") TransactionsModule.render();
+    if(target === "debts") DebtsModule.render();
+    if(target === "dashboard") DashboardModule.render();
+  }
+
+  function bindTabs(){
+
+    document.querySelectorAll(".tabbar button")
+      .forEach(btn => {
+        btn.addEventListener("click", () => {
+          go(btn.dataset.tab);
+        });
+      });
+  }
+
   function renderHome(){
 
     const balanceEl = document.getElementById("balance");
@@ -33,11 +84,9 @@ window.UIModule = (function(){
     inEl.innerText = money(income);
     outEl.innerText = money(outcome);
 
-    // contas
     accountsDiv.innerHTML = "";
 
     accounts.forEach(a=>{
-
       const saldo = ACCOUNT_CACHE[a.name] || 0;
 
       accountsDiv.innerHTML += `
@@ -47,20 +96,21 @@ window.UIModule = (function(){
         </div>
       `;
     });
-
   }
 
   function bind(){
 
+    bindTabs();
+
     document.getElementById("eyeBtn")
       ?.addEventListener("click", () => {
-        alert("toggle depois implementamos");
+        alert("toggle virá na fase 4");
       });
-
   }
 
   return {
     bind,
+    go,
     renderHome
   };
 
