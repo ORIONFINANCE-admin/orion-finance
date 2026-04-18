@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
   UIModule.bind();
 
   // RENDER INICIAL
-  renderHome();
+  UIModule.renderHome();
   renderTransactions();
   renderDebts();
   loadCategories();
