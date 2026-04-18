@@ -2,25 +2,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
   console.log("🚀 Orion modular iniciado");
 
-  // INIT CORE DATA
+  // ================= DADOS =================
   window.transactions = DB.get("t");
   window.accounts = DB.get("acc");
   window.debts = DB.get("debts");
 
-  // INIT MODULES
+  // ================= MÓDULOS =================
   AccountsModule.init();
   AccountsModule.updateCache();
 
   UIModule.bind();
 
-  // RENDER INICIAL
-  UIModule.renderHome();
-  TransactionsModule.render();
-  DebtsModule.render();
-  loadCategories();
-  initSettings();
-  updateEyeIcon();
-
-  DashboardModule.render();
+  // ================= INÍCIO =================
+  UIModule.go("home");
 
 });
