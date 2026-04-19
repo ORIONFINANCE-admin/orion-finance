@@ -84,8 +84,16 @@ window.UIModule = (function(){
 
         accountsDiv.innerHTML += `
           <div class="card-bank">
-            <strong>${a.name}</strong>
-            <span>${hideBalance ? "•••••" : money(saldo)}</span>
+
+            <div style="display:flex; flex-direction:column;">
+              <strong>${formatBankName(a.name)}</strong>
+              <span style="font-size:18px; margin-top:4px;">
+                ${hideBalance ? "•••••" : money(saldo)}
+              </span>
+            </div>
+
+            ${renderCreditInfo(a)}
+
           </div>
         `;
       });
