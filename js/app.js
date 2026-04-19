@@ -13,13 +13,30 @@ document.addEventListener("DOMContentLoaded", () => {
   AccountsModule.init();
   AccountsModule.updateCache();
 
-  // 🔥 ESSENCIAL (corrige o submit quebrado)
+  // 🔥 CORRIGE SUBMIT / FORM
   if(window.TransactionsModule?.bind){
     TransactionsModule.bind();
   }
 
-  // 🔥 UI por último
+  // 🔥 ATIVA DÍVIDAS (IMPORTANTE PRO CRÉDITO)
+  if(window.DebtsModule?.bind){
+    DebtsModule.bind();
+  }
+
+  // 🔥 UI POR ÚLTIMO (sempre)
   UIModule.bind();
   UIModule.go("home");
 
 });
+
+
+// 🔄 ATUALIZAÇÃO GLOBAL SEGURA
+function refreshAll(){
+
+  AccountsModule.updateCache();
+
+  const activeTab =
+    document.querySelector(".tabbar .active")?.dataset.tab || "home";
+
+  UIModule.go(activeTab);
+}
