@@ -32,10 +32,10 @@ window.UIModule = (function(){
     current = target;
 
     if(target === "home") renderHome();
-    if(target === "transactions") TransactionsModule.render();
-    if(target === "debts") DebtsModule.render();
-    if(target === "dashboard") DashboardModule.render();
-  }
+    if(target === "transactions") window.TransactionsModule?.render?.();
+    if(target === "debts") window.DebtsModule?.render?.();
+    if(target === "dashboard") window.DashboardModule?.render?.();  
+    }
 
   function renderHome(){
 
