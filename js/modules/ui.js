@@ -31,11 +31,16 @@ window.UIModule = (function(){
 
     current = target;
 
-    if(target === "home") renderHome();
-    if(target === "transactions") window.TransactionsModule?.render?.();
-    if(target === "debts") window.DebtsModule?.render?.();
-    if(target === "dashboard") window.DashboardModule?.render?.();  
+    // 🔥 render seguro (NUNCA QUEBRA)
+    try {
+      if(target === "home") renderHome();
+      if(target === "transactions") window.TransactionsModule?.render?.();
+      if(target === "debts") window.DebtsModule?.render?.();
+      if(target === "dashboard") window.DashboardModule?.render?.();
+    } catch(e){
+      console.log("Erro ao renderizar tela:", e);
     }
+  }
 
   function renderHome(){
 
@@ -50,12 +55,11 @@ window.UIModule = (function(){
     let income = 0;
     let outcome = 0;
 
-    // 🔥 cálculo correto
-    window.accounts.forEach(a=>{
+    (window.accounts || []).forEach(a=>{
       total += (a.initialBalance ?? a.balance ?? 0);
     });
 
-    window.transactions.forEach(t=>{
+    (window.transactions || []).forEach(t=>{
       if(t.type === "entrada"){
         total += t.value;
         income += t.value;
@@ -71,19 +75,23 @@ window.UIModule = (function(){
     inEl.innerText = hideBalance ? "R$ •••••" : money(income);
     outEl.innerText = hideBalance ? "R$ •••••" : money(outcome);
 
-    // 🔥 render contas
-    accountsDiv.innerHTML = "";
+    // 🔥 evita crash aqui
+    try{
+      accountsDiv.innerHTML = "";
 
-    window.accounts.forEach(a=>{
-      const saldo = (window.ACCOUNT_CACHE?.[a.name]) ?? 0;
+      (window.accounts || []).forEach(a=>{
+        const saldo = (window.ACCOUNT_CACHE?.[a.name]) ?? 0;
 
-      accountsDiv.innerHTML += `
-        <div class="card-bank">
-          <strong>${a.name}</strong>
-          <span>${hideBalance ? "•••••" : money(saldo)}</span>
-        </div>
-      `;
-    });
+        accountsDiv.innerHTML += `
+          <div class="card-bank">
+            <strong>${a.name}</strong>
+            <span>${hideBalance ? "•••••" : money(saldo)}</span>
+          </div>
+        `;
+      });
+    }catch(e){
+      console.log("Erro contas:", e);
+    }
   }
 
   function toggleBalance(){
@@ -94,7 +102,6 @@ window.UIModule = (function(){
 
   function bind(){
 
-    // abas
     document.querySelectorAll(".tabbar button")
       .forEach(btn => {
         btn.addEventListener("click", () => {
@@ -102,46 +109,13 @@ window.UIModule = (function(){
         });
       });
 
-    // olho
     document.getElementById("eyeBtn")
       ?.addEventListener("click", toggleBalance);
-
-    // 🔥 CORREÇÃO CRÍTICA DO FORM
-    const form = document.getElementById("form");
-
-    if(form){
-      
-        e.preventDefault(); // 🔥 impede reload (era seu bug)
-
-        const desc = document.getElementById("desc").value;
-        const value = Number(document.getElementById("value").value);
-        const type = document.getElementById("type").value;
-        const account = document.getElementById("account").value;
-        const category = document.getElementById("category").value;
-
-        window.transactions.push({
-          desc,
-          value,
-          type,
-          account,
-          category,
-          date: Date.now()
-        });
-
-        DB.set("t", window.transactions);
-
-        this.reset();
-
-        // 🔥 atualiza tudo SEM trocar de tela
-        refreshAll();
-      });
-    }
   }
 
   return {
     bind,
-    go,
-    renderHome
+    go
   };
 
 })();
