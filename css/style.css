@@ -1,1 +1,589 @@
+* {
+  box-sizing: border-box;
+}
 
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system;
+}
+
+header{
+  margin:0;
+}
+
+:root {
+  /* APP THEME */
+  --bg: #0b1220;
+  --card: #111827;
+  --text: #ffffff;
+  --muted: #94a3b8;
+
+  /* ACTION COLORS */
+  --primary: #22c55e;
+  --danger: #ef4444;
+  --info: #2563eb;
+
+  /* BANK COLORS */
+  --bank-bradesco: #cc092f;
+  --bank-inter: #ff7a00;
+  --bank-mp: #00b1ea;
+
+  /* VR (Sólides Hub → roxo + azul moderno) */
+  --bank-vr: linear-gradient(135deg, #6d28d9, #2563eb);
+}
+
+/* TELAS */
+.screen {
+  position: absolute;
+  inset: 60px 0 90px 0;
+
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.screen.active {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* HOME */
+.balance{padding:0 20px;}
+
+.summary{
+  display:flex;
+  gap:10px;
+  padding:10px 20px;
+}
+
+.summary div{
+  flex:1;
+  background: #1e293b;
+  padding:12px;
+  border-radius:12px;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03);
+}
+
+/* CONTAS */
+.accounts{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  padding:10px 20px;
+}
+
+.bradesco{
+  background: var(--bank-bradesco);
+  box-shadow:
+    0 6px 18px rgba(0,0,0,0.35),
+    0 0 18px rgba(204, 9, 47, 0.25);
+}
+
+.inter{
+  background: var(--bank-inter);
+  box-shadow:
+    0 6px 18px rgba(0,0,0,0.35),
+    0 0 18px rgba(255, 122, 0, 0.25);
+}
+
+.mp{
+  background: var(--bank-mp);
+  box-shadow:
+    0 6px 18px rgba(0,0,0,0.35),
+    0 0 18px rgba(0, 177, 234, 0.22);
+}
+
+.vr{
+  background: var(--bank-vr);
+  box-shadow:
+    0 6px 18px rgba(0,0,0,0.35),
+    0 0 22px rgba(109, 40, 217, 0.25),
+    0 0 28px rgba(37, 99, 235, 0.18);
+}
+
+/* CARD */
+.card{
+  margin:10px;
+  padding:12px;
+  background: var(--card);;
+  border-radius:12px;
+}
+
+/* INPUTS */
+input, select, button{
+  width:100%;
+  height:42px;
+  margin-top:8px;
+  border:none;
+  border-radius:10px;
+}
+
+.btn-primary { background: var(--primary); }
+.btn-danger { background: var(--danger); }
+.btn-info { background: var(--info); }
+
+button {
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+button:active{
+  transform: scale(0.95);
+  opacity:0.85;
+}
+
+#balance{
+  transition: 0.3s ease;
+}
+
+/* LISTA */
+.list-box{
+  height:220px;
+  overflow:auto;
+  padding:10px;
+}
+
+li{
+  background: #1e293b;
+  padding: 10px;
+  margin-bottom: 8px;
+  border-radius: 10px;
+  transition: 0.2s;
+}
+
+li:hover{
+  transform: translateX(2px);
+}
+
+/* TABBAR PREMIUM */
+.tabbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 10px 10px calc(10px + env(safe-area-inset-bottom));
+  background: #0f172a;
+  display: flex;
+  justify-content: space-around;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  z-index: 1000;
+}
+
+.tabbar button {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.tabbar button.active {
+  color: #22c55e;
+}
+
+.tabbar button span {
+  font-size: 11px;
+}
+
+.tabbar button:active{
+  transform: scale(0.9);
+}
+
+/* BOTÃO + */
+.fab{
+  position:fixed;
+  bottom:75px;
+  right:20px;
+  width:55px;
+  height:55px;
+  border-radius:50%;
+  background:#22c55e;
+  color:#000;
+  font-size:28px;
+  border:none;
+  display:none;
+}
+
+/* MODAL */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.35);
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+
+  display:flex;
+  justify-content:center;
+  align-items:flex-end;
+
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+
+  transition: opacity 0.25s ease, backdrop-filter 0.25s ease;
+}
+
+.modal.active{
+  opacity:1;
+  visibility:visible;
+  pointer-events:auto;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* FIX CHECKBOX HORIZONTAL (USAR CARTÃO) */
+label{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  width:100%;
+  overflow:hidden;
+}
+
+label input[type="checkbox"]{
+  width:auto;
+  flex-shrink:0;
+}
+
+.modal.active{display:flex;}
+
+.modal-content{
+  background: var(--card);;
+  width:100%;
+  padding:20px;
+  border-radius:20px 20px 0 0;
+
+  transform: translateY(40px) scale(0.98);
+  opacity:0;
+
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.2s ease;
+
+  will-change: transform;
+}
+
+.card-bank{
+  padding:14px;
+  border-radius:16px;
+  margin-bottom:10px;
+
+  color:#fff;
+
+  box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+
+  animation: fadeUp 0.3s ease;
+
+  position: relative;
+  overflow: hidden;
+}
+
+.card-bank:active{
+  transform: scale(0.97);
+}
+
+.card-bank:hover{
+  transform: translateY(-2px);
+}
+
+@keyframes fadeUp{
+  from{
+    opacity:0;
+    transform: translateY(10px);
+  }
+  to{
+    opacity:1;
+    transform: translateY(0);
+  }
+}
+
+.card-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:16px;
+}
+
+.card-body{
+  margin-top:8px;
+}
+
+.credit-info{
+  display:flex;
+  justify-content:space-between;
+  font-size:13px;
+  opacity:0.8;
+  margin-bottom:6px;
+}
+
+.card-actions{
+  display:flex;
+  gap:6px;
+}
+
+.btn{
+  background:#2563eb;
+  border:none;
+  padding:6px 10px;
+  border-radius:6px;
+  color:white;
+  cursor:pointer;
+}
+
+.btn.small{
+  font-size:12px;
+  padding:4px 8px;
+}
+
+.btn.danger{
+  background:#ef4444;
+}
+
+.card-alert {
+  background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.3);
+  padding: 12px;
+  border-radius: 10px;
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-alert button {
+  background: #ef4444;
+  color: #fff;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+
+.card-select {
+  background: rgba(59,130,246,0.1);
+  border: 1px solid rgba(59,130,246,0.3);
+  padding: 12px;
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+.card-select select {
+  width: 100%;
+  padding: 8px;
+  margin-top: 6px;
+  border-radius: 6px;
+  border: none;
+}
+
+.card-select small {
+  display: block;
+  margin-top: 6px;
+  opacity: 0.7;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  width: 100%;
+  height: 60px;
+
+  padding: 0 16px;
+  box-sizing: border-box; /* 🔥 CORREÇÃO */
+
+  background: #0f172a;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.topbar header {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.topbar button {
+  background: transparent;
+  border: none;
+  font-size: 22px;
+  color: #fff;
+}
+
+.balance h1{
+  font-size:28px;
+  margin:6px 0;
+}
+
+.balance small{
+  font-size:12px;
+  opacity:0.6;
+}
+
+main {
+  position: relative;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  overflow-x: hidden;
+  overscroll-behavior: none;
+}
+
+html{
+  scroll-behavior: smooth;
+}
+
+button:hover{
+  opacity:0.9;
+}
+
+body{
+  overflow-x:hidden;
+}
+
+.setting-item{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-top:12px;
+}
+
+/* SWITCH estilo iOS */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 46px;
+  height: 26px;
+}
+
+.switch input {
+  display: none;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: #374151;
+  border-radius: 34px;
+  transition: 0.3s;
+}
+
+.slider:before {
+  content: "";
+  position: absolute;
+  height: 20px;
+  width: 20px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+
+.switch input:checked + .slider {
+  background-color: #22c55e;
+}
+
+.switch input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
+.top-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.top-actions button {
+  font-size: 20px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.2s;
+}
+
+.top-actions button:active {
+  transform: scale(0.9);
+  opacity: 0.6;
+}
+
+/* BLUR estilo banco */
+.blur {
+  filter: blur(8px);
+  transition: filter 0.3s ease;
+}
+
+/* fade suave */
+.fade {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.modal.active .modal-content{
+  transform: translateY(0) scale(1);
+  opacity:1;
+  animation: iosVibratePop 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes iosVibratePop{
+  0%{
+    transform: translateY(40px) scale(0.98);
+  }
+
+  60%{
+    transform: translateY(-6px) scale(1.01);
+  }
+
+  100%{
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal-content{
+  touch-action: none;
+  will-change: transform;
+}
+
+.cdb-modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+}
+
+.cdb-box{
+  background:#111;
+  color:#fff;
+  padding:20px;
+  border-radius:14px;
+  width:280px;
+  box-shadow:0 10px 30px rgba(0,0,0,.4);
+}
+
+.cdb-box input{
+  width:100%;
+  padding:10px;
+  margin-top:10px;
+  border-radius:8px;
+  border:none;
+}
