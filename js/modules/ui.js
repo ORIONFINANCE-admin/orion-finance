@@ -32,9 +32,9 @@ window.UIModule = (function(){
     current = target;
 
     if(target === "home") renderHome();
-    if(target === "transactions") TransactionsModule.render?.();
-    if(target === "debts") DebtsModule.render?.();
-    if(target === "dashboard") DashboardModule.render?.();
+    if(target === "transactions") TransactionsModule.render();
+    if(target === "debts") DebtsModule.render();
+    if(target === "dashboard") DashboardModule.render();
   }
 
   function renderHome(){
@@ -50,6 +50,7 @@ window.UIModule = (function(){
     let income = 0;
     let outcome = 0;
 
+    // 🔥 cálculo correto
     window.accounts.forEach(a=>{
       total += (a.initialBalance ?? a.balance ?? 0);
     });
@@ -70,6 +71,7 @@ window.UIModule = (function(){
     inEl.innerText = money(income);
     outEl.innerText = money(outcome);
 
+    // 🔥 render contas
     accountsDiv.innerHTML = "";
 
     window.accounts.forEach(a=>{
@@ -92,6 +94,7 @@ window.UIModule = (function(){
 
   function bind(){
 
+    // abas
     document.querySelectorAll(".tabbar button")
       .forEach(btn => {
         btn.addEventListener("click", () => {
@@ -99,8 +102,40 @@ window.UIModule = (function(){
         });
       });
 
+    // olho
     document.getElementById("eyeBtn")
       ?.addEventListener("click", toggleBalance);
+
+    // 🔥 CORREÇÃO CRÍTICA DO FORM
+    const form = document.getElementById("form");
+
+    if(form){
+      form.addEventListener("submit", function(e){
+        e.preventDefault(); // 🔥 impede reload (era seu bug)
+
+        const desc = document.getElementById("desc").value;
+        const value = Number(document.getElementById("value").value);
+        const type = document.getElementById("type").value;
+        const account = document.getElementById("account").value;
+        const category = document.getElementById("category").value;
+
+        window.transactions.push({
+          desc,
+          value,
+          type,
+          account,
+          category,
+          date: Date.now()
+        });
+
+        DB.set("t", window.transactions);
+
+        this.reset();
+
+        // 🔥 atualiza tudo SEM trocar de tela
+        refreshAll();
+      });
+    }
   }
 
   return {
