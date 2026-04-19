@@ -44,17 +44,17 @@ window.UIModule = (function(){
     const outEl = document.getElementById("outTotal");
     const accountsDiv = document.getElementById("accounts");
 
-    if(!balanceEl) return;
+    if(!balanceEl || !accountsDiv) return;
 
     let total = 0;
     let income = 0;
     let outcome = 0;
 
-    accounts.forEach(a=>{
+    window.accounts.forEach(a=>{
       total += (a.initialBalance ?? a.balance ?? 0);
     });
 
-    transactions.forEach(t=>{
+    window.transactions.forEach(t=>{
       if(t.type === "entrada"){
         total += t.value;
         income += t.value;
@@ -72,8 +72,9 @@ window.UIModule = (function(){
 
     accountsDiv.innerHTML = "";
 
-    accounts.forEach(a=>{
-      const saldo = (ACCOUNT_CACHE?.[a.name]) ?? 0;
+    window.accounts.forEach(a=>{
+
+      const saldo = (window.ACCOUNT_CACHE?.[a.name]) ?? 0;
 
       accountsDiv.innerHTML += `
         <div class="card-bank">
