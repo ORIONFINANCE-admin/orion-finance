@@ -1,6 +1,7 @@
 window.UIModule = (function(){
 
   let current = "home";
+  let hideBalance = localStorage.getItem("hideBalance") === "true";
 
   function go(target){
 
@@ -9,19 +10,15 @@ window.UIModule = (function(){
     const screens = document.querySelectorAll(".screen");
     const tabs = document.querySelectorAll(".tabbar button");
 
-    // remove ativos
     screens.forEach(s => s.classList.remove("active"));
     tabs.forEach(t => t.classList.remove("active"));
 
-    // ativa tela
     const screen = document.getElementById(target);
     if(screen) screen.classList.add("active");
 
-    // ativa botão
     const btn = [...tabs].find(b => b.dataset.tab === target);
     if(btn) btn.classList.add("active");
 
-    // título
     const title = document.getElementById("title");
     if(title){
       title.innerText =
@@ -34,21 +31,10 @@ window.UIModule = (function(){
 
     current = target;
 
-    // render por tela
     if(target === "home") renderHome();
-    if(target === "transactions") TransactionsModule.render();
-    if(target === "debts") DebtsModule.render();
-    if(target === "dashboard") DashboardModule.render();
-  }
-
-  function bindTabs(){
-
-    document.querySelectorAll(".tabbar button")
-      .forEach(btn => {
-        btn.addEventListener("click", () => {
-          go(btn.dataset.tab);
-        });
-      });
+    if(target === "transactions") TransactionsModule.render?.();
+    if(target === "debts") DebtsModule.render?.();
+    if(target === "dashboard") DashboardModule.render?.();
   }
 
   function renderHome(){
@@ -87,7 +73,7 @@ window.UIModule = (function(){
     accountsDiv.innerHTML = "";
 
     accounts.forEach(a=>{
-      const saldo = ACCOUNT_CACHE[a.name] || 0;
+      const saldo = (ACCOUNT_CACHE?.[a.name]) ?? 0;
 
       accountsDiv.innerHTML += `
         <div class="card-bank">
@@ -98,9 +84,20 @@ window.UIModule = (function(){
     });
   }
 
+  function toggleBalance(){
+    hideBalance = !hideBalance;
+    localStorage.setItem("hideBalance", hideBalance);
+    renderHome();
+  }
+
   function bind(){
 
-    bindTabs();
+    document.querySelectorAll(".tabbar button")
+      .forEach(btn => {
+        btn.addEventListener("click", () => {
+          go(btn.dataset.tab);
+        });
+      });
 
     document.getElementById("eyeBtn")
       ?.addEventListener("click", toggleBalance);
@@ -111,16 +108,5 @@ window.UIModule = (function(){
     go,
     renderHome
   };
-
-let hideBalance = localStorage.getItem("hideBalance") === "true";
-
-function toggleBalance(){
-
-  hideBalance = !hideBalance;
-
-  localStorage.setItem("hideBalance", hideBalance);
-
-  renderHome();
-}
 
 })();
