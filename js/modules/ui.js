@@ -73,7 +73,6 @@ window.UIModule = (function(){
     accountsDiv.innerHTML = "";
 
     window.accounts.forEach(a=>{
-
       const saldo = (window.ACCOUNT_CACHE?.[a.name]) ?? 0;
 
       accountsDiv.innerHTML += `
