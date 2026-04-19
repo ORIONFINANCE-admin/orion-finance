@@ -15,7 +15,7 @@ window.TransactionsModule = (function(){
       const account = document.getElementById("account").value;
       const category = document.getElementById("category").value;
 
-      if(!desc || !value){
+      if(!desc || isNaN(value) || value <= 0){
         alert("Preencha os campos corretamente");
         return;
       }
@@ -23,7 +23,7 @@ window.TransactionsModule = (function(){
       // 🔥 cria transação
       const useCard = document.getElementById("useCard")?.checked;
 
-      const acc = window.accounts.find(a => a.name === account);
+      const acc = (window.accounts || []).find(a => a.name === account) || null;
 
       const isCredit = (
         useCard &&
@@ -44,7 +44,7 @@ window.TransactionsModule = (function(){
           customDate: null
         };
         
-        if(isCredit){
+        if(isCredit && acc){
 
         acc.used = (acc.used || 0) + value;
 
