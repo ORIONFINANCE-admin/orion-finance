@@ -91,46 +91,60 @@ window.TransactionsModule = (function(){
 
   function render(){
 
-    const list = document.getElementById("list");
-    if(!list) return;
+  const list = document.getElementById("list");
+  if(!list) return;
 
-    list.innerHTML = "";
+  list.innerHTML = "";
 
-    const sorted = [...window.transactions].sort((a,b)=>{
-      const da = a.customDate || a.date;
-      const db = b.customDate || b.date;
-      return db - da;
-    });
-
-    sorted.forEach(t => {
-
-      const li = document.createElement("li");
-
-      const color = t.type === "entrada" ? "#22c55e" : "#ef4444";
-
-      li.innerHTML = `
-        <div style="display:flex; justify-content:space-between;">
-          <span>
-            ${t.desc}
-            <br>
-            <small style="opacity:.6;">
-              ${t.category} • ${t.account}
-            </small>
-          </span>
-
-          <strong style="color:${color}">
-            ${t.type === "saida" ? "-" : "+"} ${money(t.value)}
-          </strong>
-        </div>
-      `;
-
-      list.appendChild(li);
-    });
+  if(!window.transactions || window.transactions.length === 0){
+    list.innerHTML = "<li style='opacity:.5'>Nenhuma transação</li>";
+    return;
   }
 
-  return {
-    bind,
-    render
-  };
+  // 🔥 ordenar por data (mais recente primeiro)
+  const sorted = [...window.transactions].sort((a,b)=>{
+    const da = a.customDate || a.date;
+    const db = b.customDate || b.date;
+    return db - da;
+  });
 
-})();
+  let currentLabel = "";
+
+  sorted.forEach(t => {
+
+    const date = t.customDate || t.date;
+    const label = formatDateLabel(date);
+
+    // 🔹 cria separador por dia
+    if(label !== currentLabel){
+      currentLabel = label;
+
+      const header = document.createElement("li");
+      header.innerHTML = `<strong style="opacity:.6;">${label}</strong>`;
+      list.appendChild(header);
+    }
+
+    const li = document.createElement("li");
+
+    const color = t.type === "entrada" ? "#22c55e" : "#ef4444";
+
+    li.innerHTML = `
+      <div style="display:flex; justify-content:space-between;">
+
+        <div>
+          <strong>${t.desc}</strong><br>
+          <small style="opacity:.6;">
+            ${t.category || "Outros"} • ${t.account || "Conta"}
+          </small>
+        </div>
+
+        <strong style="color:${color}">
+          ${t.type === "saida" ? "-" : "+"} ${money(t.value)}
+        </strong>
+
+      </div>
+    `;
+
+    list.appendChild(li);
+  });
+}
