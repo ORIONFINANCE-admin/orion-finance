@@ -7,6 +7,7 @@ window.TransactionsModule = (function(){
 
     form.addEventListener("submit", function(e){
       e.preventDefault();
+      e.stopPropagation();
 
       const desc = document.getElementById("desc").value;
       const value = Number(document.getElementById("value").value);
