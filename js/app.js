@@ -14,6 +14,8 @@ document.addEventListener("DOMContentLoaded", () => {
   refreshAll();
 
   UIModule.bind();
+  TransactionsModule.bind();
+
   UIModule.go("home");
 
 });
