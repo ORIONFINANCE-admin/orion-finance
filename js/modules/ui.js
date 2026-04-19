@@ -31,14 +31,13 @@ window.UIModule = (function(){
 
     current = target;
 
-    // 🔥 render seguro (NUNCA QUEBRA)
     try {
       if(target === "home") renderHome();
       if(target === "transactions") window.TransactionsModule?.render?.();
       if(target === "debts") window.DebtsModule?.render?.();
       if(target === "dashboard") window.DashboardModule?.render?.();
     } catch(e){
-      console.log("Erro ao renderizar tela:", e);
+      console.log("Erro ao renderizar:", e);
     }
   }
 
@@ -75,31 +74,27 @@ window.UIModule = (function(){
     inEl.innerText = hideBalance ? "R$ •••••" : money(income);
     outEl.innerText = hideBalance ? "R$ •••••" : money(outcome);
 
-    // 🔥 evita crash aqui
-    try{
-      accountsDiv.innerHTML = "";
+    accountsDiv.innerHTML = "";
 
-      (window.accounts || []).forEach(a=>{
-        const saldo = (window.ACCOUNT_CACHE?.[a.name]) ?? 0;
+    (window.accounts || []).forEach(a=>{
 
-        accountsDiv.innerHTML += `
-          <div class="card-bank">
+      const saldo = (window.ACCOUNT_CACHE?.[a.name]) ?? 0;
 
-            <div style="display:flex; flex-direction:column;">
-              <strong>${formatBankName(a.name)}</strong>
-              <span style="font-size:18px; margin-top:4px;">
-                ${hideBalance ? "•••••" : money(saldo)}
-              </span>
-            </div>
+      accountsDiv.innerHTML += `
+        <div class="card-bank">
 
-            ${renderCreditInfo(a)}
-
+          <div style="display:flex; flex-direction:column;">
+            <strong>${formatBankName(a.name)}</strong>
+            <span style="font-size:18px; margin-top:4px;">
+              ${hideBalance ? "•••••" : money(saldo)}
+            </span>
           </div>
-        `;
-      });
-    }catch(e){
-      console.log("Erro contas:", e);
-    }
+
+          ${renderCreditInfo(a)}
+
+        </div>
+      `;
+    });
   }
 
   function toggleBalance(){
@@ -121,51 +116,38 @@ window.UIModule = (function(){
       ?.addEventListener("click", toggleBalance);
   }
 
+  function formatBankName(name){
+    if(name === "Banco Inter") return "Inter";
+    return name;
+  }
+
+  function renderCreditInfo(acc){
+
+    if(acc.name !== "Banco Inter") return "";
+
+    if(!acc.card){
+      return `
+        <button onclick="setLimit('Banco Inter')" class="btn small" style="margin-top:8px;">
+          Ativar crédito
+        </button>
+      `;
+    }
+
+    const limit = acc.limit || 0;
+    const used = acc.used || 0;
+    const available = limit - used;
+
+    return `
+      <div style="margin-top:8px; font-size:13px; opacity:.85;">
+        💳 Limite: ${money(limit)} <br>
+        Disponível: ${money(available)}
+      </div>
+    `;
+  }
+
   return {
     bind,
     go
   };
-
-    function formatBankName(name){
-        if(name === "Banco Inter") return "Inter";
-        return name;
-      }
-      
-      function renderCreditInfo(acc){
-
-        if(acc.name !== "Banco Inter") return "";
-
-        if(!acc.card){
-          return `
-            <button onclick="setLimit('Banco Inter')" class="btn small" style="margin-top:8px;">
-              Ativar crédito
-            </button>
-          `;
-        }
-
-        const limit = acc.limit || 0;
-        const used = acc.used || 0;
-        const available = limit - used;
-
-        return `
-          <div style="margin-top:8px; font-size:13px; opacity:.85;">
-            💳 Limite: ${money(limit)} <br>
-            Disponível: ${money(available)}
-          </div>
-        `;
-      }
-
-  // com crédito ativo
-      const limit = acc.limit || 0;
-      const used = acc.used || 0;
-      const available = limit - used;
-
-        return `
-          <div style="margin-top:8px; font-size:13px; opacity:.8;">
-          Limite: ${money(limit)} <br>
-          Disponível: ${money(available)}
-          </div>
-        `;
-      }
 
 })();
