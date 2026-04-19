@@ -11,20 +11,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ================= INIT =================
   AccountsModule.init();
-  refreshAll();
+  AccountsModule.updateCache();
 
+  // 🔥 ESSENCIAL (corrige o submit quebrado)
+  if(window.TransactionsModule?.bind){
+    TransactionsModule.bind();
+  }
+
+  // 🔥 UI por último
   UIModule.bind();
-  TransactionsModule.bind();
-
   UIModule.go("home");
 
 });
-
-// 🔥 FUNÇÃO GLOBAL DE ATUALIZAÇÃO
-function refreshAll(){
-
-  AccountsModule.updateCache();
-
-  // re-render tela atual
-  UIModule.go(document.querySelector(".tabbar .active")?.dataset.tab || "home");
-}
