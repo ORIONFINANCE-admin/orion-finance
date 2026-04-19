@@ -16,7 +16,12 @@ document.addEventListener("DOMContentLoaded", () => {
   // 🔥 CORRIGE SUBMIT / FORM
   if(window.TransactionsModule?.bind){
     TransactionsModule.bind();
-  }
+    
+      form.reset();
+    
+        document.getElementById("useCard").checked = false;
+        document.getElementById("paymentType").style.display = "none";
+      }
 
   // 🔥 ATIVA DÍVIDAS (IMPORTANTE PRO CRÉDITO)
   if(window.DebtsModule?.bind){
