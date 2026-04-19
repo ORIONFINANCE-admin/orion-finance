@@ -68,8 +68,8 @@ window.UIModule = (function(){
     });
 
     balanceEl.innerText = hideBalance ? "R$ •••••" : money(total);
-    inEl.innerText = money(income);
-    outEl.innerText = money(outcome);
+    inEl.innerText = hideBalance ? "R$ •••••" : money(income);
+    outEl.innerText = hideBalance ? "R$ •••••" : money(outcome);
 
     // 🔥 render contas
     accountsDiv.innerHTML = "";
@@ -110,7 +110,7 @@ window.UIModule = (function(){
     const form = document.getElementById("form");
 
     if(form){
-      form.addEventListener("submit", function(e){
+      
         e.preventDefault(); // 🔥 impede reload (era seu bug)
 
         const desc = document.getElementById("desc").value;
