@@ -76,15 +76,14 @@ window.TransactionsModule = (function(){
       AccountsModule.updateCache();
 
       // 🔥 limpa form
-      document.getElementById("desc").value = "";
-      document.getElementById("value").value = "";
-      document.getElementById("type").value = "entrada";
-      document.getElementById("account").selectedIndex = 0;
-      document.getElementById("category").selectedIndex = 0;
+      document.getElementById("form").reset();
 
-      // 🔥 volta para mesma tela (sem bug)
-      const activeTab = document.querySelector(".tabbar .active")?.dataset.tab || "transactions";
-      UIModule.go(activeTab);
+       // 🔥 atualiza tudo SEM navegar
+          if(typeof refreshAll === "function"){
+           refreshAll();
+         } else {
+        AccountsModule.updateCache();
+}
 
     });
   }
