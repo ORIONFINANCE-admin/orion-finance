@@ -20,17 +20,51 @@ window.TransactionsModule = (function(){
       }
 
       // 🔥 cria transação
+      const useCard = document.getElementById("useCard")?.checked;
+
+      const acc = window.accounts.find(a => a.name === account);
+
+      const isCredit = (
+        useCard &&
+        acc &&
+        acc.card === true &&
+        acc.name === "Banco Inter"
+      );
+
       const newTransaction = {
-        desc,
-        value,
-        type,
-        account,
-        category,
-        paymentType: null,
-        isCredit: false,
-        date: Date.now(),
-        customDate: null
-      };
+          desc,
+          value,
+          type,
+          account,
+          category,
+          paymentType: isCredit ? "credito" : null,
+          isCredit: isCredit,
+          date: Date.now(),
+          customDate: null
+        };
+        
+        if(isCredit){
+
+        acc.used = (acc.used || 0) + value;
+
+        let fatura = window.debts.find(d => d.isCard && d.account === acc.name);
+
+        if(fatura){
+          fatura.totalValor += value;
+        } else {
+          window.debts.push({
+            name: "Fatura Inter",
+            valor: 0,
+            totalValor: value,
+            pago: 0,
+            isCard: true,
+            account: acc.name
+          });
+        }
+
+        DB.set("debts", window.debts);
+        DB.set("acc", window.accounts);
+      }
 
       // 🔥 salva no estado GLOBAL
       window.transactions.push(newTransaction);
