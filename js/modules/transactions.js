@@ -1,6 +1,23 @@
 window.TransactionsModule = (function(){
 
-  let currentList = [];
+  // ================= ADD =================
+  function addTransaction(data){
+
+    window.transactions.push({
+      desc: data.desc,
+      value: Number(data.value),
+      type: data.type,
+      account: data.account,
+      category: data.category,
+      paymentType: null,
+      isCredit: false,
+      date: Date.now()
+    });
+
+    DB.set("t", window.transactions);
+
+    refreshAll();
+  }
 
   // ================= FORMAT DATA =================
   function formatDateLabel(timestamp){
@@ -11,13 +28,8 @@ window.TransactionsModule = (function(){
 
     yesterday.setDate(today.getDate() - 1);
 
-    if(d.toDateString() === today.toDateString()){
-      return "Hoje";
-    }
-
-    if(d.toDateString() === yesterday.toDateString()){
-      return "Ontem";
-    }
+    if(d.toDateString() === today.toDateString()) return "Hoje";
+    if(d.toDateString() === yesterday.toDateString()) return "Ontem";
 
     return d.toLocaleDateString("pt-BR");
   }
@@ -37,7 +49,6 @@ window.TransactionsModule = (function(){
       return;
     }
 
-    // 🔥 ordena por data
     const sorted = [...source].sort((a,b)=>{
       const da = a.customDate || a.date;
       const db = b.customDate || b.date;
@@ -51,24 +62,20 @@ window.TransactionsModule = (function(){
       const date = t.customDate || t.date;
       const label = formatDateLabel(date);
 
-      // 🔹 grupo
       if(label !== currentLabel){
         currentLabel = label;
 
         const header = document.createElement("li");
-        header.innerHTML = `
-          <strong style="opacity:.6;">${label}</strong>
-        `;
+        header.innerHTML = `<strong style="opacity:.6;">${label}</strong>`;
         list.appendChild(header);
       }
 
-      // 🔹 item
       const li = document.createElement("li");
 
       const isEntrada = t.type === "entrada";
 
       li.innerHTML = `
-        <div style="display:flex; justify-content:space-between; gap:10px;">
+        <div style="display:flex; justify-content:space-between;">
           
           <div>
             <strong>${t.desc || "Sem descrição"}</strong><br>
@@ -86,8 +93,6 @@ window.TransactionsModule = (function(){
 
       list.appendChild(li);
     });
-
-    currentList = sorted;
   }
 
   // ================= BUSCA =================
@@ -109,6 +114,26 @@ window.TransactionsModule = (function(){
   // ================= BIND =================
   function bind(){
 
+    // 🔥 FORM (AGORA NO LUGAR CERTO)
+    const form = document.getElementById("form");
+
+    if(form){
+      form.addEventListener("submit", function(e){
+        e.preventDefault();
+
+        addTransaction({
+          desc: document.getElementById("desc").value,
+          value: document.getElementById("value").value,
+          type: document.getElementById("type").value,
+          account: document.getElementById("account").value,
+          category: document.getElementById("category").value
+        });
+
+        form.reset();
+      });
+    }
+
+    // 🔍 BUSCA
     const input = document.getElementById("searchInput");
 
     if(input){
@@ -126,8 +151,7 @@ window.TransactionsModule = (function(){
 
   return {
     render,
-    bind,
-    filter
+    bind
   };
 
 })();
