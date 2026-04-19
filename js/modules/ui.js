@@ -135,14 +135,25 @@ window.UIModule = (function(){
 
         if(acc.name !== "Banco Inter") return "";
 
-  // sem crédito ainda
         if(!acc.card){
+          return `
+            <button onclick="setLimit('Banco Inter')" class="btn small" style="margin-top:8px;">
+              Ativar crédito
+            </button>
+          `;
+        }
+
+        const limit = acc.limit || 0;
+        const used = acc.used || 0;
+        const available = limit - used;
+
         return `
-          <button onclick="setLimit('Banco Inter')" class="btn small" style="margin-top:8px;">
-            Ativar crédito
-        </button>
-      `;
-    }
+          <div style="margin-top:8px; font-size:13px; opacity:.85;">
+            💳 Limite: ${money(limit)} <br>
+            Disponível: ${money(available)}
+          </div>
+        `;
+      }
 
   // com crédito ativo
       const limit = acc.limit || 0;
