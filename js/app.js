@@ -13,29 +13,24 @@ document.addEventListener("DOMContentLoaded", () => {
   AccountsModule.init();
   AccountsModule.updateCache();
 
-  // 🔥 CORRIGE SUBMIT / FORM
+  // 🔥 BIND DO FORM (ESSENCIAL)
   if(window.TransactionsModule?.bind){
     TransactionsModule.bind();
-    
-      form.reset();
-    
-        document.getElementById("useCard").checked = false;
-        document.getElementById("paymentType").style.display = "none";
-      }
+  }
 
-  // 🔥 ATIVA DÍVIDAS (IMPORTANTE PRO CRÉDITO)
+  // 🔥 DÍVIDAS
   if(window.DebtsModule?.bind){
     DebtsModule.bind();
   }
 
-  // 🔥 UI POR ÚLTIMO (sempre)
+  // 🔥 UI POR ÚLTIMO
   UIModule.bind();
   UIModule.go("home");
 
 });
 
 
-// 🔄 ATUALIZAÇÃO GLOBAL SEGURA
+// 🔄 ATUALIZAÇÃO GLOBAL
 function refreshAll(){
 
   AccountsModule.updateCache();
