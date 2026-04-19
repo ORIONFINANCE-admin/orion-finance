@@ -2,28 +2,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
   console.log("🚀 Orion modular iniciado");
 
-  // ================= DADOS =================
+  // ================= DADOS GLOBAIS =================
   window.transactions = DB.get("t") || [];
   window.accounts = DB.get("acc") || [];
   window.debts = DB.get("debts") || [];
 
-  // ================= MÓDULOS =================
-  AccountsModule.init();
-  AccountsModule.updateCache();
+  window.ACCOUNT_CACHE = {};
 
-  TransactionsModule.init?.();
-  DebtsModule.init?.();
-  DashboardModule.init?.();
+  // ================= INIT =================
+  AccountsModule.init();
+  refreshAll();
 
   UIModule.bind();
-
-  // ================= RENDER INICIAL =================
-  AccountsModule.render?.();
-  TransactionsModule.render?.();
-  DebtsModule.render?.();
-  DashboardModule.render?.();
-
-  // ================= START =================
   UIModule.go("home");
 
 });
+
+// 🔥 FUNÇÃO GLOBAL DE ATUALIZAÇÃO
+function refreshAll(){
+
+  AccountsModule.updateCache();
+
+  // re-render tela atual
+  UIModule.go(document.querySelector(".tabbar .active")?.dataset.tab || "home");
+}
