@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>Orion Finance</title>
 
-<!-- PWA iOS FIX -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Orion Finance">
@@ -57,7 +56,6 @@
       <form id="form" onsubmit="return false;">
 
         <input id="desc" placeholder="Descrição" required>
-
         <input id="value" type="number" inputmode="decimal" placeholder="Valor" required>
 
         <select id="type">
@@ -80,13 +78,11 @@
           <option>Outros</option>
         </select>
 
-        <!-- USO DO CARTÃO -->
         <label style="display:flex; align-items:center; gap:8px;">
           <input type="checkbox" id="useCard">
           <span>Usar cartão</span>
         </label>
 
-        <!-- 🔥 PARCELAMENTO (NOVO) -->
         <input 
           id="installments" 
           type="number" 
@@ -95,17 +91,11 @@
           style="display:none;"
         >
 
-        <select id="paymentType" style="display:none;">
-          <option value="credito">Crédito</option>
-          <option value="debito">Débito</option>
-        </select>
-
         <button type="submit">Adicionar</button>
 
       </form>
     </div>
 
-    <!-- BOTÃO EXTRATO -->
     <div style="padding:10px;">
       <button id="btnExtract" style="background:#374151;color:#fff;">
         Ver extrato
@@ -114,7 +104,6 @@
 
   </div>
 
-  <!-- EXTRATO -->
   <div id="extractView" style="display:none;">
 
     <div style="padding:10px;">
@@ -126,7 +115,7 @@
     <div style="padding:10px;">
       <input 
         id="searchInput" 
-        placeholder="Buscar por descrição, conta ou categoria..."
+        placeholder="Buscar..."
         style="width:100%; padding:10px; border-radius:10px; border:none;"
       >
     </div>
@@ -141,96 +130,66 @@
 
 <!-- DASHBOARD -->
 <section id="dashboard" class="screen">
-
   <div class="card">
     <h3>Visão geral</h3>
-
     <div style="display:flex; flex-direction:column; gap:10px;">
-
       <div class="card">
         <span>Saldo real</span>
         <strong id="dashReal">R$ 0,00</strong>
       </div>
-
       <div class="card">
         <span>Total em contas</span>
         <strong id="dashTotal">R$ 0,00</strong>
       </div>
-
       <div class="card">
         <span>Gastos no mês</span>
         <strong id="dashOut">R$ 0,00</strong>
       </div>
-
       <canvas id="dashChart" height="180"></canvas>
-
     </div>
-
   </div>
-
 </section>
 
 <!-- DÍVIDAS -->
 <section id="debts" class="screen">
-
   <div class="card">
     <input id="d_name" placeholder="Nome">
-    <input id="d_valor" type="number" inputmode="numeric" placeholder="Valor da parcela">
-    <input id="d_total" type="number" inputmode="numeric" placeholder="Total">
-    <input id="d_pago" type="number" inputmode="numeric" placeholder="Parcelas pagas">
-
+    <input id="d_valor" type="number" placeholder="Valor">
+    <input id="d_total" type="number" placeholder="Total">
+    <input id="d_pago" type="number" placeholder="Pago">
     <button id="btnAddDebt">Salvar</button>
   </div>
-
   <div id="debtList" class="list-box"></div>
-
 </section>
 
-<!-- CONFIG -->
-<div id="settingsModal" class="modal">
-  <div class="modal-content">
+<!-- 💳 CARTÃO (CORRETO AGORA) -->
+<section id="card" class="screen">
 
-    <h3>⚙️ Configurações</h3>
-    
-    <div class="card">
-      <strong>Visual</strong>
+  <div class="card">
+    <strong>Cartão Inter</strong>
 
-      <div class="setting-item">
-        <span>Ocultar saldo</span>
-        <label class="switch">
-          <input type="checkbox" id="toggleBalanceSwitch">
-          <span class="slider"></span>
-        </label>
-      </div>
-
-      <div class="setting-item">
-        <span>Mostrar centavos</span>
-        <label class="switch">
-          <input type="checkbox" id="toggleCentsSwitch">
-          <span class="slider"></span>
-        </label>
-      </div>
+    <div style="margin-top:10px;">
+      Limite<br>
+      <strong id="cardLimit">R$ 0,00</strong>
     </div>
 
-    <div class="card">
-      <strong>Backup</strong>
-      <button onclick="exportData()">Salvar backup</button>
-      <input type="file" id="importFile">
+    <div style="margin-top:10px;">
+      Disponível<br>
+      <strong id="cardAvailable">R$ 0,00</strong>
     </div>
 
-    <div class="card">
-      <strong>Segurança</strong>
-      <button onclick="resetAll()" class="btn danger">
-        Resetar tudo
-      </button>
+    <div style="margin-top:10px;">
+      Usado<br>
+      <strong id="cardUsed">R$ 0,00</strong>
     </div>
-
-    <button onclick="closeSettings()" style="margin-top:10px;">
-      Fechar
-    </button>
-
   </div>
-</div>
+
+  <div class="card">
+    <strong>Faturas</strong>
+    <div id="cardInvoices"></div>
+  </div>
+
+</section>
 
 </main>
 
@@ -243,12 +202,11 @@
   <button data-tab="card">💳<span>Cartão</span></button>
 </div>
 
-<!-- CORE -->
+<!-- SCRIPTS (ORDEM CORRETA) -->
 <script src="js/core/db.js"></script>
 <script src="js/core/utils.js"></script>
 <script src="js/core/state.js"></script>
 
-<!-- MODULES -->
 <script src="js/modules/accounts.js"></script>
 <script src="js/modules/transactions.js"></script>
 <script src="js/modules/debts.js"></script>
@@ -256,45 +214,8 @@
 <script src="js/modules/dashboard.js"></script>
 <script src="js/modules/ui.js"></script>
 
-<!-- CARTÃO -->
-<section id="card" class="screen">
-
-  <div id="cardView">
-
-    <!-- RESUMO -->
-    <div class="card">
-      <strong>Cartão Inter</strong><br>
-
-      <div style="margin-top:10px;">
-        <span>Limite</span><br>
-        <strong id="cardLimit">R$ 0,00</strong>
-      </div>
-
-      <div style="margin-top:10px;">
-        <span>Disponível</span><br>
-        <strong id="cardAvailable">R$ 0,00</strong>
-      </div>
-
-      <div style="margin-top:10px;">
-        <span>Usado</span><br>
-        <strong id="cardUsed">R$ 0,00</strong>
-      </div>
-    </div>
-
-    <!-- FATURAS -->
-    <div class="card">
-      <strong>Faturas</strong>
-      <div id="cardInvoices" style="margin-top:10px;"></div>
-    </div>
-
-  </div>
-
-</section>
-
-<!-- APP -->
 <script src="js/app.js"></script>
 
-<!-- 🔥 SCRIPT PARCELAMENTO -->
 <script>
 document.addEventListener("DOMContentLoaded", () => {
   const useCard = document.getElementById("useCard");
