@@ -174,8 +174,9 @@ window.UIModule = (function(){
   }
 
   return {
-    bind,
-    go
-  };
+  bind,
+  go,
+  renderHome
+};
 
 })();
