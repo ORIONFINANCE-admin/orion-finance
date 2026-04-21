@@ -121,9 +121,11 @@ window.UIModule = (function(){
     return name;
   }
 
-  function renderCreditInfo(acc){
+function renderCreditInfo(acc){
 
-    if(acc.name !== "Banco Inter") return "";
+  try {
+
+    if(!acc || acc.name !== "Banco Inter") return "";
 
     if(!acc.card){
       return `
@@ -133,8 +135,8 @@ window.UIModule = (function(){
       `;
     }
 
-    const limit = acc.limit || 0;
-    const used = acc.used || 0;
+    const limit = Number(acc.limit || 0);
+    const used = Number(acc.used || 0);
     const available = limit - used;
 
     return `
@@ -147,7 +149,12 @@ window.UIModule = (function(){
         Pagar fatura
       </button>
     `;
+
+  } catch(e){
+    console.log("Erro crédito:", e);
+    return "";
   }
+}
 
     const limit = acc.limit || 0;
     const used = acc.used || 0;
