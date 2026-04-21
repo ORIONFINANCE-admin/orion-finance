@@ -147,4 +147,11 @@ window.TransactionsModule = (function(){
 
     list.appendChild(li);
   });
-}
+  }
+
+  return {
+    bind,
+    render
+  };
+
+})();
