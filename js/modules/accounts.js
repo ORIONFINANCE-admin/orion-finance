@@ -50,7 +50,7 @@ window.AccountsModule = (function(){
 })();
 
 
-// 🔥 FORA DO MÓDULO (CORRETO)
+// 💳 ATIVAR LIMITE (FORA DO MÓDULO)
 window.setLimit = function(bankName){
 
   const acc = window.accounts.find(a => a.name === bankName);
