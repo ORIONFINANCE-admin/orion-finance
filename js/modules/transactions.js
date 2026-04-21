@@ -20,8 +20,11 @@ window.TransactionsModule = (function(){
         return;
       }
 
-      // 🔥 cria transação
-      const useCard = document.getElementById("useCard")?.checked;
+      // 🔥 cartão
+      const useCardEl = document.getElementById("useCard");
+      const paymentTypeEl = document.getElementById("paymentType");
+
+      const useCard = useCardEl?.checked;
 
       const acc = (window.accounts || []).find(a => a.name === account) || null;
 
@@ -32,19 +35,21 @@ window.TransactionsModule = (function(){
         acc.name === "Banco Inter"
       );
 
+      // 🔥 cria transação
       const newTransaction = {
-          desc,
-          value,
-          type,
-          account,
-          category,
-          paymentType: isCredit ? "credito" : null,
-          isCredit: isCredit,
-          date: Date.now(),
-          customDate: null
-        };
-        
-        if(isCredit && acc){
+        desc,
+        value,
+        type,
+        account,
+        category,
+        paymentType: isCredit ? "credito" : null,
+        isCredit: isCredit,
+        date: Date.now(),
+        customDate: null
+      };
+
+      // 🔥 lógica de crédito
+      if(isCredit && acc){
 
         acc.used = (acc.used || 0) + value;
 
@@ -67,86 +72,87 @@ window.TransactionsModule = (function(){
         DB.set("acc", window.accounts);
       }
 
-      // 🔥 salva no estado GLOBAL
+      // 🔥 salva
       window.transactions.push(newTransaction);
-
-      // 🔥 salva no banco
       DB.set("t", window.transactions);
 
       // 🔥 atualiza contas
       AccountsModule.updateCache();
 
-      // 🔥 limpa form
-      document.getElementById("form").reset();
+      // 🔥 limpa form (CORRETO)
+      form.reset();
 
-       // 🔥 atualiza tudo SEM navegar
-          if(typeof refreshAll === "function"){
-           refreshAll();
-         } else {
+      if(useCardEl) useCardEl.checked = false;
+      if(paymentTypeEl) paymentTypeEl.style.display = "none";
+
+      // 🔥 atualiza UI (UMA VEZ SÓ)
+      if(typeof refreshAll === "function"){
+        refreshAll();
+      } else {
         AccountsModule.updateCache();
-}
+      }
 
     });
   }
 
   function render(){
 
-  const list = document.getElementById("list");
-  if(!list) return;
+    const list = document.getElementById("list");
+    if(!list) return;
 
-  list.innerHTML = "";
+    list.innerHTML = "";
 
-  if(!window.transactions || window.transactions.length === 0){
-    list.innerHTML = "<li style='opacity:.5'>Nenhuma transação</li>";
-    return;
-  }
-
-  // 🔥 ordenar por data (mais recente primeiro)
-  const sorted = [...window.transactions].sort((a,b)=>{
-    const da = a.customDate || a.date;
-    const db = b.customDate || b.date;
-    return db - da;
-  });
-
-  let currentLabel = "";
-
-  sorted.forEach(t => {
-
-    const date = t.customDate || t.date;
-    const label = formatDateLabel(date);
-
-    // 🔹 cria separador por dia
-    if(label !== currentLabel){
-      currentLabel = label;
-
-      const header = document.createElement("li");
-      header.innerHTML = `<strong style="opacity:.6;">${label}</strong>`;
-      list.appendChild(header);
+    if(!window.transactions || window.transactions.length === 0){
+      list.innerHTML = "<li style='opacity:.5'>Nenhuma transação</li>";
+      return;
     }
 
-    const li = document.createElement("li");
+    // 🔥 ordenar por data
+    const sorted = [...window.transactions].sort((a,b)=>{
+      const da = a.customDate || a.date;
+      const db = b.customDate || b.date;
+      return db - da;
+    });
 
-    const color = t.type === "entrada" ? "#22c55e" : "#ef4444";
+    let currentLabel = "";
 
-    li.innerHTML = `
-      <div style="display:flex; justify-content:space-between;">
+    sorted.forEach(t => {
 
-        <div>
-          <strong>${t.desc}</strong><br>
-          <small style="opacity:.6;">
-            ${t.category || "Outros"} • ${t.account || "Conta"}
-          </small>
+      const date = t.customDate || t.date;
+      const label = formatDateLabel(date);
+
+      // 🔹 separador de dia
+      if(label !== currentLabel){
+        currentLabel = label;
+
+        const header = document.createElement("li");
+        header.innerHTML = `<strong style="opacity:.6;">${label}</strong>`;
+        list.appendChild(header);
+      }
+
+      const li = document.createElement("li");
+
+      const color = t.type === "entrada" ? "#22c55e" : "#ef4444";
+
+      li.innerHTML = `
+        <div style="display:flex; justify-content:space-between;">
+
+          <div>
+            <strong>${t.desc}</strong><br>
+            <small style="opacity:.6;">
+              ${t.category || "Outros"} • ${t.account || "Conta"}
+            </small>
+          </div>
+
+          <strong style="color:${color}">
+            ${t.type === "saida" ? "-" : "+"} ${money(t.value)}
+          </strong>
+
         </div>
+      `;
 
-        <strong style="color:${color}">
-          ${t.type === "saida" ? "-" : "+"} ${money(t.value)}
-        </strong>
-
-      </div>
-    `;
-
-    list.appendChild(li);
-  });
+      list.appendChild(li);
+    });
   }
 
   return {
