@@ -1,63 +1,63 @@
-const CACHE_NAME = "orion-v1";
+const CACHE_NAME = "orion-v2";
 
-// 🔥 arquivos essenciais
+// 🔥 pega base correta automaticamente
+const BASE = self.location.pathname.replace("/service-worker.js", "");
+
+// 🔥 arquivos com caminho correto
 const urlsToCache = [
-  "/",
-  "/index.html",
-  "/css/style.css",
-  "/js/app.js",
-  "/js/core/db.js",
-  "/js/core/utils.js",
-  "/js/core/state.js",
-  "/js/modules/accounts.js",
-  "/js/modules/transactions.js",
-  "/js/modules/debts.js",
-  "/js/modules/credit.js",
-  "/js/modules/dashboard.js",
-  "/js/modules/ui.js"
+  `${BASE}/`,
+  `${BASE}/index.html`,
+  `${BASE}/css/style.css`,
+  `${BASE}/js/app.js`,
+  `${BASE}/js/core/db.js`,
+  `${BASE}/js/core/utils.js`,
+  `${BASE}/js/core/state.js`,
+  `${BASE}/js/modules/accounts.js`,
+  `${BASE}/js/modules/transactions.js`,
+  `${BASE}/js/modules/debts.js`,
+  `${BASE}/js/modules/credit.js`,
+  `${BASE}/js/modules/dashboard.js`,
+  `${BASE}/js/modules/ui.js`
 ];
 
-// 🔥 instala e limpa cache antigo
+// 🔥 install
 self.addEventListener("install", event => {
-  self.skipWaiting(); // força ativação imediata
+  self.skipWaiting();
 
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(urlsToCache);
-    })
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(urlsToCache))
+      .catch(err => {
+        console.log("Erro ao cachear:", err);
+      })
   );
 });
 
-// 🔥 ativa e remove versões antigas
+// 🔥 activate
 self.addEventListener("activate", event => {
   event.waitUntil(
-    caches.keys().then(keys => {
-      return Promise.all(
-        keys.map(key => {
-          if(key !== CACHE_NAME){
-            return caches.delete(key);
-          }
-        })
-      );
-    })
+    caches.keys().then(keys =>
+      Promise.all(
+        keys.map(key => key !== CACHE_NAME && caches.delete(key))
+      )
+    )
   );
 
   self.clients.claim();
 });
 
-// 🔥 estratégia: sempre tenta rede primeiro
+// 🔥 fetch (network first)
 self.addEventListener("fetch", event => {
   event.respondWith(
     fetch(event.request)
-      .then(response => {
-
-        const resClone = response.clone();
+      .then(res => {
+        const clone = res.clone();
 
         caches.open(CACHE_NAME).then(cache => {
-          cache.put(event.request, resClone);
+          cache.put(event.request, clone);
         });
 
-        return response;
+        return res;
       })
       .catch(() => caches.match(event.request))
   );
