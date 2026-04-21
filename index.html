@@ -1,16 +1,24 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
 <title>Orion Finance</title>
 
+<!-- 🔥 PWA / APP -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f172a">
+
+<!-- 🔥 iOS FULLSCREEN -->
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Orion Finance">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Orion">
 <link rel="apple-touch-icon" href="icon.png">
 
 <link rel="stylesheet" href="css/style.css">
+
 </head>
 
 <body>
@@ -132,21 +140,28 @@
 <section id="dashboard" class="screen">
   <div class="card">
     <h3>Visão geral</h3>
+
     <div style="display:flex; flex-direction:column; gap:10px;">
+
       <div class="card">
         <span>Saldo real</span>
         <strong id="dashReal">R$ 0,00</strong>
       </div>
+
       <div class="card">
         <span>Total em contas</span>
         <strong id="dashTotal">R$ 0,00</strong>
       </div>
+
       <div class="card">
         <span>Gastos no mês</span>
         <strong id="dashOut">R$ 0,00</strong>
       </div>
+
       <canvas id="dashChart" height="180"></canvas>
+
     </div>
+
   </div>
 </section>
 
@@ -159,10 +174,11 @@
     <input id="d_pago" type="number" placeholder="Pago">
     <button id="btnAddDebt">Salvar</button>
   </div>
+
   <div id="debtList" class="list-box"></div>
 </section>
 
-<!-- 💳 CARTÃO (CORRETO AGORA) -->
+<!-- 💳 CARTÃO -->
 <section id="card" class="screen">
 
   <div class="card">
@@ -202,11 +218,12 @@
   <button data-tab="card">💳<span>Cartão</span></button>
 </div>
 
-<!-- SCRIPTS (ORDEM CORRETA) -->
+<!-- CORE -->
 <script src="js/core/db.js"></script>
 <script src="js/core/utils.js"></script>
 <script src="js/core/state.js"></script>
 
+<!-- MODULES -->
 <script src="js/modules/accounts.js"></script>
 <script src="js/modules/transactions.js"></script>
 <script src="js/modules/debts.js"></script>
@@ -214,8 +231,10 @@
 <script src="js/modules/dashboard.js"></script>
 <script src="js/modules/ui.js"></script>
 
+<!-- APP -->
 <script src="js/app.js"></script>
 
+<!-- 🔥 SCRIPT PARCELAMENTO -->
 <script>
 document.addEventListener("DOMContentLoaded", () => {
   const useCard = document.getElementById("useCard");
