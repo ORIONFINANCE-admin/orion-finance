@@ -90,7 +90,7 @@ window.UIModule = (function(){
             </span>
           </div>
 
-          ${renderCreditInfo(a)}
+          ${typeof renderCreditInfo === "function" ? renderCreditInfo(a) : ""}
 
         </div>
       `;
