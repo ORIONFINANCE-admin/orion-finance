@@ -1,48 +1,64 @@
-const CACHE = "orion-v14";
-const BASE = "/orion-finance/";
+const CACHE_NAME = "orion-v1";
 
-const FILES = [
-  BASE,
-  BASE + "index.html",
-  BASE + "style.css",
-  BASE + "app.js",
-  BASE + "manifest.json"
+// 🔥 arquivos essenciais
+const urlsToCache = [
+  "/",
+  "/index.html",
+  "/css/style.css",
+  "/js/app.js",
+  "/js/core/db.js",
+  "/js/core/utils.js",
+  "/js/core/state.js",
+  "/js/modules/accounts.js",
+  "/js/modules/transactions.js",
+  "/js/modules/debts.js",
+  "/js/modules/credit.js",
+  "/js/modules/dashboard.js",
+  "/js/modules/ui.js"
 ];
 
-// ================= INSTALL =================
-self.addEventListener("install", (event) => {
-  self.skipWaiting();
+// 🔥 instala e limpa cache antigo
+self.addEventListener("install", event => {
+  self.skipWaiting(); // força ativação imediata
 
   event.waitUntil(
-    caches.open(CACHE).then((cache) => cache.addAll(FILES))
+    caches.open(CACHE_NAME).then(cache => {
+      return cache.addAll(urlsToCache);
+    })
   );
 });
 
-// ================= ACTIVATE =================
-self.addEventListener("activate", (event) => {
+// 🔥 ativa e remove versões antigas
+self.addEventListener("activate", event => {
   event.waitUntil(
-    caches.keys().then((keys) => {
+    caches.keys().then(keys => {
       return Promise.all(
-        keys
-          .filter((key) => key !== CACHE)
-          .map((key) => caches.delete(key))
+        keys.map(key => {
+          if(key !== CACHE_NAME){
+            return caches.delete(key);
+          }
+        })
       );
-    }).then(() => self.clients.claim())
+    })
   );
+
+  self.clients.claim();
 });
 
-// ================= FETCH =================
-self.addEventListener("fetch", (event) => {
-  const req = event.request;
-
-  if (req.mode === "navigate") {
-    event.respondWith(
-      fetch(req).catch(() => caches.match(BASE + "index.html"))
-    );
-    return;
-  }
-
+// 🔥 estratégia: sempre tenta rede primeiro
+self.addEventListener("fetch", event => {
   event.respondWith(
-    caches.match(req).then((cached) => cached || fetch(req))
+    fetch(event.request)
+      .then(response => {
+
+        const resClone = response.clone();
+
+        caches.open(CACHE_NAME).then(cache => {
+          cache.put(event.request, resClone);
+        });
+
+        return response;
+      })
+      .catch(() => caches.match(event.request))
   );
 });
