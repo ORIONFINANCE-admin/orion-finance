@@ -12,24 +12,47 @@ window.DebtsModule = (function(){
       return;
     }
 
-    window.debts.forEach((d, i)=>{
+    // 🔥 ordenar por mês (faturas primeiro)
+    const sorted = [...window.debts].sort((a,b)=>{
+      if(a.mes && b.mes) return a.mes.localeCompare(b.mes);
+      return 0;
+    });
 
+    sorted.forEach((d, i)=>{
+
+      // 💳 FATURA
+      if(d.isCard){
+
+        list.innerHTML += `
+          <div class="card">
+            <strong>${d.name}</strong><br>
+
+            <span style="font-size:18px;">
+              ${money(d.totalValor)}
+            </span>
+
+            <div style="margin-top:10px;">
+              <button onclick="DebtsModule.payDebt(${i})">
+                Pagar fatura
+              </button>
+            </div>
+          </div>
+        `;
+
+        return;
+      }
+
+      // 📄 DÍVIDA NORMAL (mantida)
       list.innerHTML += `
         <div class="card">
           <strong>${d.name}</strong><br>
-          Total: ${money(d.totalValor)}
-
-          <div style="margin-top:10px;">
-            <button onclick="DebtsModule.payDebt(${i})">
-              Pagar fatura
-            </button>
-          </div>
+          <span>${money(d.totalValor || d.valor || 0)}</span>
         </div>
       `;
     });
   }
 
-  // 💳 PAGAMENTO REAL (ESTILO BANCO)
+  // 💳 PAGAMENTO DE FATURA
   function payDebt(i){
 
     const d = window.debts[i];
@@ -37,16 +60,27 @@ window.DebtsModule = (function(){
 
     const acc = window.accounts.find(a => a.name === d.account);
 
-    if(acc){
-      acc.used = Math.max(0, (acc.used || 0) - d.totalValor);
+    if(!acc){
+      alert("Conta não encontrada");
+      return;
     }
 
-    // 🔥 lança saída REAL no saldo
+    const valor = d.totalValor || 0;
+
+    if(valor <= 0){
+      alert("Nada para pagar");
+      return;
+    }
+
+    // 🔥 reduz limite usado
+    acc.used = Math.max(0, (acc.used || 0) - valor);
+
+    // 🔥 registra pagamento como saída REAL
     window.transactions.push({
-      desc: "Pagamento fatura Inter",
-      value: d.totalValor,
+      desc: `Pagamento ${d.name}`,
+      value: valor,
       type: "saida",
-      account: d.account,
+      account: acc.name,
       category: "Cartão de crédito",
       paymentType: null,
       isCredit: false,
@@ -54,19 +88,20 @@ window.DebtsModule = (function(){
       customDate: null
     });
 
-    // remove dívida
+    // 🔥 remove a fatura paga
     window.debts.splice(i, 1);
 
-    // salva tudo
+    // 🔥 salvar tudo
     DB.set("debts", window.debts);
     DB.set("acc", window.accounts);
     DB.set("t", window.transactions);
 
-    // 🔄 atualiza tudo
-    AccountsModule.updateCache();
-
-    const activeTab = document.querySelector(".tabbar .active")?.dataset.tab || "debts";
-    UIModule.go(activeTab);
+    // 🔄 atualizar sistema
+    if(typeof refreshAll === "function"){
+      refreshAll();
+    } else {
+      AccountsModule.updateCache();
+    }
   }
 
   function bind(){
@@ -85,32 +120,5 @@ window.DebtsModule = (function(){
     bind,
     payDebt
   };
-
-window.payCreditCard = function(accountName){
-
-  const acc = window.accounts.find(a => a.name === accountName);
-  if(!acc) return;
-
-  const fatura = window.debts.find(d => d.isCard && d.account === accountName);
-  if(!fatura) return;
-
-  const valor = fatura.totalValor;
-
-  if(valor <= 0){
-    alert("Nada para pagar");
-    return;
-  }
-
-  // 🔥 reduz limite usado
-  acc.used = Math.max(0, (acc.used || 0) - valor);
-
-  // 🔥 zera fatura
-  fatura.totalValor = 0;
-
-  DB.set("acc", window.accounts);
-  DB.set("debts", window.debts);
-
-  refreshAll();
-};
 
 })();
