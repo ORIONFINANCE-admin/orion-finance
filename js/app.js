@@ -15,10 +15,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 🔥 BIND DO FORM (ESSENCIAL)
   if(window.TransactionsModule?.bind){
-    TransactionsModule.bind();
-  }
-
-  if(window.TransactionsModule?.bind){
     console.log("🔥 bind do form ativo");
     TransactionsModule.bind();
   }
