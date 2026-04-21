@@ -56,13 +56,17 @@ window.UIModule = (function(){
   let income = 0;
   let outcome = 0;
 
-  // 🔥 base das contas
-  (window.accounts || []).forEach(a=>{
+  // 🔥 garante segurança dos dados
+  const accs = window.accounts || [];
+  const trans = window.transactions || [];
+
+  // 🔥 soma base
+  accs.forEach(a=>{
     total += (a.initialBalance ?? a.balance ?? 0);
   });
 
-  // 🔥 transações
-  (window.transactions || []).forEach(t=>{
+  // 🔥 soma transações
+  trans.forEach(t=>{
     if(t.type === "entrada"){
       total += t.value;
       income += t.value;
@@ -74,29 +78,33 @@ window.UIModule = (function(){
     }
   });
 
-  // 🔥 UI PRINCIPAL
+  // 🔥 UI valores
   balanceEl.innerText = hideBalance ? "R$ •••••" : money(total);
   inEl.innerText = hideBalance ? "R$ •••••" : money(income);
   outEl.innerText = hideBalance ? "R$ •••••" : money(outcome);
 
-  // 🔥 COR DINÂMICA
   inEl.style.color = "#22c55e";
   outEl.style.color = "#ef4444";
 
-  // 🔥 CONTAS ORDENADAS POR SALDO
-  const orderedAccounts = [...(window.accounts || [])].sort((a,b)=>{
-    const sa = (window.ACCOUNT_CACHE?.[a.name]) ?? 0;
-    const sb = (window.ACCOUNT_CACHE?.[b.name]) ?? 0;
-    return sb - sa;
-  });
-
+  // 🔥 render contas (SEM DEPENDER DO CACHE)
   accountsDiv.innerHTML = "";
 
-  orderedAccounts.forEach(a=>{
+  accs.forEach(a=>{
 
-    const saldo = (window.ACCOUNT_CACHE?.[a.name]) ?? 0;
+    // calcula saldo direto (sem cache)
+    let saldo = (a.initialBalance ?? a.balance ?? 0);
 
-    const isNegative = saldo < 0;
+    trans.forEach(t=>{
+      if(t.account !== a.name) return;
+
+      if(t.type === "entrada"){
+        saldo += t.value;
+      } else {
+        if(t.paymentType !== "credito"){
+          saldo -= t.value;
+        }
+      }
+    });
 
     accountsDiv.innerHTML += `
       <div class="card-bank">
@@ -104,11 +112,7 @@ window.UIModule = (function(){
         <div style="display:flex; flex-direction:column;">
           <strong>${formatBankName(a.name)}</strong>
 
-          <span style="
-            font-size:18px;
-            margin-top:4px;
-            color:${isNegative ? "#ef4444" : "#fff"};
-          ">
+          <span style="font-size:18px; margin-top:4px;">
             ${hideBalance ? "•••••" : money(saldo)}
           </span>
         </div>
@@ -118,6 +122,7 @@ window.UIModule = (function(){
       </div>
     `;
   });
+
 }
 
   function toggleBalance(){
