@@ -2,21 +2,25 @@ window.AccountsModule = (function(){
 
   function init(){
 
-    // 🔥 pega do banco
-    let saved = DB.get("acc");
+  let saved = DB.get("acc");
 
-    // 🔥 se não existir OU estiver vazio → cria padrão
-    if(!Array.isArray(saved) || saved.length === 0){
+  // 🔥 CORREÇÃO: força recriação se vier vazio
+  if(!Array.isArray(saved) || saved.length === 0){
 
-      saved = [
-        { name: "Bradesco", initialBalance: 0, balance: 0, card: false },
-        { name: "Banco Inter", initialBalance: 0, balance: 0, card: false, limit: 0, used: 0 },
-        { name: "Mercado Pago", initialBalance: 0, balance: 0, card: true },
-        { name: "VR", initialBalance: 0, balance: 0, card: false }
-      ];
+    saved = [
+      { name: "Bradesco", initialBalance: 0, balance: 0, card: false },
+      { name: "Banco Inter", initialBalance: 0, balance: 0, card: false, limit: 0, used: 0 },
+      { name: "Mercado Pago", initialBalance: 0, balance: 0, card: true },
+      { name: "VR", initialBalance: 0, balance: 0, card: false }
+    ];
 
-      DB.set("acc", saved);
-    }
+    DB.set("acc", saved);
+
+    console.log("🔥 contas recriadas automaticamente");
+  }
+
+  window.accounts = saved;
+}
 
     // 🔥 joga pro sistema global
     window.accounts = saved;
