@@ -46,13 +46,11 @@
   </div>
 
   <div id="accounts" class="accounts"></div>
-
 </section>
 
 <!-- LANÇAMENTOS -->
 <section id="transactions" class="screen">
 
-  <!-- VIEW FORM -->
   <div id="transactionView">
 
     <div class="card">
@@ -88,6 +86,15 @@
           <span>Usar cartão</span>
         </label>
 
+        <!-- 🔥 PARCELAMENTO (NOVO) -->
+        <input 
+          id="installments" 
+          type="number" 
+          min="1" 
+          placeholder="Parcelas"
+          style="display:none;"
+        >
+
         <select id="paymentType" style="display:none;">
           <option value="credito">Crédito</option>
           <option value="debito">Débito</option>
@@ -107,30 +114,28 @@
 
   </div>
 
-  <!-- VIEW EXTRATO -->
-  <!-- VIEW EXTRATO -->
-<div id="extractView" style="display:none;">
+  <!-- EXTRATO -->
+  <div id="extractView" style="display:none;">
 
-  <div style="padding:10px;">
-    <button id="btnBackExtract" style="background:#374151;color:#fff;">
-      ← Voltar
-    </button>
+    <div style="padding:10px;">
+      <button id="btnBackExtract" style="background:#374151;color:#fff;">
+        ← Voltar
+      </button>
+    </div>
+
+    <div style="padding:10px;">
+      <input 
+        id="searchInput" 
+        placeholder="Buscar por descrição, conta ou categoria..."
+        style="width:100%; padding:10px; border-radius:10px; border:none;"
+      >
+    </div>
+
+    <div class="list-box">
+      <ul id="list"></ul>
+    </div>
+
   </div>
-
-  <!-- 🔍 BUSCA -->
-  <div style="padding:10px;">
-    <input 
-      id="searchInput" 
-      placeholder="Buscar por descrição, conta ou categoria..."
-      style="width:100%; padding:10px; border-radius:10px; border:none;"
-    >
-  </div>
-
-  <div class="list-box">
-    <ul id="list"></ul>
-  </div>
-
-</div>
 
 </section>
 
@@ -181,47 +186,40 @@
 
 </section>
 
-<!-- CONFIGURAÇÕES -->
+<!-- CONFIG -->
 <div id="settingsModal" class="modal">
-
   <div class="modal-content">
 
     <h3>⚙️ Configurações</h3>
     
     <div class="card">
-  <strong>Visual</strong>
+      <strong>Visual</strong>
 
-  <div class="setting-item">
-    <span>Ocultar saldo</span>
-    <label class="switch">
-      <input type="checkbox" id="toggleBalanceSwitch">
-      <span class="slider"></span>
-    </label>
-  </div>
+      <div class="setting-item">
+        <span>Ocultar saldo</span>
+        <label class="switch">
+          <input type="checkbox" id="toggleBalanceSwitch">
+          <span class="slider"></span>
+        </label>
+      </div>
 
-  <div class="setting-item">
-    <span>Mostrar centavos</span>
-    <label class="switch">
-      <input type="checkbox" id="toggleCentsSwitch">
-      <span class="slider"></span>
-    </label>
-  </div>
-
-</div>
-
-    <!-- ✅ NOVO BLOCO -->
+      <div class="setting-item">
+        <span>Mostrar centavos</span>
+        <label class="switch">
+          <input type="checkbox" id="toggleCentsSwitch">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
 
     <div class="card">
       <strong>Backup</strong>
-
       <button onclick="exportData()">Salvar backup</button>
-
       <input type="file" id="importFile">
     </div>
 
     <div class="card">
       <strong>Segurança</strong>
-
       <button onclick="resetAll()" class="btn danger">
         Resetar tudo
       </button>
@@ -232,7 +230,6 @@
     </button>
 
   </div>
-
 </div>
 
 </main>
@@ -245,12 +242,12 @@
   <button data-tab="debts">📄<span>Dívidas</span></button>
 </div>
 
-<!-- CORE (base primeiro) -->
+<!-- CORE -->
 <script src="js/core/db.js"></script>
 <script src="js/core/utils.js"></script>
 <script src="js/core/state.js"></script>
 
-<!-- MÓDULOS -->
+<!-- MODULES -->
 <script src="js/modules/accounts.js"></script>
 <script src="js/modules/transactions.js"></script>
 <script src="js/modules/debts.js"></script>
@@ -258,9 +255,22 @@
 <script src="js/modules/dashboard.js"></script>
 <script src="js/modules/ui.js"></script>
 
-<!-- APP (sempre por último) -->
+<!-- APP -->
 <script src="js/app.js"></script>
 
+<!-- 🔥 SCRIPT PARCELAMENTO -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const useCard = document.getElementById("useCard");
+  const installments = document.getElementById("installments");
+
+  if(useCard && installments){
+    useCard.addEventListener("change", () => {
+      installments.style.display = useCard.checked ? "block" : "none";
+    });
+  }
+});
+</script>
 
 </body>
 </html>
