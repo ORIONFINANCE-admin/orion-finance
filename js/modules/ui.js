@@ -10,7 +10,6 @@ window.UIModule = (function(){
     const screens = document.querySelectorAll(".screen");
     const tabs = document.querySelectorAll(".tabbar button");
 
-    // troca telas
     screens.forEach(s => s.classList.remove("active"));
     tabs.forEach(t => t.classList.remove("active"));
 
@@ -20,7 +19,6 @@ window.UIModule = (function(){
     const btn = [...tabs].find(b => b.dataset.tab === target);
     if(btn) btn.classList.add("active");
 
-    // título
     const title = document.getElementById("title");
     if(title){
       title.innerText =
@@ -33,7 +31,6 @@ window.UIModule = (function(){
 
     current = target;
 
-    // render seguro
     try{
       if(target === "home") renderHome();
       if(target === "transactions") window.TransactionsModule?.render?.();
@@ -77,7 +74,6 @@ window.UIModule = (function(){
     inEl.innerText = hideBalance ? "R$ •••••" : money(income);
     outEl.innerText = hideBalance ? "R$ •••••" : money(outcome);
 
-    // render contas (SIMPLES E SEGURO)
     accountsDiv.innerHTML = "";
 
     (window.accounts || []).forEach(a=>{
@@ -86,12 +82,18 @@ window.UIModule = (function(){
 
       accountsDiv.innerHTML += `
         <div class="card-bank">
+
           <div style="display:flex; flex-direction:column;">
             <strong>${formatBankName(a.name)}</strong>
+
             <span style="font-size:18px; margin-top:4px;">
               ${hideBalance ? "•••••" : money(saldo)}
             </span>
+
+            ${renderCreditButton(a)}
+
           </div>
+
         </div>
       `;
     });
@@ -119,6 +121,30 @@ window.UIModule = (function(){
   function formatBankName(name){
     if(name === "Banco Inter") return "Inter";
     return name;
+  }
+
+  function renderCreditButton(acc){
+
+    if(acc.name !== "Banco Inter") return "";
+
+    if(!acc.card){
+      return `
+        <button onclick="setLimit('Banco Inter')" style="margin-top:6px;">
+          Ativar crédito
+        </button>
+      `;
+    }
+
+    const limit = acc.limit || 0;
+    const used = acc.used || 0;
+    const available = limit - used;
+
+    return `
+      <div style="margin-top:6px; font-size:12px; opacity:.8;">
+        💳 Limite: ${money(limit)} <br>
+        Disponível: ${money(available)}
+      </div>
+    `;
   }
 
   return {
