@@ -10,6 +10,7 @@ window.UIModule = (function(){
     const screens = document.querySelectorAll(".screen");
     const tabs = document.querySelectorAll(".tabbar button");
 
+    // troca telas
     screens.forEach(s => s.classList.remove("active"));
     tabs.forEach(t => t.classList.remove("active"));
 
@@ -19,6 +20,7 @@ window.UIModule = (function(){
     const btn = [...tabs].find(b => b.dataset.tab === target);
     if(btn) btn.classList.add("active");
 
+    // título
     const title = document.getElementById("title");
     if(title){
       title.innerText =
@@ -31,12 +33,13 @@ window.UIModule = (function(){
 
     current = target;
 
-    try {
+    // render seguro
+    try{
       if(target === "home") renderHome();
       if(target === "transactions") window.TransactionsModule?.render?.();
       if(target === "debts") window.DebtsModule?.render?.();
       if(target === "dashboard") window.DashboardModule?.render?.();
-    } catch(e){
+    }catch(e){
       console.log("Erro ao renderizar:", e);
     }
   }
@@ -74,6 +77,7 @@ window.UIModule = (function(){
     inEl.innerText = hideBalance ? "R$ •••••" : money(income);
     outEl.innerText = hideBalance ? "R$ •••••" : money(outcome);
 
+    // render contas (SIMPLES E SEGURO)
     accountsDiv.innerHTML = "";
 
     (window.accounts || []).forEach(a=>{
@@ -82,16 +86,12 @@ window.UIModule = (function(){
 
       accountsDiv.innerHTML += `
         <div class="card-bank">
-
           <div style="display:flex; flex-direction:column;">
             <strong>${formatBankName(a.name)}</strong>
             <span style="font-size:18px; margin-top:4px;">
               ${hideBalance ? "•••••" : money(saldo)}
             </span>
           </div>
-
-          ${typeof renderCreditInfo === "function" ? renderCreditInfo(a) : ""}
-
         </div>
       `;
     });
@@ -119,53 +119,6 @@ window.UIModule = (function(){
   function formatBankName(name){
     if(name === "Banco Inter") return "Inter";
     return name;
-  }
-
-function renderCreditInfo(acc){
-
-  try {
-
-    if(!acc || acc.name !== "Banco Inter") return "";
-
-    if(!acc.card){
-      return `
-        <button onclick="setLimit('Banco Inter')" class="btn small" style="margin-top:8px;">
-          Ativar crédito
-        </button>
-      `;
-    }
-
-    const limit = Number(acc.limit || 0);
-    const used = Number(acc.used || 0);
-    const available = limit - used;
-
-    return `
-      <div style="margin-top:8px; font-size:13px; opacity:.85;">
-        💳 Limite: ${money(limit)} <br>
-        Disponível: ${money(available)}
-      </div>
-
-      <button onclick="payCreditCard('Banco Inter')" class="btn small" style="margin-top:6px;">
-        Pagar fatura
-      </button>
-    `;
-
-  } catch(e){
-    console.log("Erro crédito:", e);
-    return "";
-  }
-}
-
-    const limit = acc.limit || 0;
-    const used = acc.used || 0;
-    const available = limit - used;
-
-    return `
-      <div style="margin-top:8px; font-size:13px; opacity:.85;">
-        💳 Limite: ${money(limit)} <br>
-        Disponível: ${money(available)}
-      </div>
-    `;
   }
 
   return {
