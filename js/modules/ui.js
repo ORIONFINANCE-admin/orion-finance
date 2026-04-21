@@ -25,6 +25,7 @@ window.UIModule = (function(){
         target === "home" ? "Home" :
         target === "transactions" ? "Lançamentos" :
         target === "dashboard" ? "Dashboard" :
+        target === "card" ? "Cartão" :
         target === "debts" ? "Dívidas" :
         "Orion Finance";
     }
@@ -36,6 +37,7 @@ window.UIModule = (function(){
       if(target === "transactions") window.TransactionsModule?.render?.();
       if(target === "debts") window.DebtsModule?.render?.();
       if(target === "dashboard") window.DashboardModule?.render?.();
+      if(target === "card") window.CreditModule?.render?.();
     }catch(e){
       console.log("Erro ao renderizar:", e);
     }
