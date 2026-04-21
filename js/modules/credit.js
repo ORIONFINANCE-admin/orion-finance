@@ -1,42 +1,103 @@
 window.CreditModule = (function(){
 
-  function setLimit(accountName){
+  function render(){
 
-    const acc = accounts.find(a => a.name === accountName);
+    const acc = (window.accounts || []).find(a => a.name === "Banco Inter");
     if(!acc) return;
 
-    const value = Number(prompt("Valor do limite (CDB):"));
+    const limitEl = document.getElementById("cardLimit");
+    const availableEl = document.getElementById("cardAvailable");
+    const usedEl = document.getElementById("cardUsed");
+    const invoicesDiv = document.getElementById("cardInvoices");
 
-    if(isNaN(value) || value <= 0) return;
+    if(!limitEl || !invoicesDiv) return;
 
-    acc.limit = value;
-    acc.used = 0;
-    acc.card = true;
-    acc.type = "real";
+    const limit = acc.limit || 0;
+    const used = acc.used || 0;
+    const available = limit - used;
 
-    DB.set("acc", accounts);
+    limitEl.innerText = money(limit);
+    availableEl.innerText = money(available);
+    usedEl.innerText = money(used);
 
-    renderHome();
+    // 🔥 FATURAS POR MÊS
+    const faturas = (window.debts || []).filter(d => d.isCard);
+
+    invoicesDiv.innerHTML = "";
+
+    if(faturas.length === 0){
+      invoicesDiv.innerHTML = "<p style='opacity:.5'>Nenhuma fatura</p>";
+      return;
+    }
+
+    // ordenar por mês
+    faturas.sort((a,b)=> a.mes.localeCompare(b.mes));
+
+    faturas.forEach((f, i)=>{
+
+      invoicesDiv.innerHTML += `
+        <div class="card" style="margin-top:10px;">
+          <strong>${formatMes(f.mes)}</strong><br>
+
+          <span style="font-size:18px;">
+            ${money(f.totalValor)}
+          </span>
+
+          <div style="margin-top:10px;">
+            <button onclick="CreditModule.payInvoice('${f.mes}')">
+              Pagar
+            </button>
+          </div>
+        </div>
+      `;
+    });
   }
 
-  function removeCredit(accountName){
+  function payInvoice(mes){
 
-    const acc = accounts.find(a => a.name === accountName);
+    const faturaIndex = window.debts.findIndex(d => d.mes === mes && d.isCard);
+    if(faturaIndex === -1) return;
+
+    const f = window.debts[faturaIndex];
+
+    const acc = window.accounts.find(a => a.name === f.account);
     if(!acc) return;
 
-    acc.card = false;
-    acc.limit = 0;
-    acc.used = 0;
-    acc.type = null;
+    const valor = f.totalValor;
 
-    DB.set("acc", accounts);
+    // 🔥 reduz limite
+    acc.used = Math.max(0, (acc.used || 0) - valor);
 
-    renderHome();
+    // 🔥 cria saída real
+    window.transactions.push({
+      desc: `Pagamento fatura ${formatMes(mes)}`,
+      value: valor,
+      type: "saida",
+      account: acc.name,
+      category: "Cartão",
+      date: Date.now()
+    });
+
+    // remove fatura
+    window.debts.splice(faturaIndex, 1);
+
+    DB.set("debts", window.debts);
+    DB.set("acc", window.accounts);
+    DB.set("t", window.transactions);
+
+    if(typeof refreshAll === "function"){
+      refreshAll();
+    }
+  }
+
+  function formatMes(m){
+    const [y, mm] = m.split("-");
+    return `${mm}/${y}`;
   }
 
   return {
-    setLimit,
-    removeCredit
+    render,
+    payInvoice
   };
 
 })();
