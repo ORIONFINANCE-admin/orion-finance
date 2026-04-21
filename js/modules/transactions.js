@@ -20,7 +20,6 @@ window.TransactionsModule = (function(){
         return;
       }
 
-      // 🔥 cartão
       const useCardEl = document.getElementById("useCard");
       const paymentTypeEl = document.getElementById("paymentType");
 
@@ -35,7 +34,6 @@ window.TransactionsModule = (function(){
         acc.name === "Banco Inter"
       );
 
-      // 🔥 cria transação
       const newTransaction = {
         desc,
         value,
@@ -48,7 +46,7 @@ window.TransactionsModule = (function(){
         customDate: null
       };
 
-      // 🔥 lógica de crédito
+      // 💳 crédito
       if(isCredit && acc){
 
         acc.used = (acc.used || 0) + value;
@@ -72,26 +70,21 @@ window.TransactionsModule = (function(){
         DB.set("acc", window.accounts);
       }
 
-      // 🔥 salva
       window.transactions.push(newTransaction);
       DB.set("t", window.transactions);
 
-      // 🔥 atualiza contas
-      AccountsModule.updateCache();
-
-      // 🔥 limpa form (CORRETO)
-      form.reset();
-
-      if(useCardEl) useCardEl.checked = false;
-      if(paymentTypeEl) paymentTypeEl.style.display = "none";
-
-      // 🔥 atualiza UI (UMA VEZ SÓ)
+      // 🔥 atualização correta
       if(typeof refreshAll === "function"){
         refreshAll();
       } else {
         AccountsModule.updateCache();
       }
 
+      // 🔥 limpa form
+      form.reset();
+
+      if(useCardEl) useCardEl.checked = false;
+      if(paymentTypeEl) paymentTypeEl.style.display = "none";
     });
   }
 
@@ -107,7 +100,6 @@ window.TransactionsModule = (function(){
       return;
     }
 
-    // 🔥 ordenar por data
     const sorted = [...window.transactions].sort((a,b)=>{
       const da = a.customDate || a.date;
       const db = b.customDate || b.date;
@@ -121,7 +113,6 @@ window.TransactionsModule = (function(){
       const date = t.customDate || t.date;
       const label = formatDateLabel(date);
 
-      // 🔹 separador de dia
       if(label !== currentLabel){
         currentLabel = label;
 
