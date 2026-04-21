@@ -45,61 +45,80 @@ window.UIModule = (function(){
 
   function renderHome(){
 
-    const balanceEl = document.getElementById("balance");
-    const inEl = document.getElementById("inTotal");
-    const outEl = document.getElementById("outTotal");
-    const accountsDiv = document.getElementById("accounts");
+  const balanceEl = document.getElementById("balance");
+  const inEl = document.getElementById("inTotal");
+  const outEl = document.getElementById("outTotal");
+  const accountsDiv = document.getElementById("accounts");
 
-    if(!balanceEl || !accountsDiv) return;
+  if(!balanceEl || !accountsDiv) return;
 
-    let total = 0;
-    let income = 0;
-    let outcome = 0;
+  let total = 0;
+  let income = 0;
+  let outcome = 0;
 
-    (window.accounts || []).forEach(a=>{
-      total += (a.initialBalance ?? a.balance ?? 0);
-    });
+  // 🔥 base das contas
+  (window.accounts || []).forEach(a=>{
+    total += (a.initialBalance ?? a.balance ?? 0);
+  });
 
-    (window.transactions || []).forEach(t=>{
-      if(t.type === "entrada"){
-        total += t.value;
-        income += t.value;
-      } else {
-        if(t.paymentType !== "credito"){
-          total -= t.value;
-        }
-        outcome += t.value;
+  // 🔥 transações
+  (window.transactions || []).forEach(t=>{
+    if(t.type === "entrada"){
+      total += t.value;
+      income += t.value;
+    } else {
+      if(t.paymentType !== "credito"){
+        total -= t.value;
       }
-    });
+      outcome += t.value;
+    }
+  });
 
-    balanceEl.innerText = hideBalance ? "R$ •••••" : money(total);
-    inEl.innerText = hideBalance ? "R$ •••••" : money(income);
-    outEl.innerText = hideBalance ? "R$ •••••" : money(outcome);
+  // 🔥 UI PRINCIPAL
+  balanceEl.innerText = hideBalance ? "R$ •••••" : money(total);
+  inEl.innerText = hideBalance ? "R$ •••••" : money(income);
+  outEl.innerText = hideBalance ? "R$ •••••" : money(outcome);
 
-    accountsDiv.innerHTML = "";
+  // 🔥 COR DINÂMICA
+  inEl.style.color = "#22c55e";
+  outEl.style.color = "#ef4444";
 
-    (window.accounts || []).forEach(a=>{
+  // 🔥 CONTAS ORDENADAS POR SALDO
+  const orderedAccounts = [...(window.accounts || [])].sort((a,b)=>{
+    const sa = (window.ACCOUNT_CACHE?.[a.name]) ?? 0;
+    const sb = (window.ACCOUNT_CACHE?.[b.name]) ?? 0;
+    return sb - sa;
+  });
 
-      const saldo = (window.ACCOUNT_CACHE?.[a.name]) ?? 0;
+  accountsDiv.innerHTML = "";
 
-      accountsDiv.innerHTML += `
-        <div class="card-bank">
+  orderedAccounts.forEach(a=>{
 
-          <div style="display:flex; flex-direction:column;">
-            <strong>${formatBankName(a.name)}</strong>
+    const saldo = (window.ACCOUNT_CACHE?.[a.name]) ?? 0;
 
-            <span style="font-size:18px; margin-top:4px;">
-              ${hideBalance ? "•••••" : money(saldo)}
-            </span>
+    const isNegative = saldo < 0;
 
-            ${renderCreditButton(a)}
+    accountsDiv.innerHTML += `
+      <div class="card-bank">
 
-          </div>
+        <div style="display:flex; flex-direction:column;">
+          <strong>${formatBankName(a.name)}</strong>
 
+          <span style="
+            font-size:18px;
+            margin-top:4px;
+            color:${isNegative ? "#ef4444" : "#fff"};
+          ">
+            ${hideBalance ? "•••••" : money(saldo)}
+          </span>
         </div>
-      `;
-    });
-  }
+
+        ${renderCreditInfo(a)}
+
+      </div>
+    `;
+  });
+}
 
   function toggleBalance(){
     hideBalance = !hideBalance;
