@@ -25,105 +25,90 @@ window.UIModule = (function(){
         target === "home" ? "Home" :
         target === "transactions" ? "Lançamentos" :
         target === "dashboard" ? "Dashboard" :
-        target === "card" ? "Cartão" :
         target === "debts" ? "Dívidas" :
+        target === "card" ? "Cartão" :
         "Orion Finance";
     }
 
     current = target;
 
-    try{
+    try {
       if(target === "home") renderHome();
       if(target === "transactions") window.TransactionsModule?.render?.();
       if(target === "debts") window.DebtsModule?.render?.();
       if(target === "dashboard") window.DashboardModule?.render?.();
       if(target === "card") window.CreditModule?.render?.();
-    }catch(e){
+    } catch(e){
       console.log("Erro ao renderizar:", e);
     }
   }
 
   function renderHome(){
 
-  const balanceEl = document.getElementById("balance");
-  const inEl = document.getElementById("inTotal");
-  const outEl = document.getElementById("outTotal");
-  const accountsDiv = document.getElementById("accounts");
+    const balanceEl = document.getElementById("balance");
+    const inEl = document.getElementById("inTotal");
+    const outEl = document.getElementById("outTotal");
+    const accountsDiv = document.getElementById("accounts");
 
-  if(!balanceEl || !accountsDiv) return;
+    if(!balanceEl || !accountsDiv) return;
 
-  let total = 0;
-  let income = 0;
-  let outcome = 0;
+    let total = 0;
+    let income = 0;
+    let outcome = 0;
 
-  // 🔥 garante segurança dos dados
-  const accs = window.accounts || [];
-  const trans = window.transactions || [];
+    (window.accounts || []).forEach(a=>{
+      total += (a.initialBalance ?? a.balance ?? 0);
+    });
 
-  // 🔥 soma base
-  accs.forEach(a=>{
-    total += (a.initialBalance ?? a.balance ?? 0);
-  });
-
-  // 🔥 soma transações
-  trans.forEach(t=>{
-    if(t.type === "entrada"){
-      total += t.value;
-      income += t.value;
-    } else {
-      if(t.paymentType !== "credito"){
-        total -= t.value;
-      }
-      outcome += t.value;
-    }
-  });
-
-  // 🔥 UI valores
-  balanceEl.innerText = hideBalance ? "R$ •••••" : money(total);
-  inEl.innerText = hideBalance ? "R$ •••••" : money(income);
-  outEl.innerText = hideBalance ? "R$ •••••" : money(outcome);
-
-  inEl.style.color = "#22c55e";
-  outEl.style.color = "#ef4444";
-
-  // 🔥 render contas (SEM DEPENDER DO CACHE)
-  accountsDiv.innerHTML = "";
-
-  accs.forEach(a=>{
-
-    // calcula saldo direto (sem cache)
-    let saldo = (a.initialBalance ?? a.balance ?? 0);
-
-    trans.forEach(t=>{
-      if(t.account !== a.name) return;
-
+    (window.transactions || []).forEach(t=>{
       if(t.type === "entrada"){
-        saldo += t.value;
+        total += t.value;
+        income += t.value;
       } else {
         if(t.paymentType !== "credito"){
-          saldo -= t.value;
+          total -= t.value;
         }
+        outcome += t.value;
       }
     });
 
-    accountsDiv.innerHTML += `
-      <div class="card-bank">
+    balanceEl.innerText = hideBalance ? "R$ •••••" : money(total);
+    if(inEl) inEl.innerText = hideBalance ? "R$ •••••" : money(income);
+    if(outEl) outEl.innerText = hideBalance ? "R$ •••••" : money(outcome);
 
-        <div style="display:flex; flex-direction:column;">
-          <strong>${formatBankName(a.name)}</strong>
+    // 🔥 PROTEÇÃO TOTAL
+    try{
 
-          <span style="font-size:18px; margin-top:4px;">
-            ${hideBalance ? "•••••" : money(saldo)}
-          </span>
-        </div>
+      accountsDiv.innerHTML = "";
 
-        ${renderCreditInfo(a)}
+      if(!window.ACCOUNT_CACHE){
+        window.ACCOUNT_CACHE = {};
+      }
 
-      </div>
-    `;
-  });
+      (window.accounts || []).forEach(a=>{
 
-}
+        const saldo = window.ACCOUNT_CACHE[a.name] ?? 0;
+
+        accountsDiv.innerHTML += `
+          <div class="card-bank">
+
+            <div style="display:flex; flex-direction:column;">
+              <strong>${formatBankName(a.name)}</strong>
+              <span style="font-size:18px; margin-top:4px;">
+                ${hideBalance ? "•••••" : money(saldo)}
+              </span>
+            </div>
+
+            ${renderCreditInfo(a)}
+
+          </div>
+        `;
+      });
+
+    }catch(e){
+      console.log("Erro contas:", e);
+    }
+  }
 
   function toggleBalance(){
     hideBalance = !hideBalance;
@@ -146,16 +131,16 @@ window.UIModule = (function(){
 
   function formatBankName(name){
     if(name === "Banco Inter") return "Inter";
-    return name;
+    return name || "Conta";
   }
 
-  function renderCreditButton(acc){
+  function renderCreditInfo(acc){
 
-    if(acc.name !== "Banco Inter") return "";
+    if(!acc || acc.name !== "Banco Inter") return "";
 
     if(!acc.card){
       return `
-        <button onclick="setLimit('Banco Inter')" style="margin-top:6px;">
+        <button onclick="setLimit('Banco Inter')" class="btn small" style="margin-top:8px;">
           Ativar crédito
         </button>
       `;
@@ -166,7 +151,7 @@ window.UIModule = (function(){
     const available = limit - used;
 
     return `
-      <div style="margin-top:6px; font-size:12px; opacity:.8;">
+      <div style="margin-top:8px; font-size:13px; opacity:.85;">
         💳 Limite: ${money(limit)} <br>
         Disponível: ${money(available)}
       </div>
@@ -174,9 +159,9 @@ window.UIModule = (function(){
   }
 
   return {
-  bind,
-  go,
-  renderHome
-};
+    bind,
+    go,
+    renderHome
+  };
 
 })();
