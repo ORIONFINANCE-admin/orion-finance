@@ -12,37 +12,80 @@ window.DebtsModule = (function(){
       return;
     }
 
-    // 🔥 ordenar por mês (faturas primeiro)
+    // 🔥 ordenar por mês (mais recente primeiro)
     const sorted = [...window.debts].sort((a,b)=>{
-      if(a.mes && b.mes) return a.mes.localeCompare(b.mes);
+      if(a.mes && b.mes) return b.mes.localeCompare(a.mes);
       return 0;
     });
 
     sorted.forEach((d, i)=>{
 
-      // 💳 FATURA
+      // =========================
+      // 💳 FATURA DE CARTÃO
+      // =========================
       if(d.isCard){
+
+        // 🔥 pega transações da fatura
+        const compras = (window.transactions || []).filter(t =>
+          t.isCredit &&
+          t.account === d.account &&
+          t.faturaMes === d.mes
+        );
+
+        const totalCompras = compras.length;
+
+        let comprasHTML = "";
+
+        compras.forEach(c => {
+
+          comprasHTML += `
+            <div style="display:flex; justify-content:space-between; font-size:13px; margin-top:6px;">
+
+              <div>
+                ${c.desc}
+              </div>
+
+              <div>
+                ${money(c.value)}
+              </div>
+
+            </div>
+          `;
+        });
 
         list.innerHTML += `
           <div class="card">
-            <strong>${d.name}</strong><br>
 
-            <span style="font-size:18px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <strong>${formatMes(d.mes)}</strong>
+              <span style="font-size:12px; opacity:.6;">
+                ${totalCompras} compra(s)
+              </span>
+            </div>
+
+            <div style="font-size:22px; margin-top:6px;">
               ${money(d.totalValor)}
-            </span>
+            </div>
 
-            <div style="margin-top:10px;">
+            <div style="margin-top:10px; border-top:1px solid #333; padding-top:10px;">
+              ${comprasHTML || "<span style='opacity:.5;'>Sem compras</span>"}
+            </div>
+
+            <div style="margin-top:12px;">
               <button onclick="DebtsModule.payDebt(${i})">
                 Pagar fatura
               </button>
             </div>
+
           </div>
         `;
 
         return;
       }
 
-      // 📄 DÍVIDA NORMAL (mantida)
+      // =========================
+      // 📄 DÍVIDA NORMAL
+      // =========================
       list.innerHTML += `
         <div class="card">
           <strong>${d.name}</strong><br>
@@ -52,7 +95,9 @@ window.DebtsModule = (function(){
     });
   }
 
+  // =========================
   // 💳 PAGAMENTO DE FATURA
+  // =========================
   function payDebt(i){
 
     const d = window.debts[i];
@@ -75,9 +120,9 @@ window.DebtsModule = (function(){
     // 🔥 reduz limite usado
     acc.used = Math.max(0, (acc.used || 0) - valor);
 
-    // 🔥 registra pagamento como saída REAL
+    // 🔥 registra pagamento REAL
     window.transactions.push({
-      desc: `Pagamento ${d.name}`,
+      desc: `Pagamento ${formatMes(d.mes)}`,
       value: valor,
       type: "saida",
       account: acc.name,
@@ -88,15 +133,15 @@ window.DebtsModule = (function(){
       customDate: null
     });
 
-    // 🔥 remove a fatura paga
+    // 🔥 remove fatura
     window.debts.splice(i, 1);
 
-    // 🔥 salvar tudo
+    // 💾 salvar
     DB.set("debts", window.debts);
     DB.set("acc", window.accounts);
     DB.set("t", window.transactions);
 
-    // 🔄 atualizar sistema
+    // 🔄 atualizar
     if(typeof refreshAll === "function"){
       refreshAll();
     } else {
@@ -113,6 +158,22 @@ window.DebtsModule = (function(){
         alert("Dívida manual será melhorada na próxima fase");
       });
     }
+  }
+
+  // =========================
+  // 📅 FORMATADOR DE MÊS
+  // =========================
+  function formatMes(mes){
+
+    if(!mes) return "Fatura";
+
+    const [ano, mesNum] = mes.split("-");
+    const nomes = [
+      "Janeiro","Fevereiro","Março","Abril","Maio","Junho",
+      "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"
+    ];
+
+    return `${nomes[Number(mesNum)-1]} ${ano}`;
   }
 
   return {
