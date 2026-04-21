@@ -240,6 +240,7 @@
   <button data-tab="transactions">💸<span>Lançar</span></button>
   <button data-tab="dashboard">📊<span>Dashboard</span></button>
   <button data-tab="debts">📄<span>Dívidas</span></button>
+  <button data-tab="card">💳<span>Cartão</span></button>
 </div>
 
 <!-- CORE -->
@@ -254,6 +255,41 @@
 <script src="js/modules/credit.js"></script>
 <script src="js/modules/dashboard.js"></script>
 <script src="js/modules/ui.js"></script>
+
+<!-- CARTÃO -->
+<section id="card" class="screen">
+
+  <div id="cardView">
+
+    <!-- RESUMO -->
+    <div class="card">
+      <strong>Cartão Inter</strong><br>
+
+      <div style="margin-top:10px;">
+        <span>Limite</span><br>
+        <strong id="cardLimit">R$ 0,00</strong>
+      </div>
+
+      <div style="margin-top:10px;">
+        <span>Disponível</span><br>
+        <strong id="cardAvailable">R$ 0,00</strong>
+      </div>
+
+      <div style="margin-top:10px;">
+        <span>Usado</span><br>
+        <strong id="cardUsed">R$ 0,00</strong>
+      </div>
+    </div>
+
+    <!-- FATURAS -->
+    <div class="card">
+      <strong>Faturas</strong>
+      <div id="cardInvoices" style="margin-top:10px;"></div>
+    </div>
+
+  </div>
+
+</section>
 
 <!-- APP -->
 <script src="js/app.js"></script>
