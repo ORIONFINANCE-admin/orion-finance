@@ -9,12 +9,12 @@ window.TransactionsModule = (function(){
       e.preventDefault();
       e.stopPropagation();
 
-      const desc = document.getElementById("desc").value;
+      const desc = document.getElementById("desc").value.trim();
       const value = Number(document.getElementById("value").value);
       const type = document.getElementById("type").value;
       const account = document.getElementById("account").value;
       const category = document.getElementById("category").value;
-      const installments = Number(document.getElementById("installments")?.value || 1);
+      const installments = Math.max(1, Number(document.getElementById("installments")?.value || 1));
 
       if(!desc || isNaN(value) || value <= 0){
         alert("Preencha os campos corretamente");
@@ -31,10 +31,20 @@ window.TransactionsModule = (function(){
         acc.name === "Banco Inter"
       );
 
-      // 🔥 CRÉDITO COM PARCELAMENTO
+      // =========================
+      // 💳 CRÉDITO COM PARCELAS
+      // =========================
       if(isCredit){
 
-        const parcelaValor = value / installments;
+        // 🔒 segurança
+        if(installments > 24){
+          alert("Máximo de 24 parcelas");
+          return;
+        }
+
+        // 💰 arredondamento correto
+        const base = Math.floor((value / installments) * 100) / 100;
+        let totalDistribuido = 0;
 
         for(let i = 0; i < installments; i++){
 
@@ -42,6 +52,14 @@ window.TransactionsModule = (function(){
           data.setMonth(data.getMonth() + i);
 
           const faturaMes = `${data.getFullYear()}-${String(data.getMonth()+1).padStart(2,"0")}`;
+
+          // 🧠 última parcela corrige diferença
+          let parcelaValor = base;
+          if(i === installments - 1){
+            parcelaValor = Number((value - totalDistribuido).toFixed(2));
+          }
+
+          totalDistribuido += parcelaValor;
 
           const parcela = {
             desc: installments > 1 ? `${desc} (${i+1}/${installments})` : desc,
@@ -58,10 +76,10 @@ window.TransactionsModule = (function(){
 
           window.transactions.push(parcela);
 
-          // 🔥 soma no limite usado
+          // 💳 limite
           acc.used = (acc.used || 0) + parcelaValor;
 
-          // 🔥 cria/atualiza fatura
+          // 📄 fatura
           let fatura = window.debts.find(d => 
             d.isCard &&
             d.account === acc.name &&
@@ -87,6 +105,9 @@ window.TransactionsModule = (function(){
 
       } else {
 
+        // =========================
+        // 💸 NORMAL
+        // =========================
         const newTransaction = {
           desc,
           value,
@@ -102,13 +123,22 @@ window.TransactionsModule = (function(){
         window.transactions.push(newTransaction);
       }
 
+      // 💾 salvar
       DB.set("t", window.transactions);
 
+      // 🔄 atualizar UI
       if(typeof refreshAll === "function"){
         refreshAll();
       }
 
+      // 🧹 limpar form corretamente
       form.reset();
+
+      const installmentsEl = document.getElementById("installments");
+      if(installmentsEl) installmentsEl.style.display = "none";
+
+      const useCardEl = document.getElementById("useCard");
+      if(useCardEl) useCardEl.checked = false;
     });
   }
 
@@ -148,6 +178,7 @@ window.TransactionsModule = (function(){
 
       li.innerHTML = `
         <div style="display:flex; justify-content:space-between;">
+
           <div>
             <strong>${t.desc}</strong><br>
             <small style="opacity:.6;">
@@ -158,6 +189,7 @@ window.TransactionsModule = (function(){
           <strong style="color:${color}">
             ${t.type === "saida" ? "-" : "+"} ${money(t.value)}
           </strong>
+
         </div>
       `;
 
