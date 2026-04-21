@@ -14,17 +14,14 @@ window.TransactionsModule = (function(){
       const type = document.getElementById("type").value;
       const account = document.getElementById("account").value;
       const category = document.getElementById("category").value;
+      const installments = Number(document.getElementById("installments")?.value || 1);
 
       if(!desc || isNaN(value) || value <= 0){
         alert("Preencha os campos corretamente");
         return;
       }
 
-      const useCardEl = document.getElementById("useCard");
-      const paymentTypeEl = document.getElementById("paymentType");
-
-      const useCard = useCardEl?.checked;
-
+      const useCard = document.getElementById("useCard")?.checked;
       const acc = (window.accounts || []).find(a => a.name === account) || null;
 
       const isCredit = (
@@ -34,57 +31,84 @@ window.TransactionsModule = (function(){
         acc.name === "Banco Inter"
       );
 
-      const newTransaction = {
-        desc,
-        value,
-        type,
-        account,
-        category,
-        paymentType: isCredit ? "credito" : null,
-        isCredit: isCredit,
-        date: Date.now(),
-        customDate: null
-      };
+      // 🔥 CRÉDITO COM PARCELAMENTO
+      if(isCredit){
 
-      // 💳 crédito
-      if(isCredit && acc){
+        const parcelaValor = value / installments;
 
-        acc.used = (acc.used || 0) + value;
+        for(let i = 0; i < installments; i++){
 
-        let fatura = window.debts.find(d => d.isCard && d.account === acc.name);
+          const data = new Date();
+          data.setMonth(data.getMonth() + i);
 
-        if(fatura){
-          fatura.totalValor += value;
-        } else {
-          window.debts.push({
-            name: "Fatura Inter",
-            valor: 0,
-            totalValor: value,
-            pago: 0,
-            isCard: true,
-            account: acc.name
-          });
+          const faturaMes = `${data.getFullYear()}-${String(data.getMonth()+1).padStart(2,"0")}`;
+
+          const parcela = {
+            desc: installments > 1 ? `${desc} (${i+1}/${installments})` : desc,
+            value: parcelaValor,
+            type,
+            account,
+            category,
+            paymentType: "credito",
+            isCredit: true,
+            date: data.getTime(),
+            customDate: data.getTime(),
+            faturaMes
+          };
+
+          window.transactions.push(parcela);
+
+          // 🔥 soma no limite usado
+          acc.used = (acc.used || 0) + parcelaValor;
+
+          // 🔥 cria/atualiza fatura
+          let fatura = window.debts.find(d => 
+            d.isCard &&
+            d.account === acc.name &&
+            d.mes === faturaMes
+          );
+
+          if(fatura){
+            fatura.totalValor += parcelaValor;
+          } else {
+            window.debts.push({
+              name: `Fatura ${faturaMes}`,
+              totalValor: parcelaValor,
+              pago: 0,
+              isCard: true,
+              account: acc.name,
+              mes: faturaMes
+            });
+          }
         }
 
         DB.set("debts", window.debts);
         DB.set("acc", window.accounts);
+
+      } else {
+
+        const newTransaction = {
+          desc,
+          value,
+          type,
+          account,
+          category,
+          paymentType: null,
+          isCredit: false,
+          date: Date.now(),
+          customDate: null
+        };
+
+        window.transactions.push(newTransaction);
       }
 
-      window.transactions.push(newTransaction);
       DB.set("t", window.transactions);
 
-      // 🔥 atualização correta
       if(typeof refreshAll === "function"){
         refreshAll();
-      } else {
-        AccountsModule.updateCache();
       }
 
-      // 🔥 limpa form
       form.reset();
-
-      if(useCardEl) useCardEl.checked = false;
-      if(paymentTypeEl) paymentTypeEl.style.display = "none";
     });
   }
 
@@ -101,17 +125,14 @@ window.TransactionsModule = (function(){
     }
 
     const sorted = [...window.transactions].sort((a,b)=>{
-      const da = a.customDate || a.date;
-      const db = b.customDate || b.date;
-      return db - da;
+      return (b.customDate || b.date) - (a.customDate || a.date);
     });
 
     let currentLabel = "";
 
     sorted.forEach(t => {
 
-      const date = t.customDate || t.date;
-      const label = formatDateLabel(date);
+      const label = formatDateLabel(t.customDate || t.date);
 
       if(label !== currentLabel){
         currentLabel = label;
@@ -127,18 +148,16 @@ window.TransactionsModule = (function(){
 
       li.innerHTML = `
         <div style="display:flex; justify-content:space-between;">
-
           <div>
             <strong>${t.desc}</strong><br>
             <small style="opacity:.6;">
-              ${t.category || "Outros"} • ${t.account || "Conta"}
+              ${t.category || "Outros"} • ${t.account}
             </small>
           </div>
 
           <strong style="color:${color}">
             ${t.type === "saida" ? "-" : "+"} ${money(t.value)}
           </strong>
-
         </div>
       `;
 
