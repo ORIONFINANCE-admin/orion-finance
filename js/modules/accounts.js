@@ -47,4 +47,29 @@ window.AccountsModule = (function(){
     updateCache
   };
 
+window.setLimit = function(bankName){
+
+  const acc = window.accounts.find(a => a.name === bankName);
+  if(!acc) return;
+
+  const value = prompt("Digite o limite do cartão:");
+
+  if(!value) return;
+
+  const limit = Number(value);
+
+  if(isNaN(limit) || limit <= 0){
+    alert("Valor inválido");
+    return;
+  }
+
+  acc.card = true;
+  acc.limit = limit;
+  acc.used = 0;
+
+  DB.set("acc", window.accounts);
+
+  refreshAll();
+};
+
 })();
