@@ -36,11 +36,22 @@ function refreshAll(){
 
   AccountsModule.updateCache();
 
-  const activeTab =
-    document.querySelector(".tabbar .active")?.dataset.tab || "home";
+  // 🔥 ATUALIZA SEM NAVEGAR
+  if(window.UIModule?.renderHome){
+    window.UIModule.renderHome();
+  }
 
-  UIModule.go(activeTab);
-}
+  if(window.TransactionsModule?.render){
+    window.TransactionsModule.render();
+  }
+
+  if(window.DebtsModule?.render){
+    window.DebtsModule.render();
+  }
+
+  if(window.DashboardModule?.render){
+    window.DashboardModule.render();
+  }
 
 // 🔥 SERVICE WORKER
 if ("serviceWorker" in navigator) {
