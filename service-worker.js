@@ -1,4 +1,4 @@
-const CACHE_NAME = "orion-v2";
+const CACHE_NAME = "orion-v3";
 
 // 🔥 pega base correta automaticamente
 const BASE = self.location.pathname.replace("/service-worker.js", "");
