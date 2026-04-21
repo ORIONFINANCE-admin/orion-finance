@@ -86,4 +86,31 @@ window.DebtsModule = (function(){
     payDebt
   };
 
+window.payCreditCard = function(accountName){
+
+  const acc = window.accounts.find(a => a.name === accountName);
+  if(!acc) return;
+
+  const fatura = window.debts.find(d => d.isCard && d.account === accountName);
+  if(!fatura) return;
+
+  const valor = fatura.totalValor;
+
+  if(valor <= 0){
+    alert("Nada para pagar");
+    return;
+  }
+
+  // 🔥 reduz limite usado
+  acc.used = Math.max(0, (acc.used || 0) - valor);
+
+  // 🔥 zera fatura
+  fatura.totalValor = 0;
+
+  DB.set("acc", window.accounts);
+  DB.set("debts", window.debts);
+
+  refreshAll();
+};
+
 })();
