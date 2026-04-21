@@ -6,13 +6,13 @@ window.AccountsModule = (function(){
       window.accounts = [
         { name: "Bradesco", initialBalance: 0, balance: 0, card: false },
         { 
-        name: "Banco Inter",
-        initialBalance: 0,
-        balance: 0,
-        card: false,
-        limit: 0,
-        used: 0
-      },
+          name: "Banco Inter",
+          initialBalance: 0,
+          balance: 0,
+          card: false,
+          limit: 0,
+          used: 0
+        },
         { name: "Mercado Pago", initialBalance: 0, balance: 0, card: true, type: "fake" },
         { name: "VR", initialBalance: 0, balance: 0, card: false }
       ];
@@ -47,6 +47,10 @@ window.AccountsModule = (function(){
     updateCache
   };
 
+})();
+
+
+// 🔥 FORA DO MÓDULO (CORRETO)
 window.setLimit = function(bankName){
 
   const acc = window.accounts.find(a => a.name === bankName);
@@ -71,5 +75,3 @@ window.setLimit = function(bankName){
 
   refreshAll();
 };
-
-})();
