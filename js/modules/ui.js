@@ -136,27 +136,29 @@ window.UIModule = (function(){
 
   function renderCreditInfo(acc){
 
-    if(!acc || acc.name !== "Banco Inter") return "";
+  if(!acc || acc.name !== "Banco Inter") return "";
 
-    if(!acc.card){
-      return `
-        <button onclick="setLimit('Banco Inter')" class="btn small" style="margin-top:8px;">
+  if(!acc.card){
+    return `
+      <div style="margin-top:10px;">
+        <button onclick="setLimit('Banco Inter')" class="btn small">
           Ativar crédito
         </button>
-      `;
-    }
-
-    const limit = acc.limit || 0;
-    const used = acc.used || 0;
-    const available = limit - used;
-
-    return `
-      <div style="margin-top:8px; font-size:13px; opacity:.85;">
-        💳 Limite: ${money(limit)} <br>
-        Disponível: ${money(available)}
       </div>
     `;
   }
+
+  const limit = acc.limit || 0;
+  const used = acc.used || 0;
+  const available = limit - used;
+
+  return `
+    <div style="margin-top:10px; font-size:13px; opacity:.8; display:flex; flex-direction:column;">
+      <span>💳 Limite: ${money(limit)}</span>
+      <span>Disponível: ${money(available)}</span>
+    </div>
+  `;
+}
 
   return {
     bind,
